@@ -1,7 +1,7 @@
 import React from "react";
 import { hot } from "react-hot-loader";
-import { PostList } from "../features/post/PostList";
-import { AddPostForm } from "../features/post/AddPostForm";
+import { PostList } from "../example/post/PostList";
+import { AddPostForm } from "../example/post/AddPostForm";
 
 export default hot(module)(function App() {
     return (
