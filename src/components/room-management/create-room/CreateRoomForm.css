@@ -1,0 +1,30 @@
+.create-room-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+    margin: 0 auto;
+    border-radius: 10px;
+}
+#classroomName, #instructorName {
+    width: 70%;
+    margin: 10px 0 10px 0;
+    padding: 5px;
+}
+
+.first-row {
+    display: flex;
+    flex-direction: row;
+}
+#startDate, #numberOfStudents {
+    margin: 10px 0 10px 0;
+    padding: 5px;
+}
+.form-section {
+    display: flex;
+    flex-direction: column ;
+    margin-right: 2em;
+}
+#weekly-class-section {
+    flex-direction: row;
+}

@@ -84,6 +84,7 @@
     "@types/electron-devtools-installer": "^2.2.0",
     "@types/react": "^16.9.44",
     "@types/react-dom": "^16.9.8",
+    "@types/react-modal": "^3.10.6",
     "@types/react-redux": "^7.1.9",
     "@types/webpack-env": "^1.15.2",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
@@ -115,6 +116,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-hot-loader": "^4.12.21",
+    "react-modal": "^3.11.2",
     "react-redux": "^7.2.1",
     "react-router-dom": "^5.2.0",
     "rxjs": "^6.6.2"
