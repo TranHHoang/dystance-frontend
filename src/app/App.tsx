@@ -1,27 +1,26 @@
 import React from "react";
 import { hot } from "react-hot-loader";
-import { SignInForm } from "../components/account-management/SignInForm";
-import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
+import { LoginForm } from "../components/account-management/login/LoginForm";
+import { BrowserRouter, Redirect, Route, Switch, HashRouter } from "react-router-dom";
 import { RegisterForm } from "../components/account-management/RegisterForm";
 
 export default hot(module)(function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Switch>
+        <Route exact path="/register" component={RegisterForm} />
         <Route
           exact
           path="/"
           render={() => (
             <React.Fragment>
-              <SignInForm />
+              <LoginForm />
               {/*<AddPostForm />*/}
               {/*<PostList />*/}
             </React.Fragment>
           )}
         />
-        <Route exact path="/register" component={RegisterForm} />
-        <Redirect to="/" />
       </Switch>
-    </BrowserRouter>
+    </HashRouter>
   );
 });
