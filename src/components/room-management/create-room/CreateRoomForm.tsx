@@ -1,73 +1,94 @@
 import React, { useState } from "react";
 import "./CreateRoomForm.css";
-import Modal from "react-modal";
+import { Field, reduxForm, InjectedFormProps } from "redux-form";
+import { Modal, Button, Input, TimePicker, DatePicker, Textarea } from "react-rainbow-components";
+import { RootState } from "../../../app/rootReducer";
+import { useSelector, useDispatch } from "react-redux";
+import { createRoom } from "./createRoomSlice";
 
-const customStyles = {
-  content: {
-    top: "20%",
-    left: "30%",
-    right: "30%",
-    bottom: "30%"
-  },
-  overlay: {
-    backgroundColor: "rgba(0,0,0,.5)"
-  }
+const initialValues = {
+  classroomName: "",
+  startDate: new Date(),
+  startTime: new Date().toLocaleTimeString("it-IT"),
+  endTime: new Date().toLocaleTimeString("it-IT"),
+  endDate: new Date(),
+  description: ""
 };
+const RoomForm = (props: any) => {
+  const { handleSubmit, reset, onSubmit } = props;
+
+  const submit = (values) => {
+    onSubmit(values);
+    reset();
+  };
+  return (
+    <form id="redux-form-id" noValidate onSubmit={handleSubmit(submit)}>
+      <Field component={Input} name="classroomName" required label="Class Name" placeholder="Enter classroom name" />
+
+      <Field component={DatePicker} name="startDate" required label="Start Date" placeholder="Choose a start date" />
+      <div className="rainbow-flex rainbow-justify_spread">
+        <Field component={TimePicker} name="startTime" required label="Start Time" placeholder="Choose a start time" />
+        <Field component={TimePicker} name="endTime" required label="End Time" placeholder="Choose an end time" />
+      </div>
+      <div className="rainbow-flex rainbow-justify_spread">
+        <Field component={DatePicker} name="endDate" required label="End Date" placeholder="Choose an end date" />
+        <Field component={Textarea} name="description" label="Description" placeholder="Add note" />
+      </div>
+    </form>
+  );
+};
+
+const Form = reduxForm({
+  form: "createRoomForm"
+})(RoomForm);
+
 export const CreateRoomForm = () => {
-  const today = new Date();
-  const date = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [classroomName, setClassroomName] = useState("");
-  const [startDate, setStartDate] = useState(date);
-  const [isWeekly, setIsWeekly] = useState(false);
-  const days = [
-    { id: 1, value: "Monday", isChecked: false },
-    { id: 2, value: "Tuesday", isChecked: false },
-    { id: 3, value: "Wednesday", isChecked: false },
-    { id: 4, value: "Thursday", isChecked: false },
-    { id: 5, value: "Friday", isChecked: false },
-    { id: 6, value: "Saturday", isChecked: false },
-    { id: 7, value: "Sunday", isChecked: false }
-  ];
-  const onClassroomNameChange = (e: React.ChangeEvent<HTMLInputElement>) => setClassroomName(e.target.value);
-  const onStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => setStartDate(e.target.value);
+  const dispatch = useDispatch();
+  const roomCreation = useSelector((state: RootState) => state.roomCreation);
+
+  const submit = (values) => {
+    if (!roomCreation.isLoading) {
+      dispatch(
+        createRoom(
+          values.classroomName,
+          values.startDate,
+          values.startTime,
+          values.endTime,
+          values.endDate,
+          values.description
+        )
+      );
+    }
+  };
 
   return (
     <div>
-      <button onClick={() => setModalIsOpen(true)}>Create Room</button>
-      <Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)} style={customStyles}>
-        <h1>Create Classroom</h1>
-        <form className="create-room-container">
-          <label htmlFor="classroomName">Classroom Name: </label>
-          <input
-            type="text"
-            id="classroomName"
-            value={classroomName}
-            onChange={onClassroomNameChange}
-            required={true}
-          />
-          <div className="first-row">
-            <div className="form-section">
-              <label htmlFor="instructorName">Start Date: </label>
-              <input type="date" id="startDate" value={startDate} onChange={onStartDateChange} />
-            </div>
-          </div>
-          <div className="form-section" id="weekly-class-section">
-            <label htmlFor="isWeekly">Weekly Class: </label>
-            <input
-              type="checkbox"
-              id="isWeekly"
-              name="Weekly"
-              checked={isWeekly}
-              onChange={() => setIsWeekly(!isWeekly)}
+      <Button
+        label="Create Room"
+        onClick={() => setModalIsOpen(true)}
+        variant="brand"
+        className="rainbow-m-around_medium"
+      />
+      {roomCreation.error && <div>{roomCreation.error.message}</div>}
+      <Modal
+        title="Create Classroom"
+        isOpen={modalIsOpen}
+        onRequestClose={() => setModalIsOpen(false)}
+        footer={
+          <div className="rainbow-flex rainbow-justify_end">
+            <Button
+              form="redux-form-id"
+              className="rainbow-m-right_large"
+              label="Cancel"
+              variant="neutral"
+              onClick={() => setModalIsOpen(false)}
             />
+            <Button form="redux-form-id" label="Save" variant="brand" type="submit" disabled={roomCreation.isLoading} />
           </div>
-          <textarea name="description" placeholder="Add class description..." />
-          <div>
-            <button onClick={() => setModalIsOpen(false)}>Cancel</button>
-            <button>Create</button>
-          </div>
-        </form>
+        }
+      >
+        <Form onSubmit={submit} initialValues={initialValues} />
       </Modal>
     </div>
   );
