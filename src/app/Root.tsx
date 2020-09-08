@@ -14,7 +14,7 @@ const theme = {
   }
 };
 const Container = styled.div`
-  background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
+  background-color: ${theme.rainbow.palette.mainBackground};
   height: 100%;
 `;
 ReactDOM.render(

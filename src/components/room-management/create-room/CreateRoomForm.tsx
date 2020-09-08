@@ -1,9 +1,18 @@
 import React, { useState } from "react";
-import { Field, reduxForm, InjectedFormProps } from "redux-form";
-import { Application, Modal, Button, Input, TimePicker, DatePicker, Textarea } from "react-rainbow-components";
+import { Field, reduxForm, InjectedFormProps, formValues } from "redux-form";
+import { Modal, Button, Input, TimePicker, DatePicker, Textarea } from "react-rainbow-components";
 import { RootState } from "../../../app/rootReducer";
 import { useSelector, useDispatch } from "react-redux";
 import { createRoom } from "./createRoomSlice";
+
+interface CreateRoomForm {
+  classroomName: string;
+  startDate: Date;
+  startTime: string;
+  endTime: string;
+  endDate: Date;
+  description: string;
+}
 
 const initialValues = {
   classroomName: "",
@@ -14,9 +23,15 @@ const initialValues = {
   description: ""
 };
 
-function validate(values: any) {
+function validate(values: CreateRoomForm) {
   const { classroomName, startDate, startTime, endTime, endDate } = values;
-  const errors = {};
+  const errors = {
+    classroomName: "",
+    startDate: "",
+    startTime: "",
+    endTime: "",
+    endDate: ""
+  };
   if (!classroomName) {
     errors.classroomName = "Classroom Name is a required field";
   }
@@ -32,13 +47,26 @@ function validate(values: any) {
   if (!endDate) {
     errors.endDate = "End Date is a required field";
   }
+
+  if (startDate && endDate) {
+    const startDateTime = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const endDateTime = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+
+    if (endDateTime.getTime() < startDateTime.getTime()) {
+      errors.endDate = "End Date must be after Start Date";
+    }
+    if (endDateTime.getTime() === startDateTime.getTime() && startTime >= endTime) {
+      errors.endTime = "End Time must be after Start Time";
+    }
+  }
+
   return errors;
 }
 
 const RoomForm = (props: any) => {
   const { handleSubmit, reset, onSubmit } = props;
 
-  const submit = (values) => {
+  const submit = (values: CreateRoomForm) => {
     onSubmit(values);
     reset();
   };
@@ -46,13 +74,27 @@ const RoomForm = (props: any) => {
     <form id="redux-form-id" noValidate onSubmit={handleSubmit(submit)}>
       <Field component={Input} name="classroomName" required label="Class Name" placeholder="Enter classroom name" />
 
-      <Field component={DatePicker} name="startDate" required label="Start Date" placeholder="Choose a start date" />
+      <Field
+        component={DatePicker}
+        name="startDate"
+        locale="en-GB"
+        required
+        label="Start Date"
+        placeholder="Choose a start date"
+      />
       <div className="rainbow-flex rainbow-justify_spread">
         <Field component={TimePicker} name="startTime" required label="Start Time" placeholder="Choose a start time" />
         <Field component={TimePicker} name="endTime" required label="End Time" placeholder="Choose an end time" />
       </div>
       <div className="rainbow-flex rainbow-justify_spread">
-        <Field component={DatePicker} name="endDate" required label="End Date" placeholder="Choose an end date" />
+        <Field
+          component={DatePicker}
+          name="endDate"
+          locale="en-GB"
+          required
+          label="End Date"
+          placeholder="Choose an end date"
+        />
       </div>
       <Field component={Textarea} name="description" label="Description" placeholder="Add note" />
     </form>
@@ -69,7 +111,7 @@ export const CreateRoomForm = () => {
   const dispatch = useDispatch();
   const roomCreation = useSelector((state: RootState) => state.roomCreation);
 
-  const submit = (values) => {
+  const submit = (values: CreateRoomForm) => {
     if (!roomCreation.isLoading) {
       dispatch(
         createRoom(
