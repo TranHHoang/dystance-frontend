@@ -4,7 +4,7 @@ import App from "./App";
 import { Provider } from "react-redux";
 import { Application } from "react-rainbow-components";
 import store from "./store";
-
+import styled from "styled-components";
 const theme = {
   rainbow: {
     palette: {
@@ -13,10 +13,16 @@ const theme = {
     }
   }
 };
+const Container = styled.div`
+  background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
+  height: 100%;
+`;
 ReactDOM.render(
   <Provider store={store}>
     <Application theme={theme}>
-      <App />
+      <Container>
+        <App />
+      </Container>
     </Application>
   </Provider>,
   document.getElementById("root")
