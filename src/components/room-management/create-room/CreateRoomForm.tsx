@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import "./CreateRoomForm.css";
 import { Field, reduxForm, InjectedFormProps } from "redux-form";
-import { Modal, Button, Input, TimePicker, DatePicker, Textarea } from "react-rainbow-components";
+import { Application, Modal, Button, Input, TimePicker, DatePicker, Textarea } from "react-rainbow-components";
 import { RootState } from "../../../app/rootReducer";
 import { useSelector, useDispatch } from "react-redux";
 import { createRoom } from "./createRoomSlice";
@@ -14,6 +13,28 @@ const initialValues = {
   endDate: new Date(),
   description: ""
 };
+
+function validate(values: any) {
+  const { classroomName, startDate, startTime, endTime, endDate } = values;
+  const errors = {};
+  if (!classroomName) {
+    errors.classroomName = "Classroom Name is a required field";
+  }
+  if (!startDate) {
+    errors.startDate = "Start Date is a required field";
+  }
+  if (!startTime) {
+    errors.startTime = "Start Time is a required field";
+  }
+  if (!endTime) {
+    errors.endTime = "End Time is a required field";
+  }
+  if (!endDate) {
+    errors.endDate = "End Date is a required field";
+  }
+  return errors;
+}
+
 const RoomForm = (props: any) => {
   const { handleSubmit, reset, onSubmit } = props;
 
@@ -32,14 +53,15 @@ const RoomForm = (props: any) => {
       </div>
       <div className="rainbow-flex rainbow-justify_spread">
         <Field component={DatePicker} name="endDate" required label="End Date" placeholder="Choose an end date" />
-        <Field component={Textarea} name="description" label="Description" placeholder="Add note" />
       </div>
+      <Field component={Textarea} name="description" label="Description" placeholder="Add note" />
     </form>
   );
 };
 
 const Form = reduxForm({
-  form: "createRoomForm"
+  form: "createRoomForm",
+  validate
 })(RoomForm);
 
 export const CreateRoomForm = () => {
