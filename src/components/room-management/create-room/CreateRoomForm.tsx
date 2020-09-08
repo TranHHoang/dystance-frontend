@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Field, reduxForm, InjectedFormProps, formValues } from "redux-form";
 import { Modal, Button, Input, TimePicker, DatePicker, Textarea } from "react-rainbow-components";
 import { RootState } from "../../../app/rootReducer";
 import { useSelector, useDispatch } from "react-redux";
-import { createRoom } from "./createRoomSlice";
+import { createRoom, createRoomCleanup } from "./createRoomSlice";
 
 interface CreateRoomForm {
   classroomName: string;
@@ -110,6 +110,17 @@ export const CreateRoomForm = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const dispatch = useDispatch();
   const roomCreation = useSelector((state: RootState) => state.roomCreation);
+
+  useEffect(() => {
+    // a?.b.c --> null if a null
+    // a.b.c --> exception if a null
+    // 3 status: undefined = chua gui request, null = khong loi, error ... = co loi
+    if (roomCreation?.error === null) {
+      //
+      setModalIsOpen(false);
+    }
+    dispatch(createRoomCleanup());
+  }, [roomCreation.error]);
 
   const submit = (values: CreateRoomForm) => {
     if (!roomCreation.isLoading) {

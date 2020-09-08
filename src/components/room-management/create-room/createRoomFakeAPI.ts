@@ -16,6 +16,9 @@ mock.onPost("/api/rooms/create").reply((config) => {
   const description = params.get("description");
 
   if (classroomName === "SWD") {
+    return [200, { message: "Success" }];
+  }
+  if (classroomName === "ACC") {
     return [500, { message: "Server error!!!!!!!!!!!!!!!" }];
   }
 });

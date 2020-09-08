@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError, AxiosResponse } from "axios";
-import AppThunk from "../../../app/store";
+import { AppThunk } from "../../../app/store";
 import Axios from "./createRoomFakeAPI";
 
 interface ErrorResponse {
@@ -10,7 +10,7 @@ interface ErrorResponse {
 
 interface CreateRoomState {
   isLoading: boolean;
-  error?: ErrorResponse;
+  error?: ErrorResponse | null;
 }
 
 const initialState: CreateRoomState = {
@@ -28,16 +28,20 @@ const createRoomSlice = createSlice({
     createRoomSuccess(state) {
       // Call when async response is ok
       state.isLoading = false;
+      state.error = null;
     },
     createRoomFailed(state, action: PayloadAction<ErrorResponse>) {
       state.isLoading = false;
       state.error = action.payload;
+    },
+    createRoomCleanup(state) {
+      state.error = undefined;
     }
   }
 });
 
 export default createRoomSlice.reducer;
-export const { roomCreateStart, createRoomSuccess, createRoomFailed } = createRoomSlice.actions;
+export const { roomCreateStart, createRoomSuccess, createRoomFailed, createRoomCleanup } = createRoomSlice.actions;
 
 function formatDate(date: Date): string {
   function pad(n: number) {
