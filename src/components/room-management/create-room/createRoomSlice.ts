@@ -10,38 +10,45 @@ interface ErrorResponse {
 
 interface CreateRoomState {
   isLoading: boolean;
-  error?: ErrorResponse | null;
+  isModalOpen: boolean;
+  isCreationSuccess: boolean;
+  error?: ErrorResponse;
 }
 
 const initialState: CreateRoomState = {
   // Use to update react component
-  isLoading: false
+  isLoading: false,
+  isModalOpen: false,
+  isCreationSuccess: false
 };
 
 const createRoomSlice = createSlice({
   name: "createRoom",
   initialState,
   reducers: {
+    setRoomCreateModalOpen(state, action: PayloadAction<boolean>) {
+      state.isModalOpen = action.payload;
+      state.isCreationSuccess = false;
+      state.error = undefined;
+    },
     roomCreateStart(state) {
       state.isLoading = true;
     },
     createRoomSuccess(state) {
       // Call when async response is ok
       state.isLoading = false;
-      state.error = null;
+      state.isCreationSuccess = true;
+      state.error = undefined;
     },
     createRoomFailed(state, action: PayloadAction<ErrorResponse>) {
       state.isLoading = false;
       state.error = action.payload;
-    },
-    createRoomCleanup(state) {
-      state.error = undefined;
     }
   }
 });
 
 export default createRoomSlice.reducer;
-export const { roomCreateStart, createRoomSuccess, createRoomFailed, createRoomCleanup } = createRoomSlice.actions;
+export const { roomCreateStart, createRoomSuccess, createRoomFailed, setRoomCreateModalOpen } = createRoomSlice.actions;
 
 function formatDate(date: Date): string {
   function pad(n: number) {

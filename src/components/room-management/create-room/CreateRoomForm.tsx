@@ -1,9 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { Field, reduxForm, InjectedFormProps, formValues } from "redux-form";
-import { Modal, Button, Input, TimePicker, DatePicker, Textarea } from "react-rainbow-components";
+import React from "react";
+import { Field, reduxForm } from "redux-form";
+import { Modal, Button, Input, TimePicker, DatePicker, Textarea, Notification } from "react-rainbow-components";
 import { RootState } from "../../../app/rootReducer";
 import { useSelector, useDispatch } from "react-redux";
-import { createRoom, createRoomCleanup } from "./createRoomSlice";
+import { createRoom, setRoomCreateModalOpen } from "./createRoomSlice";
+import styled from "styled-components";
+
+const StyledNotification = styled(Notification)`
+  width: 100%;
+`;
 
 interface CreateRoomForm {
   classroomName: string;
@@ -107,20 +112,8 @@ const Form = reduxForm({
 })(RoomForm);
 
 export const CreateRoomForm = () => {
-  const [modalIsOpen, setModalIsOpen] = useState(false);
   const dispatch = useDispatch();
   const roomCreation = useSelector((state: RootState) => state.roomCreation);
-
-  useEffect(() => {
-    // a?.b.c --> null if a null
-    // a.b.c --> exception if a null
-    // 3 status: undefined = chua gui request, null = khong loi, error ... = co loi
-    if (roomCreation?.error === null) {
-      //
-      setModalIsOpen(false);
-    }
-    dispatch(createRoomCleanup());
-  }, [roomCreation.error]);
 
   const submit = (values: CreateRoomForm) => {
     if (!roomCreation.isLoading) {
@@ -136,20 +129,24 @@ export const CreateRoomForm = () => {
       );
     }
   };
+  if (roomCreation.isCreationSuccess) {
+    setTimeout(() => {
+      dispatch(setRoomCreateModalOpen(false));
+    }, 2000);
+  }
 
   return (
     <div>
       <Button
         label="Create Room"
-        onClick={() => setModalIsOpen(true)}
+        onClick={() => dispatch(setRoomCreateModalOpen(true))}
         variant="brand"
         className="rainbow-m-around_medium"
       />
-      {roomCreation.error && <div>{roomCreation.error.message}</div>}
       <Modal
         title="Create Classroom"
-        isOpen={modalIsOpen}
-        onRequestClose={() => setModalIsOpen(false)}
+        isOpen={roomCreation.isModalOpen}
+        hideCloseButton={true}
         footer={
           <div className="rainbow-flex rainbow-justify_end">
             <Button
@@ -157,12 +154,35 @@ export const CreateRoomForm = () => {
               className="rainbow-m-right_large"
               label="Cancel"
               variant="neutral"
-              onClick={() => setModalIsOpen(false)}
+              onClick={() => dispatch(setRoomCreateModalOpen(false))}
+              disabled={roomCreation.isLoading || roomCreation.isCreationSuccess}
             />
-            <Button form="redux-form-id" label="Save" variant="brand" type="submit" disabled={roomCreation.isLoading} />
+            <Button
+              form="redux-form-id"
+              label="Save"
+              variant="brand"
+              type="submit"
+              disabled={roomCreation.isLoading || roomCreation.isCreationSuccess}
+            />
           </div>
         }
       >
+        {roomCreation.error && (
+          <StyledNotification
+            title="An Error Occured"
+            hideCloseButton={true}
+            description={roomCreation.error.message}
+            icon="error"
+          />
+        )}
+        {roomCreation.isCreationSuccess && (
+          <StyledNotification
+            title="Classroom Created Successfully"
+            hideCloseButton={true}
+            description="You will be redirected to the homepage shortly"
+            icon="success"
+          />
+        )}
         <Form onSubmit={submit} initialValues={initialValues} />
       </Modal>
     </div>
