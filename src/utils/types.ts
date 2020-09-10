@@ -1,6 +1,7 @@
-interface UserLoginData {
+export interface UserLoginData {
   id: string;
   userName: string;
-  token: string;
+  accessToken: string;
   refreshToken: string;
+  expires?: string;
 }

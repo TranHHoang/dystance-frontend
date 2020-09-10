@@ -1,6 +1,6 @@
-import Axios from "axios";
+import Axios from "$utils/axiosIntercept";
 import MockAdapter from "axios-mock-adapter";
-import { hostName } from "./hostUtils";
+import { hostName } from "$utils/hostUtils";
 
 const mock = new MockAdapter(Axios, { delayResponse: 1000 });
 
@@ -19,8 +19,8 @@ mock.onPost(`${hostName}/api/users/login`).reply((config) => {
       200,
       {
         id: "5f4ef22a-7295-42d2-b311-7d31bfff4060",
-        username: "hoang",
-        jwtToken:
+        userName: "hoang",
+        accessToken:
           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjVmNGVmMjJhLTcyOTUtNDJkMi1iMzExLTdkMzFiZmZmNDA2MCIsIm5iZiI6MTU5OTI5NTIxNSwiZXhwIjoxNTk5MzgxNjE0LCJpYXQiOjE1OTkyOTUyMTV9.NMmJPtBF3LbgW4vqtWpKcaWYppQRDb1iDnwOGLptb5M",
         refreshToken: "SJPrgD9dXDutLrpNQEHbu3SoUDIMW8xQ7Qn1SbgJYPAT7KZbMzCpqOJvM8JZ2DNBfq7EuklhXlB995eKXdllvQ==",
         expires: 86400
@@ -61,6 +61,16 @@ mock.onPost(`${hostName}/api/users/login`).reply((config) => {
   } else {
     mock.restore();
   }
+});
+
+mock.onPost(`${hostName}/api/users/google`).reply(404);
+mock.onPost(`${hostName}/api/users/google/updateInfo`).reply(200, {
+  id: "5f4ef22a-7295-42d2-b311-7d31bfff4060",
+  userName: "hoang",
+  jwtToken:
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjVmNGVmMjJhLTcyOTUtNDJkMi1iMzExLTdkMzFiZmZmNDA2MCIsIm5iZiI6MTU5OTI5NTIxNSwiZXhwIjoxNTk5MzgxNjE0LCJpYXQiOjE1OTkyOTUyMTV9.NMmJPtBF3LbgW4vqtWpKcaWYppQRDb1iDnwOGLptb5M",
+  refreshToken: "SJPrgD9dXDutLrpNQEHbu3SoUDIMW8xQ7Qn1SbgJYPAT7KZbMzCpqOJvM8JZ2DNBfq7EuklhXlB995eKXdllvQ==",
+  expires: 86400
 });
 
 export default Axios;

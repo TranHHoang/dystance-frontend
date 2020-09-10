@@ -2,6 +2,7 @@ import Axios from "axios";
 import keytar from "keytar";
 import { getLoginData, saveLoginData } from "./tokenStorage";
 import { hostName } from "$utils/hostUtils";
+import { UserLoginData } from "$utils/types";
 
 const userName = "userName";
 
@@ -14,8 +15,7 @@ Axios.interceptors.request.use(
     if (!isPublicRoute) {
       // only need token for api access
       const loginData = await getLoginData();
-
-      config.headers["Authorization"] = `Bearer ${loginData.token}`;
+      config.headers["Authorization"] = `Bearer ${loginData.accessToken}`;
     }
 
     return config;
@@ -26,7 +26,7 @@ Axios.interceptors.request.use(
 Axios.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response.status !== 401 || error.config._retry) {
+    if (error.response?.status !== 401 || error.config._retry) {
       return Promise.reject(error);
     }
 
@@ -36,19 +36,23 @@ Axios.interceptors.response.use(
 
     try {
       const form = new FormData();
-      form.append("accessToken", userInfo.token);
+      form.append("accessToken", userInfo.accessToken);
       form.append("refreshToken", userInfo.refreshToken);
 
-      const response = (await Axios.post(`${hostName}/api/user?action=refreshToken`, form, {
+      console.log("Expired token, need refreshing...");
+
+      const response: UserLoginData = await Axios.post(`${hostName}/api/users/refreshToken`, form, {
         headers: { "Content-Type": "multipart/form-data" }
-      })) as { id: string; username: string; accessToken: string; refreshToken: string; expires: number };
+      });
 
       await saveLoginData(userName, {
         id: response.id,
-        userName: response.username,
-        token: response.accessToken,
+        userName: response.userName,
+        accessToken: response.accessToken,
         refreshToken: response.refreshToken
       });
+
+      console.log("Refreshed fisnish. Resend request...");
 
       // Resend request
       error.response.configs.headers["Authorization"] = `Bearer ${response.accessToken}`;

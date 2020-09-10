@@ -1,34 +1,34 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AxiosResponse } from "axios";
+import { AxiosResponse, AxiosError } from "axios";
 import { hostName } from "$utils/hostUtils";
+import { UserLoginData } from "$utils/types";
 import { AppThunk } from "$app/store";
 import { createHashHistory } from "history";
-import Axios from "$utils/fakeApi";
+import Axios from "./loginApi.stub";
 import { saveLoginData } from "$utils/tokenStorage";
 
-interface ErrorResponse {
+export enum LoginError {
+  NameEmailPasswordIncorrect,
+  EmailIsNotConfirmed,
+  Other
+}
+
+export interface ErrorResponse {
   type: number;
   message: string;
 }
 
-interface OkResponse {
-  id: string;
-  userName: string;
-  token: string;
-  refreshToken: string;
-  expire: number;
+export type OkResponse = UserLoginData;
+
+interface LoginFormState {
   isLoading: boolean;
-  error: ErrorResponse | null;
+  error?: ErrorResponse;
+  resendEmailLoading?: boolean;
+  resendEmailError?: string;
 }
 
-const initialState: OkResponse = {
-  id: "",
-  userName: "",
-  token: "",
-  refreshToken: "",
-  expire: 0,
-  isLoading: false,
-  error: null
+const initialState: LoginFormState = {
+  isLoading: false
 };
 
 const loginSlice = createSlice({
@@ -38,19 +38,35 @@ const loginSlice = createSlice({
     loginStart(state) {
       state.isLoading = true;
     },
-    loginSuccess(state, action: PayloadAction<OkResponse>) {
+    loginSuccess(state) {
       state.isLoading = false;
-      state = action.payload;
     },
     loginFailed(state, action: PayloadAction<ErrorResponse>) {
       state.isLoading = false;
       state.error = action.payload;
+    },
+    resendEmailStart(state) {
+      state.resendEmailLoading = true;
+    },
+    resendEmailSuccess(state) {
+      state.resendEmailLoading = false;
+    },
+    resendEmailError(state, action: PayloadAction<string>) {
+      state.resendEmailLoading = false;
+      state.resendEmailError = action.payload;
     }
   }
 });
 
 export default loginSlice.reducer;
-export const { loginStart, loginSuccess, loginFailed } = loginSlice.actions;
+export const {
+  loginStart,
+  loginSuccess,
+  loginFailed,
+  resendEmailStart,
+  resendEmailSuccess,
+  resendEmailError
+} = loginSlice.actions;
 
 function postForm(url: string, form: FormData): Promise<AxiosResponse<any>> {
   return Axios.post(url, form, {
@@ -58,14 +74,15 @@ function postForm(url: string, form: FormData): Promise<AxiosResponse<any>> {
   });
 }
 
-export function startLogin(
-  email: string | null,
-  userName: string | null,
-  password: string,
-  googleTokenId: string | null
-): AppThunk {
+function getAxiosError(e: AxiosError) {
+  return loginFailed(
+    e.response?.data ? (e.response.data as ErrorResponse) : { type: LoginError.Other, message: "Something went wrong" }
+  );
+}
+
+export function startLogin(email?: string, userName?: string, password?: string, googleTokenId?: string): AppThunk {
   return async (dispatch) => {
-    let response: AxiosResponse<OkResponse | ErrorResponse | any>;
+    let response: AxiosResponse<OkResponse | ErrorResponse>;
     dispatch(loginStart());
 
     try {
@@ -79,38 +96,50 @@ export function startLogin(
         // normal login
         const form = new FormData();
         userName && form.append("userName", userName);
-        form.append("password", password);
         email && form.append("email", email);
+        password && form.append("password", password);
 
         response = await postForm(`${hostName}/api/users/login`, form);
       }
 
-      if (response.status === 200) {
-        const data = response.data as OkResponse;
+      const data = response.data as OkResponse;
+      dispatch(loginSuccess());
 
-        dispatch(loginSuccess(data));
-        await saveLoginData(data.userName, {
-          id: data.id,
-          userName: data.userName,
-          token: data.token,
-          refreshToken: data.refreshToken
-        });
+      await saveLoginData(data.userName, {
+        id: data.id,
+        userName: data.userName,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken
+      });
 
-        createHashHistory().push("/register"); // TODO: homepage
+      createHashHistory().push("/");
+    } catch (ex) {
+      const e = ex as AxiosError;
+      // Google login first time
+      if (googleTokenId && e.response?.status === 404) {
+        dispatch(loginSuccess());
+        createHashHistory().push("/googleUpdateInfo");
+      } else {
+        dispatch(getAxiosError(ex as AxiosError));
       }
-    } catch (e) {
-      console.log(e.response);
-      dispatch(loginFailed(e.response.data as ErrorResponse));
     }
   };
 }
 
-export function resendEmail(userName: string | null, email: string | null): AppThunk {
+export function resendEmail(userName?: string, email?: string): AppThunk {
   return async (dispatch) => {
+    dispatch(resendEmailStart());
+
     try {
-      const response = await Axios.get(`${hostName}/api/users/resendEmail?email=${email}`);
-      if (response.status === 200) {
-      }
-    } catch (e) {}
+      const form = new FormData();
+      userName && form.append("userName", userName);
+      email && form.append("email", email);
+
+      await postForm(`${hostName}/api/users/resendEmail`, form);
+
+      dispatch(resendEmailSuccess());
+    } catch (ex) {
+      dispatch(resendEmailError((ex as AxiosError).message));
+    }
   };
 }
