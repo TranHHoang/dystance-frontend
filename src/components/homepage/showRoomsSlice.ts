@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError, AxiosResponse } from "axios";
 import { AppThunk } from "../../app//store";
 import { getFormInitialValues } from "redux-form";
-import Axios from "./HomepageFakeAPI";
+import Axios from "../../utils/fakeAPI";
 
 enum ShowRoomError {
   OtherError = 2
