@@ -11,7 +11,8 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint . --ext .js,.ts,.tsx --quiet --fix",
-    "test": "jest"
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch --runInBand"
   },
   "keywords": [],
   "author": {
@@ -74,6 +75,17 @@
       "eslint --fix"
     ]
   },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "<rootDir>configs/setupTests.ts"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/configs/fileMock.js"
+    }
+  },
   "devDependencies": {
     "@electron-forge/cli": "6.0.0-beta.52",
     "@electron-forge/maker-deb": "6.0.0-beta.52",
@@ -82,7 +94,10 @@
     "@electron-forge/maker-zip": "6.0.0-beta.52",
     "@electron-forge/plugin-webpack": "6.0.0-beta.52",
     "@marshallofsound/webpack-asset-relocator-loader": "^0.5.0",
+    "@testing-library/react": "^11.0.2",
     "@types/electron-devtools-installer": "^2.2.0",
+    "@types/enzyme-adapter-react-16": "^1.0.6",
+    "@types/jest": "^26.0.13",
     "@types/react": "^16.9.44",
     "@types/react-dom": "^16.9.8",
     "@types/react-modal": "^3.10.6",
@@ -94,6 +109,9 @@
     "css-loader": "^3.0.0",
     "electron": "9.1.2",
     "electron-devtools-installer": "^3.1.1",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.4",
+    "enzyme-to-json": "^3.5.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-import": "^2.20.0",
@@ -108,6 +126,7 @@
     "node-loader": "^0.6.0",
     "prettier": "^2.0.5",
     "style-loader": "^0.23.1",
+    "ts-jest": "^26.3.0",
     "ts-loader": "^6.2.1",
     "typescript": "^3.9.7",
     "webpack": "^4.44.1",
