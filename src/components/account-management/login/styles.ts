@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Input, Button, Card, Notification } from "react-rainbow-components";
+import { Input, Button, Card, Notification, DatePicker } from "react-rainbow-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form } from "formik";
 
@@ -32,7 +32,8 @@ export const Title = styled.h1`
   font-size: 30px;
   text-align: center;
   font-weight: 500;
-  color: ${(props) => props.theme.rainbow.palette.text.label};
+  color: ${(props) => props.theme.rainbow.palette.brand.main};
+  padding-bottom: 10px;
 `;
 export const Register = styled.p`
   font-family: "Lato";
@@ -98,4 +99,13 @@ export const ResendButton = styled(Button)`
   font-size: 20px;
   width: 100%;
   padding: 0;
+`;
+export const StyledDatePicker = styled(DatePicker)`
+  label {
+    font-size: 20px;
+  }
+  input,
+  input:focus {
+    padding: 25px 1rem 25px 2.35rem;
+  }
 `;

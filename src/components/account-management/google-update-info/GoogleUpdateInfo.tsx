@@ -3,11 +3,23 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
 import { Field, reduxForm, FormErrors } from "redux-form";
 import { startGoogleUpdateInfo } from "./googleUpdateInfoSlice";
-
+import { faUser, faLock, faEnvelope, faCalendar } from "@fortawesome/free-solid-svg-icons";
+import {
+  ButtonContainer,
+  Container,
+  StyledButton,
+  StyledCard,
+  StyledDatePicker,
+  StyledForm,
+  StyledInput,
+  StyledNotification,
+  Title
+} from "../login/styles";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 interface GoogleUpdateInfoForm {
   userName: string;
   realName: string;
-  dob: string;
+  dob: Date;
 }
 
 function validate(values: GoogleUpdateInfoForm): FormErrors<GoogleUpdateInfoForm, string> {
@@ -31,17 +43,6 @@ function validate(values: GoogleUpdateInfoForm): FormErrors<GoogleUpdateInfoForm
 
   return errors;
 }
-
-const requiredField = ({ input, label, type, meta: { touched, error } }: any) => (
-  <div>
-    <label>{label}</label>
-    <div>
-      <input {...input} placeholder={label} type={type} />
-      {touched && error && <span>{error}</span>}
-    </div>
-  </div>
-);
-
 const GoogleUpdateInfoForm = reduxForm({
   form: "google-update-info-form",
   validate
@@ -55,30 +56,48 @@ const GoogleUpdateInfoForm = reduxForm({
   }
 
   return (
-    <div>
-      <h1>Update User Info</h1>
+    <Container>
+      <Title>Update User Info</Title>
+      <StyledCard>
+        {updateInfoState.error && (
+          <StyledNotification title={updateInfoState.error.message} hideCloseButton={true} icon="error" />
+        )}
 
-      {updateInfoState.error && <div color="red">{updateInfoState.error && updateInfoState.error.message}</div>}
-
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <label htmlFor="userName">User name:</label>
-        <Field name="userName" component={requiredField} type="text" required />
-
-        <br />
-
-        <label htmlFor="realName">Real name:</label>
-        <Field name="realName" component={requiredField} type="text" required />
-
-        <label htmlFor="dob">Date of birth:</label>
-        <Field name="dob" component={requiredField} type="date" required />
-
-        <br />
-
-        <button type="submit" disabled={updateInfoState.isLoading}>
-          Update
-        </button>
-      </form>
-    </div>
+        <StyledForm onSubmit={handleSubmit(onSubmit)}>
+          <Field
+            name="userName"
+            component={StyledInput}
+            icon={<FontAwesomeIcon icon={faUser} />}
+            type="text"
+            label="Username"
+            placeholder="Enter your username"
+            required
+          />
+          <Field
+            name="realName"
+            component={StyledInput}
+            icon={<FontAwesomeIcon icon={faUser} />}
+            type="text"
+            label="Real Name"
+            placeholder="Enter your real name"
+            required
+          />
+          <Field
+            name="dob"
+            component={StyledDatePicker}
+            label="Date Of Birth"
+            locale="en-GB"
+            placeholder="Enter your date of birth"
+            required
+          />
+          <ButtonContainer>
+            <StyledButton variant="brand" type="submit" disabled={updateInfoState.isLoading}>
+              Update
+            </StyledButton>
+          </ButtonContainer>
+        </StyledForm>
+      </StyledCard>
+    </Container>
   );
 });
 

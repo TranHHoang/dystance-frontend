@@ -48,8 +48,14 @@ function getAxiosError(e: AxiosError) {
       : { type: GoogleUpdateInfoError.Other, message: "Something went wrong" }
   );
 }
+function formatDate(date: Date): string {
+  function pad(n: number) {
+    return n < 10 ? "0" + n : n;
+  }
 
-export function startGoogleUpdateInfo(userName: string, realName: string, dob: string): AppThunk {
+  return [date.getFullYear(), pad(date.getMonth() + 1), pad(date.getDate())].join("-");
+}
+export function startGoogleUpdateInfo(userName: string, realName: string, dob: Date): AppThunk {
   return async (dispatch) => {
     dispatch(updateInfoStart());
 
@@ -57,7 +63,7 @@ export function startGoogleUpdateInfo(userName: string, realName: string, dob: s
     form.append("email", window.localStorage.getItem(LoginLocalStorageKey.GoogleEmail));
     form.append("userName", userName);
     form.append("realName", realName);
-    form.append("dob", dob);
+    form.append("dob", formatDate(dob));
 
     try {
       const response = await Axios.post(`${hostName}/api/users/google/updateInfo`, form, {
