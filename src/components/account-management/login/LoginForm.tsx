@@ -1,11 +1,27 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import GoogleLogin, { GoogleLoginResponse } from "react-google-login";
 import config from "./googleConfigs.json";
 import { useDispatch, useSelector } from "react-redux";
 import { startLogin, LoginError, resendEmail } from "./loginSlice";
 import { RootState } from "$app/rootReducer";
 import { Field, reduxForm, FormErrors } from "redux-form";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
+import { faGoogle } from "@fortawesome/free-brands-svg-icons";
+import {
+  ButtonContainer,
+  Container,
+  Register,
+  ResendButton,
+  StyledButton,
+  StyledCard,
+  StyledForm,
+  StyledGoogleIcon,
+  StyledInput,
+  StyledLink,
+  StyledNotification,
+  Title
+} from "./styles";
 
 interface LoginForm {
   emailOrUserName: string;
@@ -88,13 +104,18 @@ const LoginForm = reduxForm({
   if (loginState.error?.type === LoginError.EmailIsNotConfirmed) {
     if (loginState.resendEmailLoading === undefined) {
       resendEmailSection = (
-        <span>
-          <button onClick={onResendEmail}>Click here</button>
-          to resend email
-        </span>
+        <StyledNotification
+          title={
+            <ResendButton variant="base" onClick={onResendEmail}>
+              Click here to resend confirmation email
+            </ResendButton>
+          }
+          hideCloseButton={true}
+          icon="warning"
+        />
       );
     } else if (loginState.resendEmailLoading) {
-      resendEmailSection = <span>Sending...</span>;
+      resendEmailSection = <StyledNotification title="Sending..." hideCloseButton={true} icon="warning" />;
     } else if (!loginState.resendEmailLoading && !loginState.resendEmailError) {
       console.log(loginState);
 
@@ -105,42 +126,65 @@ const LoginForm = reduxForm({
         </span>
       );
     } else {
-      resendEmailSection = <span>{loginState.resendEmailError}</span>;
+      resendEmailSection = (
+        <StyledNotification title={loginState.resendEmailError} hideCloseButton={true} icon="error" />
+      );
     }
   }
 
   return (
-    <div>
-      <h1>Sign In</h1>
-      {resendEmailSection}
+    <Container>
+      <Title>Sign in</Title>
+      <Register>
+        Don't have an account? <span> </span>
+        <StyledLink to="/register">Create Account Here</StyledLink>
+      </Register>
+      <StyledCard>
+        {loginState.error && (
+          <StyledNotification title={loginState.error.message} hideCloseButton={true} icon="error" />
+        )}
+        {loginState.isLoginSuccess && (
+          <StyledNotification title="Login successful. Redirecting..." hideCloseButton={true} icon="success" />
+        )}
+        {resendEmailSection}
 
-      {loginState.error && <div color="red">{loginState.error && loginState.error.message}</div>}
-
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <label htmlFor="emailOrUserName">Email/User name:</label>
-        <Field name="emailOrUserName" component={requiredField} type="text" required />
-
-        <br />
-
-        <label htmlFor="password">Password:</label>
-        <Field name="password" component={requiredField} type="password" required />
-
-        <br />
-
-        <Link to="/register">Create a new account</Link>
-
-        <button type="submit" disabled={loginState.isLoading}>
-          Sign In
-        </button>
-      </form>
-      <GoogleLogin
-        clientId={config.GoogleClientId}
-        onSuccess={onGoogleResponse}
-        onFailure={(e) => console.log(e)}
-        render={(renderProps) => <button onClick={renderProps.onClick}>Login with Google</button>}
-        cookiePolicy="single_host_origin"
-      />
-    </div>
+        <StyledForm onSubmit={handleSubmit(onSubmit)}>
+          <Field
+            component={StyledInput}
+            icon={<FontAwesomeIcon icon={faUser} />}
+            name="emailOrUserName"
+            required
+            label="Email/User name"
+            placeholder="Enter email or username"
+          />
+          <Field
+            component={StyledInput}
+            icon={<FontAwesomeIcon icon={faLock} />}
+            type="password"
+            name="password"
+            required
+            label="Password"
+            placeholder="Enter password"
+          />
+          <ButtonContainer>
+            <StyledButton type="submit" label="Sign In" variant="brand" disabled={loginState.isLoading} />
+            <GoogleLogin
+              clientId={config.GoogleClientId}
+              onSuccess={onGoogleResponse}
+              onFailure={(e) => console.log(e)}
+              render={(renderProps) => (
+                <StyledButton onClick={renderProps.onClick}>
+                  <StyledGoogleIcon icon={faGoogle} />
+                  Login with Google
+                </StyledButton>
+              )}
+              cookiePolicy="single_host_origin"
+            />
+          </ButtonContainer>
+          <StyledLink to="/register">Forgot your password?</StyledLink>
+        </StyledForm>
+      </StyledCard>
+    </Container>
   );
 });
 

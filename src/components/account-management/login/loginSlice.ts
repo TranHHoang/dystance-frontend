@@ -23,12 +23,14 @@ export type OkResponse = UserLoginData;
 interface LoginFormState {
   isLoading: boolean;
   error?: ErrorResponse;
+  isLoginSuccess: boolean;
   resendEmailLoading?: boolean;
   resendEmailError?: string;
 }
 
 const initialState: LoginFormState = {
-  isLoading: false
+  isLoading: false,
+  isLoginSuccess: false
 };
 
 const loginSlice = createSlice({
@@ -40,6 +42,8 @@ const loginSlice = createSlice({
     },
     loginSuccess(state) {
       state.isLoading = false;
+      state.isLoginSuccess = true;
+      state.error = undefined;
     },
     loginFailed(state, action: PayloadAction<ErrorResponse>) {
       state.isLoading = false;
