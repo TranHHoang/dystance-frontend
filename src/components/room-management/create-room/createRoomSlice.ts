@@ -1,7 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError } from "axios";
+import moment from "moment";
 import { AppThunk } from "../../../app/store";
 import Axios from "./createRoomFakeAPI";
+import { CreateRoomFormValues } from "./CreateRoomForm";
 
 interface ErrorResponse {
   type: number;
@@ -50,22 +52,14 @@ const createRoomSlice = createSlice({
 export default createRoomSlice.reducer;
 export const { roomCreateStart, createRoomSuccess, createRoomFailed, setRoomCreateModalOpen } = createRoomSlice.actions;
 
-function formatDate(date: Date): string {
-  function pad(n: number) {
-    return n < 10 ? "0" + n : n;
-  }
-
-  return [date.getFullYear(), pad(date.getMonth() + 1), pad(date.getDate())].join("-");
-}
-
-export function createRoom(
-  classroomName: string,
-  startDate: Date,
-  startTime: string,
-  endTime: string,
-  endDate: Date,
-  description: string
-): AppThunk {
+export function createRoom({
+  classroomName,
+  startDate,
+  startTime,
+  endTime,
+  endDate,
+  description
+}: CreateRoomFormValues): AppThunk {
   return async (dispatch) => {
     dispatch(roomCreateStart());
     try {
@@ -77,8 +71,8 @@ export function createRoom(
       };
       fd.append("name", classroomName);
       fd.append("description", description);
-      fd.append("startDate", formatDate(startDate));
-      fd.append("endDate", formatDate(endDate));
+      fd.append("startDate", moment(startDate).format("YYYY-MM-DD"));
+      fd.append("endDate", moment(endDate).format("YYYY-MM-DD"));
       fd.append("startHour", startTime);
       fd.append("endHour", endTime);
 

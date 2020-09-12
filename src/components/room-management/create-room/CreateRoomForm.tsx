@@ -1,16 +1,18 @@
-import React from "react";
-import { Field, reduxForm } from "redux-form";
+import React, { useRef } from "react";
 import { Modal, Button, Input, TimePicker, DatePicker, Textarea, Notification } from "react-rainbow-components";
 import { RootState } from "../../../app/rootReducer";
 import { useSelector, useDispatch } from "react-redux";
 import { createRoom, setRoomCreateModalOpen } from "./createRoomSlice";
 import styled from "styled-components";
+import { Formik, Field, Form, FormikProps } from "formik";
+import * as Yup from "yup";
+import moment from "moment";
 
 const StyledNotification = styled(Notification)`
   width: 100%;
 `;
 
-interface CreateRoomForm {
+export interface CreateRoomFormValues {
   classroomName: string;
   startDate: Date;
   startTime: string;
@@ -19,117 +21,114 @@ interface CreateRoomForm {
   description: string;
 }
 
-const initialValues = {
+const initialValues: CreateRoomFormValues = {
   classroomName: "",
   startDate: new Date(),
-  startTime: new Date().toLocaleTimeString("it-IT"),
-  endTime: new Date().toLocaleTimeString("it-IT"),
+  startTime: moment().format("HH:mm"),
+  endTime: moment().format("HH:mm"),
   endDate: new Date(),
   description: ""
 };
 
-function validate(values: CreateRoomForm) {
-  const { classroomName, startDate, startTime, endTime, endDate } = values;
-  const errors = {
-    classroomName: "",
-    startDate: "",
-    startTime: "",
-    endTime: "",
-    endDate: ""
-  };
-  if (!classroomName) {
-    errors.classroomName = "Classroom Name is a required field";
-  }
-  if (!startDate) {
-    errors.startDate = "Start Date is a required field";
-  }
-  if (!startTime) {
-    errors.startTime = "Start Time is a required field";
-  }
-  if (!endTime) {
-    errors.endTime = "End Time is a required field";
-  }
-  if (!endDate) {
-    errors.endDate = "End Date is a required field";
-  }
+const validationSchema = Yup.object({
+  classroomName: Yup.string().required("Classroom name is required"),
+  startDate: Yup.date()
+    .default(() => new Date())
+    .required("Start date is required"),
+  startTime: Yup.string().required("Start time is required"),
+  endTime: Yup.string()
+    .required("End time is required")
+    .test("is-time-greater", "End time must be after start time", function (value) {
+      const { startTime } = this.parent;
+      return moment(value, "HH:mm").isSameOrAfter(moment(startTime, "HH:mm"));
+    }),
+  endDate: Yup.date()
+    .default(() => new Date())
+    .required("End date is required")
+    .test("is-date-greater", "End date must be after start date", function (value) {
+      const { startDate } = this.parent;
+      return moment(value).isSameOrAfter(moment(startDate), "day");
+    })
+});
 
-  if (startDate && endDate) {
-    const startDateTime = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-    const endDateTime = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+const RoomFormComponent = (props: any) => {
+  const dispatch = useDispatch();
+  const { innerRef } = props;
+  const createRoomState = useSelector((state: RootState) => state.createRoomState);
 
-    if (endDateTime.getTime() < startDateTime.getTime()) {
-      errors.endDate = "End Date must be after Start Date";
-    }
-    if (endDateTime.getTime() === startDateTime.getTime() && startTime >= endTime) {
-      errors.endTime = "End Time must be after Start Time";
+  function onSubmit(values: CreateRoomFormValues) {
+    if (!createRoomState.isLoading) {
+      dispatch(createRoom(values));
     }
   }
 
-  return errors;
-}
-
-const RoomForm = (props: any) => {
-  const { handleSubmit, reset, onSubmit } = props;
-
-  const submit = (values: CreateRoomForm) => {
-    onSubmit(values);
-    reset();
-  };
   return (
-    <form id="redux-form-id" noValidate onSubmit={handleSubmit(submit)}>
-      <Field component={Input} name="classroomName" required label="Class Name" placeholder="Enter classroom name" />
+    <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit} innerRef={innerRef}>
+      {({ values, setFieldValue, errors, touched }: FormikProps<CreateRoomFormValues>) => (
+        <Form>
+          <Field
+            name="classroomName"
+            label="Classroom Name"
+            as={Input}
+            error={errors.classroomName && touched.classroomName ? errors.classroomName : null}
+            placeholder="Enter classroom name"
+          />
 
-      <Field
-        component={DatePicker}
-        name="startDate"
-        locale="en-GB"
-        required
-        label="Start Date"
-        placeholder="Choose a start date"
-      />
-      <div className="rainbow-flex rainbow-justify_spread">
-        <Field component={TimePicker} name="startTime" required label="Start Time" placeholder="Choose a start time" />
-        <Field component={TimePicker} name="endTime" required label="End Time" placeholder="Choose an end time" />
-      </div>
-      <div className="rainbow-flex rainbow-justify_spread">
-        <Field
-          component={DatePicker}
-          name="endDate"
-          locale="en-GB"
-          required
-          label="End Date"
-          placeholder="Choose an end date"
-        />
-      </div>
-      <Field component={Textarea} name="description" label="Description" placeholder="Add note" />
-    </form>
+          <DatePicker
+            name="startDate"
+            label="Start date"
+            value={values.startDate}
+            onChange={(e) => setFieldValue("startDate", e)}
+            error={errors.startDate && touched.startDate ? errors.startDate : null}
+            locale="en-GB"
+            formatStyle="large"
+          />
+
+          <div className="rainbow-flex rainbow-justify_spread">
+            <TimePicker
+              name="startTime"
+              label="Start time"
+              value={values.startTime}
+              onChange={(e) => setFieldValue("startTime", e)}
+              error={errors.startTime && touched.startTime ? errors.startTime : null}
+              placeholder="Choose a start time"
+            />
+
+            <TimePicker
+              name="endTime"
+              label="End time"
+              value={values.endTime}
+              onChange={(e) => setFieldValue("endTime", e)}
+              error={errors.endTime && touched.endTime ? errors.endTime : null}
+              placeholder="Choose an end time"
+            />
+          </div>
+          <div className="rainbow-flex rainbow-justify_spread">
+            <DatePicker
+              name="endDate"
+              label="End Date"
+              value={values.endDate}
+              onChange={(e) => setFieldValue("endDate", e)}
+              error={errors.endDate && touched.endDate ? errors.endDate : null}
+              placeholder="Choose an end date"
+              locale="en-GB"
+              formatStyle="large"
+            />
+          </div>
+          <Field as={Textarea} name="description" label="Description" placeholder="Add description" />
+        </Form>
+      )}
+    </Formik>
   );
 };
 
-const Form = reduxForm({
-  form: "createRoomForm",
-  validate
-})(RoomForm);
-
-export const CreateRoomForm = () => {
+const CreateRoomForm = () => {
   const dispatch = useDispatch();
-  const roomCreation = useSelector((state: RootState) => state.roomCreation);
+  const createRoomState = useSelector((state: RootState) => state.createRoomState);
 
-  const submit = (values: CreateRoomForm) => {
-    if (!roomCreation.isLoading) {
-      dispatch(
-        createRoom(
-          values.classroomName,
-          values.startDate,
-          values.startTime,
-          values.endTime,
-          values.endDate,
-          values.description
-        )
-      );
-    }
-  };
-  if (roomCreation.isCreationSuccess) {
+  const formRef = useRef(null);
+
+  if (createRoomState.isCreationSuccess) {
     setTimeout(() => {
       dispatch(setRoomCreateModalOpen(false));
     }, 2000);
@@ -144,8 +143,8 @@ export const CreateRoomForm = () => {
         className="rainbow-m-around_medium"
       />
       <Modal
-        title="Create Classroom"
-        isOpen={roomCreation.isModalOpen}
+        id="create-room-modal"
+        isOpen={createRoomState.isModalOpen}
         hideCloseButton={true}
         footer={
           <div className="rainbow-flex rainbow-justify_end">
@@ -155,27 +154,28 @@ export const CreateRoomForm = () => {
               label="Cancel"
               variant="neutral"
               onClick={() => dispatch(setRoomCreateModalOpen(false))}
-              disabled={roomCreation.isLoading || roomCreation.isCreationSuccess}
+              disabled={createRoomState.isLoading || createRoomState.isCreationSuccess}
             />
             <Button
               form="redux-form-id"
               label="Save"
               variant="brand"
               type="submit"
-              disabled={roomCreation.isLoading || roomCreation.isCreationSuccess}
+              onClick={() => formRef.current.handleSubmit()}
+              disabled={createRoomState.isLoading || createRoomState.isCreationSuccess}
             />
           </div>
         }
       >
-        {roomCreation.error && (
+        {createRoomState.error && (
           <StyledNotification
             title="An Error Occured"
             hideCloseButton={true}
-            description={roomCreation.error.message}
+            description={createRoomState.error.message}
             icon="error"
           />
         )}
-        {roomCreation.isCreationSuccess && (
+        {createRoomState.isCreationSuccess && (
           <StyledNotification
             title="Classroom Created Successfully"
             hideCloseButton={true}
@@ -183,8 +183,10 @@ export const CreateRoomForm = () => {
             icon="success"
           />
         )}
-        <Form onSubmit={submit} initialValues={initialValues} />
+        <RoomFormComponent innerRef={formRef} />
       </Modal>
     </div>
   );
 };
+
+export default CreateRoomForm;
