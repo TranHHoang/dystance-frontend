@@ -15,8 +15,13 @@ const theme = {
   }
 };
 const Container = styled.div`
-  background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
-  height: 100vh;
+  background-image: url("https://images.wallpaperscraft.com/image/cat_night_lights_74375_1920x1080.jpg");
+  background-size: cover;
+  /* background-color: ${(props) => props.theme.rainbow.palette.background.secondary}; */
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  align-items: center;
 `;
 ReactDOM.render(
   <Provider store={store}>

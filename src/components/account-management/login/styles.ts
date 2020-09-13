@@ -1,11 +1,13 @@
 import styled from "styled-components";
 import { Input, Button, Card, Notification } from "react-rainbow-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
+import { Form } from "formik";
 
 export const Container = styled.div`
-  padding-top: 10%;
-  padding-bottom: 5%;
+  /* padding-top: 10%;
+  padding-bottom: 5%; */
+  margin: auto;
+  width: 100%;
 `;
 export const StyledNotification = styled(Notification)`
   width: 80%;
@@ -34,7 +36,7 @@ export const Register = styled.p`
   color: ${(props) => props.theme.rainbow.palette.text.label};
 `;
 
-export const StyledLink = styled(Link)`
+export const StyledLink = styled.a`
   text-decoration: none;
   color: ${(props) => props.theme.rainbow.palette.brand.main};
   transition: 0.3s;
@@ -52,6 +54,7 @@ export const StyledCard = styled(Card)`
   flex-direction: column;
   margin: 0 auto;
   width: 50%;
+  background-color: rgba(48, 48, 48, 0.3);
 `;
 export const StyledInput = styled(Input)`
   margin-bottom: 15px;
@@ -64,7 +67,7 @@ export const StyledInput = styled(Input)`
     padding: 25px 1rem 25px 2.35rem;
   }
 `;
-export const StyledForm = styled.form`
+export const StyledForm = styled(Form)`
   padding: 20px;
   width: 80%;
   font-size: 1.5em;

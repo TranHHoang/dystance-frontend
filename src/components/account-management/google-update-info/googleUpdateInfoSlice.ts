@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import Axios, { AxiosError } from "axios";
-import { hostName } from "$utils/hostUtils";
-import { AppThunk } from "$app/store";
+import { hostName } from "~utils/hostUtils";
+import { AppThunk } from "~app/store";
 import { createHashHistory } from "history";
-import { saveLoginData } from "$utils/tokenStorage";
+import { saveLoginData } from "~utils/tokenStorage";
 import { ErrorResponse, OkResponse } from "../login/loginSlice";
 import { LoginLocalStorageKey } from "../login/LoginForm";
 

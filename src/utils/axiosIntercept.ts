@@ -1,8 +1,8 @@
 import Axios from "axios";
 import keytar from "keytar";
 import { getLoginData, saveLoginData } from "./tokenStorage";
-import { hostName } from "$utils/hostUtils";
-import { UserLoginData } from "$utils/types";
+import { hostName } from "~utils/hostUtils";
+import { UserLoginData } from "~utils/types";
 
 const userName = "userName";
 

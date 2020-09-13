@@ -1,6 +1,7 @@
 <html>
+
 <head>
-  <link rel="stylesheet" href="index.css" />
+  <link rel="stylesheet" href="#/index.css" />
   <meta charset="UTF-8" />
   <title>Hello World!</title>
 </head>
@@ -12,8 +13,21 @@
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
       Arial, sans-serif;
-    margin: auto;
-    height: 100vh;
+    margin: 0 auto;
+  }
+
+  ::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
   }
 </style>
 

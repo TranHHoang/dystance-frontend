@@ -1,6 +1,6 @@
-import Axios from "$utils/axiosIntercept";
+import Axios from "~utils/axiosIntercept";
 import MockAdapter from "axios-mock-adapter";
-import { hostName } from "$utils/hostUtils";
+import { hostName } from "~utils/hostUtils";
 
 const mock = new MockAdapter(Axios, { delayResponse: 1000 });
 
@@ -72,5 +72,6 @@ mock.onPost(`${hostName}/api/users/google/updateInfo`).reply(200, {
   refreshToken: "SJPrgD9dXDutLrpNQEHbu3SoUDIMW8xQ7Qn1SbgJYPAT7KZbMzCpqOJvM8JZ2DNBfq7EuklhXlB995eKXdllvQ==",
   expires: 86400
 });
+mock.onPost(`${hostName}/api/users/resendEmail`).reply(200);
 
 export default Axios;

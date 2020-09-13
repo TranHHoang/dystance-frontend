@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "$app/rootReducer";
+import { RootState } from "~app/rootReducer";
 import { Field, reduxForm, FormErrors } from "redux-form";
 import { startGoogleUpdateInfo } from "./googleUpdateInfoSlice";
 

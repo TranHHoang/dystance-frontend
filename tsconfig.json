@@ -12,8 +12,8 @@
     "resolveJsonModule": true,
     "paths": {
       "*": ["node_modules/*"],
-      "$app/*": ["app/*"],
-      "$utils/*": ["utils/*"]
+      "~app/*": ["app/*"],
+      "~utils/*": ["utils/*"]
     },
     "jsx": "react"
   },
