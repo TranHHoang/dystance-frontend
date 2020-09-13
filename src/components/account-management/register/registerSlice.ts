@@ -3,8 +3,9 @@ import { AxiosError } from "axios";
 import { hostName } from "~utils/hostUtils";
 import { AppThunk } from "~app/store";
 import { createHashHistory } from "history";
-import Axios from "./registerApi.stub";
+import Axios from "~utils/fakeAPI";
 import { RegisterFormValues } from "./RegisterForm";
+import { resetLoginState } from "../login/loginSlice";
 import moment from "moment";
 export enum RegisterError {
   EmailExists,
@@ -64,7 +65,7 @@ export function startRegister({ email, userName, password, realName, dob }: Regi
       });
 
       dispatch(registerSuccess());
-      createHashHistory().push("/");
+      createHashHistory().replace("/");
     } catch (ex) {
       const e = ex as AxiosError;
       console.log(e.response);

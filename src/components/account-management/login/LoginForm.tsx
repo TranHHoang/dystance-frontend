@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import GoogleLogin, { GoogleLoginResponse } from "react-google-login";
 import config from "./googleConfigs.json";
 import { useDispatch, useSelector } from "react-redux";
-import { startLogin, LoginError, resendEmail } from "./loginSlice";
+import { startLogin, LoginError, resendEmail, resetLoginState } from "./loginSlice";
 import { RootState } from "~app/rootReducer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
@@ -53,6 +53,9 @@ const LoginForm = () => {
   const loginState = useSelector((state: RootState) => state.loginState);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(resetLoginState());
+  }, []);
   const _: any = undefined;
 
   function onSubmit(values: LoginFormValues) {

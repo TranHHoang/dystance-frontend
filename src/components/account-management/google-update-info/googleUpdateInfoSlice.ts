@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import Axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { hostName } from "~utils/hostUtils";
 import { AppThunk } from "~app/store";
 import { createHashHistory } from "history";
@@ -7,6 +7,7 @@ import { saveLoginData } from "~utils/tokenStorage";
 import { ErrorResponse, OkResponse } from "../login/loginSlice";
 import { LoginLocalStorageKey } from "../login/LoginForm";
 import { GoogleUpdateInfoFormValues } from "./GoogleUpdateInfo";
+import Axios from "~utils/fakeAPI";
 import moment from "moment";
 
 export enum GoogleUpdateInfoError {
@@ -35,6 +36,7 @@ const googleUpdateInfoSlice = createSlice({
     updateInfoSuccess(state) {
       state.isLoading = false;
       state.isUpdateInfoSuccess = true;
+      state.error = undefined;
     },
     updateInfoFailed(state, action: PayloadAction<ErrorResponse>) {
       state.isLoading = false;
