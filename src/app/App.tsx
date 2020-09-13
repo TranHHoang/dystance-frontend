@@ -4,7 +4,7 @@ import LoginForm from "../components/account-management/login/LoginForm";
 import GoogleUpdateInfoForm from "../components/account-management/google-update-info/GoogleUpdateInfo";
 import { HomePage } from "../components/homepage/Homepage";
 import { Route, Switch, HashRouter } from "react-router-dom";
-import { RegisterForm } from "../components/account-management/register/RegisterForm";
+import RegisterForm from "../components/account-management/register/RegisterForm";
 
 export default hot(module)(function App() {
   return (
