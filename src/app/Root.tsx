@@ -5,25 +5,31 @@ import { Provider } from "react-redux";
 import { Application } from "react-rainbow-components";
 import store from "./store";
 import styled from "styled-components";
+
 const theme = {
-    rainbow: {
-        palette: {
-            brand: "#80deea",
-            mainBackground: "#303030"
-        }
+  rainbow: {
+    palette: {
+      brand: "#80deea",
+      mainBackground: "#303030"
     }
+  }
 };
 const Container = styled.div`
-    background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
-    height: 100%;
+  background-image: url("https://images.wallpaperscraft.com/image/cat_night_lights_74375_1920x1080.jpg");
+  background-size: cover;
+  /* background-color: ${(props) => props.theme.rainbow.palette.background.secondary}; */
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  align-items: center;
 `;
 ReactDOM.render(
-    <Provider store={store}>
-        <Application theme={theme}>
-            <Container>
-                <App />
-            </Container>
-        </Application>
-    </Provider>,
-    document.getElementById("root")
+  <Provider store={store}>
+    <Application theme={theme}>
+      <Container>
+        <App />
+      </Container>
+    </Application>
+  </Provider>,
+  document.getElementById("root")
 );
