@@ -4,7 +4,7 @@ import { hostName } from "~utils/hostUtils";
 import { UserLoginData } from "~utils/types";
 import { AppThunk } from "~app/store";
 import { createHashHistory } from "history";
-import Axios from "./loginApi.stub";
+import Axios from "~utils/fakeAPI";
 import { saveLoginData } from "~utils/tokenStorage";
 
 export enum LoginError {
@@ -58,6 +58,9 @@ const loginSlice = createSlice({
     resendEmailError(state, action: PayloadAction<string>) {
       state.resendEmailLoading = false;
       state.resendEmailError = action.payload;
+    },
+    resetLoginState(state) {
+      state.error = undefined;
     }
   }
 });
@@ -69,7 +72,8 @@ export const {
   loginFailed,
   resendEmailStart,
   resendEmailSuccess,
-  resendEmailError
+  resendEmailError,
+  resetLoginState
 } = loginSlice.actions;
 
 function postForm(url: string, form: FormData): Promise<AxiosResponse<any>> {

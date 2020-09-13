@@ -1,10 +1,11 @@
 import React from "react";
 import { hot } from "react-hot-loader";
 import LoginForm from "../components/account-management/login/LoginForm";
-import { Route, Switch, HashRouter } from "react-router-dom";
-import { RegisterForm } from "../components/account-management/RegisterForm";
 import GoogleUpdateInfoForm from "../components/account-management/google-update-info/GoogleUpdateInfo";
 import { HomePage } from "../components/homepage/Homepage";
+import { Route, Switch, HashRouter } from "react-router-dom";
+import RegisterForm from "../components/account-management/register/RegisterForm";
+
 export default hot(module)(function App() {
   return (
     <HashRouter>

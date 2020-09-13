@@ -9,13 +9,14 @@ import styled from "styled-components";
 const theme = {
   rainbow: {
     palette: {
-      brand: "#80deea",
-      mainBackground: "#303030"
+      brand: "#4ecca3",
+      mainBackground: "#36393f"
     }
   }
 };
 const Container = styled.div`
-  background-image: url("https://images.wallpaperscraft.com/image/cat_night_lights_74375_1920x1080.jpg");
+ /* background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('https://images.wallpaperscraft.com/image/minimalism_sky_clouds_sun_mountains_lake_landscape_95458_1920x1080.jpg'); */
+  background-image: url("https://images.wallpaperscraft.com/image/minimalism_sky_clouds_sun_mountains_lake_landscape_95458_1920x1080.jpg");
   background-size: cover;
   /* background-color: ${(props) => props.theme.rainbow.palette.background.secondary}; */
   height: 100%;
