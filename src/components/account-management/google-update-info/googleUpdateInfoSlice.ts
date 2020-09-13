@@ -6,6 +6,8 @@ import { createHashHistory } from "history";
 import { saveLoginData } from "~utils/tokenStorage";
 import { ErrorResponse, OkResponse } from "../login/loginSlice";
 import { LoginLocalStorageKey } from "../login/LoginForm";
+import { GoogleUpdateInfoFormValues } from "./GoogleUpdateInfo";
+import moment from "moment";
 
 export enum GoogleUpdateInfoError {
   UserNameAlreadyExists,
@@ -14,11 +16,13 @@ export enum GoogleUpdateInfoError {
 
 interface GoogleUpdateInfoFormState {
   isLoading: boolean;
+  isUpdateInfoSuccess: boolean;
   error?: ErrorResponse;
 }
 
 const initialState: GoogleUpdateInfoFormState = {
-  isLoading: false
+  isLoading: false,
+  isUpdateInfoSuccess: false
 };
 
 const googleUpdateInfoSlice = createSlice({
@@ -30,6 +34,7 @@ const googleUpdateInfoSlice = createSlice({
     },
     updateInfoSuccess(state) {
       state.isLoading = false;
+      state.isUpdateInfoSuccess = true;
     },
     updateInfoFailed(state, action: PayloadAction<ErrorResponse>) {
       state.isLoading = false;
@@ -48,14 +53,7 @@ function getAxiosError(e: AxiosError) {
       : { type: GoogleUpdateInfoError.Other, message: "Something went wrong" }
   );
 }
-function formatDate(date: Date): string {
-  function pad(n: number) {
-    return n < 10 ? "0" + n : n;
-  }
-
-  return [date.getFullYear(), pad(date.getMonth() + 1), pad(date.getDate())].join("-");
-}
-export function startGoogleUpdateInfo(userName: string, realName: string, dob: Date): AppThunk {
+export function startGoogleUpdateInfo({ userName, realName, dob }: GoogleUpdateInfoFormValues): AppThunk {
   return async (dispatch) => {
     dispatch(updateInfoStart());
 
@@ -63,7 +61,7 @@ export function startGoogleUpdateInfo(userName: string, realName: string, dob: D
     form.append("email", window.localStorage.getItem(LoginLocalStorageKey.GoogleEmail));
     form.append("userName", userName);
     form.append("realName", realName);
-    form.append("dob", formatDate(dob));
+    form.append("dob", moment(dob).format("YYYY-MM-DD"));
 
     try {
       const response = await Axios.post(`${hostName}/api/users/google/updateInfo`, form, {

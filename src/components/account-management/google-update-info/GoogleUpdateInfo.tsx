@@ -1,7 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
-import { Field, reduxForm, FormErrors } from "redux-form";
 import { startGoogleUpdateInfo } from "./googleUpdateInfoSlice";
 import { faUser, faLock, faEnvelope, faCalendar } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -16,89 +15,90 @@ import {
   Title
 } from "../login/styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-interface GoogleUpdateInfoForm {
+import { Formik, Field, FormikProps, yupToFormErrors } from "formik";
+import * as Yup from "yup";
+
+export interface GoogleUpdateInfoFormValues {
   userName: string;
   realName: string;
   dob: Date;
 }
 
-function validate(values: GoogleUpdateInfoForm): FormErrors<GoogleUpdateInfoForm, string> {
-  const errors = {
-    userName: "",
-    realName: "",
-    dob: ""
-  };
+const initialValues: GoogleUpdateInfoFormValues = {
+  userName: "",
+  realName: "",
+  dob: new Date()
+};
+const validateSchema = Yup.object({
+  userName: Yup.string().required("Username is required"),
+  realName: Yup.string().required("Your name is required"),
+  dob: Yup.date().required("Date of birth is required")
+});
 
-  if (!values?.userName) {
-    errors.userName = "Required";
-  }
-
-  if (!values.realName) {
-    errors.realName = "Required";
-  }
-
-  if (!values.dob) {
-    errors.dob = "Required";
-  }
-
-  return errors;
-}
-const GoogleUpdateInfoForm = reduxForm({
-  form: "google-update-info-form",
-  validate
-})((props: any) => {
-  const { handleSubmit } = props;
+const GoogleUpdateInfoForm = () => {
   const updateInfoState = useSelector((state: RootState) => state.googleUpdateInfoState);
   const dispatch = useDispatch();
 
-  function onSubmit(values: GoogleUpdateInfoForm) {
-    dispatch(startGoogleUpdateInfo(values.userName, values.realName, values.dob));
+  function onSubmit(values: GoogleUpdateInfoFormValues) {
+    dispatch(startGoogleUpdateInfo(values));
   }
 
   return (
     <Container>
-      <Title>Update User Info</Title>
       <StyledCard>
+        <Title>Update User Info</Title>
         {updateInfoState.error && (
           <StyledNotification title={updateInfoState.error.message} hideCloseButton={true} icon="error" />
         )}
+        {updateInfoState.isUpdateInfoSuccess && (
+          <StyledNotification title="Update Successful. Redirecting..." hideCloseButton={true} icon="success" />
+        )}
+        <Formik initialValues={initialValues} validationSchema={validateSchema} onSubmit={onSubmit}>
+          {({ errors, touched, values, setFieldValue }: FormikProps<GoogleUpdateInfoFormValues>) => (
+            <StyledForm>
+              <Field
+                name="userName"
+                as={StyledInput}
+                icon={<FontAwesomeIcon icon={faUser} />}
+                type="text"
+                label="Username"
+                placeholder="Enter your username"
+                error={errors.userName && touched.userName ? errors.userName : null}
+                required
+              />
+              <Field
+                name="realName"
+                as={StyledInput}
+                icon={<FontAwesomeIcon icon={faUser} />}
+                type="text"
+                label="Real Name"
+                placeholder="Enter your real name"
+                error={errors.realName && touched.realName ? errors.realName : null}
+                required
+              />
 
-        <StyledForm onSubmit={handleSubmit(onSubmit)}>
-          <Field
-            name="userName"
-            component={StyledInput}
-            icon={<FontAwesomeIcon icon={faUser} />}
-            type="text"
-            label="Username"
-            placeholder="Enter your username"
-            required
-          />
-          <Field
-            name="realName"
-            component={StyledInput}
-            icon={<FontAwesomeIcon icon={faUser} />}
-            type="text"
-            label="Real Name"
-            placeholder="Enter your real name"
-            required
-          />
-          <Field
-            name="dob"
-            component={StyledDatePicker}
-            label="Date Of Birth"
-            locale="en-GB"
-            placeholder="Enter your date of birth"
-            required
-          />
-          <ButtonContainer>
-            <StyledButton variant="brand" type="submit" disabled={updateInfoState.isLoading}>
-              Update
-            </StyledButton>
-          </ButtonContainer>
-        </StyledForm>
+              <StyledDatePicker
+                name="dob"
+                label="Date Of Birth"
+                locale="en-GB"
+                placeholder="Enter your date of birth"
+                value={values.dob}
+                onChange={(e) => setFieldValue("dob", e)}
+                error={errors.dob && touched.dob ? errors.dob : null}
+                required
+              />
+
+              <ButtonContainer>
+                <StyledButton variant="brand" type="submit" disabled={updateInfoState.isLoading}>
+                  Update
+                </StyledButton>
+              </ButtonContainer>
+            </StyledForm>
+          )}
+        </Formik>
       </StyledCard>
     </Container>
   );
-});
+};
 
 export default GoogleUpdateInfoForm;

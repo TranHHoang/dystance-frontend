@@ -1,8 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { startRegister } from "./registerSlice";
-import { RootState } from "$app/rootReducer";
-import { Field, reduxForm, FormErrors } from "redux-form";
+import { RootState } from "~app/rootReducer";
 import { faUser, faLock, faEnvelope, faCalendar } from "@fortawesome/free-solid-svg-icons";
 import {
   ButtonContainer,
@@ -16,7 +15,10 @@ import {
   Title
 } from "../login/styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-interface RegisterForm {
+import { Formik, Field, FormikProps, yupToFormErrors } from "formik";
+import * as Yup from "yup";
+
+export interface RegisterFormValues {
   userName: string;
   email: string;
   password: string;
@@ -25,7 +27,7 @@ interface RegisterForm {
   dob: Date;
 }
 
-const initialFormState: RegisterForm = {
+const initialValues: RegisterFormValues = {
   userName: "",
   email: "",
   password: "",
@@ -34,133 +36,111 @@ const initialFormState: RegisterForm = {
   dob: new Date()
 };
 
-function validate(values: RegisterForm): FormErrors<RegisterForm, string> {
-  const errors = {
-    userName: "",
-    email: "",
-    password: "",
-    rePassword: "",
-    realName: "",
-    dob: ""
-  };
+const validateSchema = Yup.object({
+  userName: Yup.string().required("Username is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  password: Yup.string().required("Password is required").min(8, "Password must be at least 8 characters"),
+  rePassword: Yup.string()
+    .required("This field is required")
+    .test("password match", "Re-enter password must match password", function (value) {
+      const { password } = this.parent;
+      return value === password;
+    }),
+  realName: Yup.string().required("Your name is required"),
+  dob: Yup.date().required("Date of birth is required")
+});
 
-  if (!values?.userName) {
-    errors.userName = "Required";
-  }
-
-  if (!values?.email) {
-    errors.email = "Required";
-  } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-    errors.email = "Invalid email";
-  }
-
-  if (!values.password) {
-    errors.password = "Required";
-  }
-
-  if (!values.rePassword) {
-    errors.rePassword = "Required";
-  }
-
-  if (values?.password !== values?.rePassword) {
-    errors.rePassword = "Password does not match";
-  }
-
-  if (!values.realName) {
-    errors.realName = "Required";
-  }
-
-  if (!values.dob) {
-    errors.dob = "Required";
-  } else if (values.dob.getTime() > new Date().getTime()) {
-    errors.dob = "Invalid date of birth";
-  }
-
-  return errors;
-}
-
-const RegisterForm = reduxForm({
-  form: "register-form",
-  initialValues: initialFormState,
-  validate
-})(({ handleSubmit }) => {
+const RegisterForm = () => {
   const registerState = useSelector((state: RootState) => state.registerState);
   const dispatch = useDispatch();
 
-  function onSubmit(values: RegisterForm) {
-    dispatch(startRegister(values.email, values.userName, values.password, values.realName, values.dob));
+  function onSubmit(values: RegisterFormValues) {
+    dispatch(startRegister(values));
   }
 
   return (
     <Container>
-      <Title>Create Your Account</Title>
-      {registerState.error && (
-        <StyledNotification title={registerState.error.message} hideCloseButton={true} icon="error" />
-      )}
       <StyledCard>
-        <StyledForm onSubmit={handleSubmit(onSubmit)}>
-          <Field
-            name="userName"
-            component={StyledInput}
-            icon={<FontAwesomeIcon icon={faUser} />}
-            type="text"
-            label="Username"
-            placeholder="Enter your username"
-            required
-          />
-          <Field
-            name="email"
-            component={StyledInput}
-            icon={<FontAwesomeIcon icon={faEnvelope} />}
-            type="email"
-            label="Email"
-            placeholder="Enter your email"
-            required
-          />
-          <Field
-            name="password"
-            component={StyledInput}
-            icon={<FontAwesomeIcon icon={faLock} />}
-            type="password"
-            label="Password"
-            placeholder="Enter your password"
-            required
-          />
-          <Field
-            name="rePassword"
-            component={StyledInput}
-            icon={<FontAwesomeIcon icon={faLock} />}
-            type="password"
-            label="Re-enter Password"
-            placeholder="Re-enter your password"
-            required
-          />
-          <Field
-            name="realName"
-            component={StyledInput}
-            icon={<FontAwesomeIcon icon={faUser} />}
-            type="text"
-            label="Real Name"
-            placeholder="Enter your real name"
-            required
-          />
-          <Field
-            name="dob"
-            component={StyledDatePicker}
-            label="Date Of Birth"
-            locale="en-GB"
-            placeholder="Enter your date of birth"
-            required
-          />
-          <ButtonContainer>
-            <StyledButton variant="brand" type="submit" disabled={registerState.isLoading}>
-              Register
-            </StyledButton>
-          </ButtonContainer>
-        </StyledForm>
+        <Title>Create Your Account</Title>
+        {registerState.error && (
+          <StyledNotification title={registerState.error.message} hideCloseButton={true} icon="error" />
+        )}
+        <Formik initialValues={initialValues} validationSchema={validateSchema} onSubmit={onSubmit}>
+          {({ errors, touched, values, setFieldValue }: FormikProps<RegisterFormValues>) => (
+            <StyledForm>
+              <Field
+                name="userName"
+                as={StyledInput}
+                icon={<FontAwesomeIcon icon={faUser} />}
+                type="text"
+                label="Username"
+                placeholder="Enter your username"
+                error={errors.userName && touched.userName ? errors.userName : null}
+                required
+              />
+              <Field
+                name="email"
+                as={StyledInput}
+                icon={<FontAwesomeIcon icon={faEnvelope} />}
+                type="email"
+                label="Email"
+                placeholder="Enter your email"
+                error={errors.email && touched.email ? errors.email : null}
+                required
+              />
+              <Field
+                name="password"
+                as={StyledInput}
+                icon={<FontAwesomeIcon icon={faLock} />}
+                type="password"
+                label="Password"
+                placeholder="Enter your password"
+                error={errors.password && touched.password ? errors.password : null}
+                required
+              />
+              <Field
+                name="rePassword"
+                as={StyledInput}
+                icon={<FontAwesomeIcon icon={faLock} />}
+                type="password"
+                label="Re-enter Password"
+                placeholder="Re-enter your password"
+                error={errors.rePassword && touched.rePassword ? errors.rePassword : null}
+                required
+              />
+              <Field
+                name="realName"
+                as={StyledInput}
+                icon={<FontAwesomeIcon icon={faUser} />}
+                type="text"
+                label="Real Name"
+                placeholder="Enter your real name"
+                error={errors.realName && touched.realName ? errors.realName : null}
+                required
+              />
+
+              <StyledDatePicker
+                name="dob"
+                label="Date Of Birth"
+                locale="en-GB"
+                placeholder="Enter your date of birth"
+                value={values.dob}
+                onChange={(e) => setFieldValue("dob", e)}
+                error={errors.dob && touched.dob ? errors.dob : null}
+                required
+              />
+
+              <ButtonContainer>
+                <StyledButton variant="brand" type="submit" disabled={registerState.isLoading}>
+                  Register
+                </StyledButton>
+              </ButtonContainer>
+            </StyledForm>
+          )}
+        </Formik>
       </StyledCard>
     </Container>
   );
-});
+};
 
 export default RegisterForm;

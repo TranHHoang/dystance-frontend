@@ -1,10 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
-import { hostName } from "$utils/hostUtils";
-import { AppThunk } from "$app/store";
+import { hostName } from "~utils/hostUtils";
+import { AppThunk } from "~app/store";
 import { createHashHistory } from "history";
 import Axios from "./registerApi.stub";
-
+import { RegisterFormValues } from "./RegisterForm";
+import moment from "moment";
 export enum RegisterError {
   EmailExists,
   UserNameExists,
@@ -45,20 +46,7 @@ const registerSlice = createSlice({
 export default registerSlice.reducer;
 export const { registerStart, registerSuccess, registerFailed } = registerSlice.actions;
 
-function formatDate(date: Date): string {
-  function pad(n: number) {
-    return n < 10 ? "0" + n : n;
-  }
-
-  return [date.getFullYear(), pad(date.getMonth() + 1), pad(date.getDate())].join("-");
-}
-export function startRegister(
-  email: string,
-  userName: string,
-  password: string,
-  realName: string,
-  dob: Date
-): AppThunk {
+export function startRegister({ email, userName, password, realName, dob }: RegisterFormValues): AppThunk {
   return async (dispatch) => {
     dispatch(registerStart());
 
@@ -69,7 +57,7 @@ export function startRegister(
       form.append("password", password);
       form.append("email", email);
       form.append("realName", realName);
-      form.append("dob", formatDate(dob));
+      form.append("dob", moment(dob).format("YYYY-MM-DD"));
 
       await Axios.post(`${hostName}/api/users/register`, form, {
         headers: { "Content-Type": "multipart/form-data" }

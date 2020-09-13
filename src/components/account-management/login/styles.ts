@@ -32,8 +32,9 @@ export const Title = styled.h1`
   font-size: 30px;
   text-align: center;
   font-weight: 500;
-  color: ${(props) => props.theme.rainbow.palette.brand.main};
+  color: ${(props) => props.theme.rainbow.palette.text.label};
   padding-bottom: 10px;
+  padding-top: 15px;
 `;
 export const Register = styled.p`
   font-family: "Lato";
@@ -62,7 +63,6 @@ export const StyledCard = styled(Card)`
   flex-direction: column;
   margin: 0 auto;
   width: 50%;
-  background-color: rgba(48, 48, 48, 0.3);
 `;
 export const StyledInput = styled(Input)`
   margin-bottom: 15px;
