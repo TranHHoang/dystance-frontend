@@ -10,6 +10,7 @@ import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import {
   ButtonContainer,
   Container,
+  NotificationContainer,
   Register,
   ResendButton,
   StyledButton,
@@ -100,10 +101,18 @@ const LoginForm = () => {
       console.log(loginState);
 
       resendEmailSection = (
-        <span>
-          <span>Resend email successful! Does not work?</span>
-          <button onClick={onResendEmail}>Click here to try again</button>
-        </span>
+        <NotificationContainer>
+          <StyledNotification title="Resend Email Successful!" hideCloseButton={true} icon="success" />
+          <StyledNotification
+            title={
+              <ResendButton variant="base" onClick={onResendEmail}>
+                Didn't work? Click here to try again
+              </ResendButton>
+            }
+            hideCloseButton={true}
+            icon="warning"
+          />
+        </NotificationContainer>
       );
     } else {
       resendEmailSection = (

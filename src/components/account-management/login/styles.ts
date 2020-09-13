@@ -4,21 +4,28 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form } from "formik";
 
 export const Container = styled.div`
-  /* padding-top: 10%;
-  padding-bottom: 5%; */
   margin: auto;
   width: 100%;
 `;
 export const StyledNotification = styled(Notification)`
   width: 80%;
   margin-top: 20px;
-  /* font-size: 20px; */
   border: 0;
   box-shadow: 0 0 0 0;
   h1 {
     font-size: 20px;
     line-height: 1.5;
   }
+`;
+
+export const NotificationContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  margin: auto;
 `;
 export const Title = styled.h1`
   font-family: "Lato";
