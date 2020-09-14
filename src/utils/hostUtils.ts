@@ -1,1 +1,1 @@
-export const hostName = "http://localhost:3000";
+export const hostName = "https://dystanceapi.azurewebsites.net";

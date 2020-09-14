@@ -3,6 +3,14 @@ import { Input, Button, Card, Notification, DatePicker } from "react-rainbow-com
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form } from "formik";
 
+export const BackgroundContainer = styled.div`
+  background-image: url("https://images.wallpaperscraft.com/image/minimalism_sky_clouds_sun_mountains_lake_landscape_95458_1920x1080.jpg");
+  background-size: cover;
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+`;
 export const Container = styled.div`
   margin: auto;
   width: 100%;

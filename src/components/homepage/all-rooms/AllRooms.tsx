@@ -1,11 +1,16 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../../app/rootReducer";
+import { RootState } from "~app/rootReducer";
 import { showRoom } from "../showRoomsSlice";
 import { SingleRoom } from "../single-room/SingleRoom";
 import styled from "styled-components";
 
+const BackgroundContainer = styled.div`
+  background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
+  height: 100%;
+  overflow: auto;
+`;
 const Container = styled.div`
   display: flex;
   flex-direction: row;
@@ -22,18 +27,20 @@ export const AllRooms = () => {
   }, []);
 
   return (
-    <Container>
-      {showRoomState.rooms.map((room) => (
-        <div key={room.id}>
-          <SingleRoom
-            name={room.name}
-            startHour={room.startHour}
-            endHour={room.endHour}
-            image={room.image}
-            description={room.description}
-          />
-        </div>
-      ))}
-    </Container>
+    <BackgroundContainer>
+      <Container>
+        {showRoomState.rooms.map((room) => (
+          <div key={room.roomId}>
+            <SingleRoom
+              name={room.roomName}
+              startHour={room.startHour}
+              endHour={room.endHour}
+              image={room.image}
+              description={room.description}
+            />
+          </div>
+        ))}
+      </Container>
+    </BackgroundContainer>
   );
 };

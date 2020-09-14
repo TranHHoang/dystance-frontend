@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import {
+  BackgroundContainer,
   ButtonContainer,
   Container,
   NotificationContainer,
@@ -125,65 +126,67 @@ const LoginForm = () => {
   }
 
   return (
-    <Container>
-      <Title>Sign in</Title>
+    <BackgroundContainer>
+      <Container>
+        <Title>Sign in</Title>
 
-      <Register>
-        Don&apos;t have an account? &nbsp;
-        <StyledLink href="#/register">Create Account Here</StyledLink>
-      </Register>
+        <Register>
+          Don&apos;t have an account? &nbsp;
+          <StyledLink href="#/register">Create Account Here</StyledLink>
+        </Register>
 
-      <StyledCard>
-        {loginState.error && loginState.error.type !== LoginError.EmailIsNotConfirmed && (
-          <StyledNotification title={loginState.error.message} hideCloseButton={true} icon="error" />
-        )}
-        {loginState.isLoginSuccess && (
-          <StyledNotification title="Login successful. Redirecting..." hideCloseButton={true} icon="success" />
-        )}
-        {resendEmailSection}
-
-        <Formik initialValues={initialValues} validationSchema={validateSchema} onSubmit={onSubmit}>
-          {({ errors, touched }: FormikProps<LoginFormValues>) => (
-            <StyledForm>
-              <Field
-                name="emailOrUserName"
-                label="Email or User name"
-                as={StyledInput}
-                icon={<FontAwesomeIcon icon={faUser} />}
-                error={errors.emailOrUserName && touched.emailOrUserName ? errors.emailOrUserName : null}
-                placeholder="Enter email or username"
-              />
-              <Field
-                name="password"
-                label="Password"
-                as={StyledInput}
-                icon={<FontAwesomeIcon icon={faLock} />}
-                type="password"
-                error={errors.password && touched.password ? errors.password : null}
-                placeholder="Enter password"
-              />
-              <ButtonContainer>
-                <StyledButton type="submit" label="Sign In" variant="brand" disabled={loginState.isLoading} />
-                <GoogleLogin
-                  clientId={config.GoogleClientId}
-                  onSuccess={onGoogleResponse}
-                  onFailure={(e) => console.log(e)}
-                  render={(renderProps) => (
-                    <StyledButton onClick={renderProps.onClick} variant="destructive">
-                      <StyledGoogleIcon icon={faGoogle} />
-                      Login with Google
-                    </StyledButton>
-                  )}
-                  cookiePolicy="single_host_origin"
-                />
-              </ButtonContainer>
-
-              <StyledLink href="#">Forgot your password?</StyledLink>
-            </StyledForm>
+        <StyledCard>
+          {loginState.error && loginState.error.type !== LoginError.EmailIsNotConfirmed && (
+            <StyledNotification title={loginState.error.message} hideCloseButton={true} icon="error" />
           )}
-        </Formik>
-      </StyledCard>
-    </Container>
+          {loginState.isLoginSuccess && (
+            <StyledNotification title="Login successful. Redirecting..." hideCloseButton={true} icon="success" />
+          )}
+          {resendEmailSection}
+
+          <Formik initialValues={initialValues} validationSchema={validateSchema} onSubmit={onSubmit}>
+            {({ errors, touched }: FormikProps<LoginFormValues>) => (
+              <StyledForm>
+                <Field
+                  name="emailOrUserName"
+                  label="Email or User name"
+                  as={StyledInput}
+                  icon={<FontAwesomeIcon icon={faUser} />}
+                  error={errors.emailOrUserName && touched.emailOrUserName ? errors.emailOrUserName : null}
+                  placeholder="Enter email or username"
+                />
+                <Field
+                  name="password"
+                  label="Password"
+                  as={StyledInput}
+                  icon={<FontAwesomeIcon icon={faLock} />}
+                  type="password"
+                  error={errors.password && touched.password ? errors.password : null}
+                  placeholder="Enter password"
+                />
+                <ButtonContainer>
+                  <StyledButton type="submit" label="Sign In" variant="brand" disabled={loginState.isLoading} />
+                  <GoogleLogin
+                    clientId={config.GoogleClientId}
+                    onSuccess={onGoogleResponse}
+                    onFailure={(e) => console.log(e)}
+                    render={(renderProps) => (
+                      <StyledButton onClick={renderProps.onClick} variant="destructive">
+                        <StyledGoogleIcon icon={faGoogle} />
+                        Login with Google
+                      </StyledButton>
+                    )}
+                    cookiePolicy="single_host_origin"
+                  />
+                </ButtonContainer>
+
+                <StyledLink href="#">Forgot your password?</StyledLink>
+              </StyledForm>
+            )}
+          </Formik>
+        </StyledCard>
+      </Container>
+    </BackgroundContainer>
   );
 };
 

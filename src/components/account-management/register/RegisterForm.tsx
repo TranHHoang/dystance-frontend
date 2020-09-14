@@ -4,6 +4,7 @@ import { startRegister } from "./registerSlice";
 import { RootState } from "~app/rootReducer";
 import { faUser, faLock, faEnvelope, faCalendar } from "@fortawesome/free-solid-svg-icons";
 import {
+  BackgroundContainer,
   ButtonContainer,
   Container,
   StyledButton,
@@ -59,87 +60,89 @@ const RegisterForm = () => {
   }
 
   return (
-    <Container>
-      <StyledCard>
-        <Title>Create Your Account</Title>
-        {registerState.error && (
-          <StyledNotification title={registerState.error.message} hideCloseButton={true} icon="error" />
-        )}
-        <Formik initialValues={initialValues} validationSchema={validateSchema} onSubmit={onSubmit}>
-          {({ errors, touched, values, setFieldValue }: FormikProps<RegisterFormValues>) => (
-            <StyledForm>
-              <Field
-                name="userName"
-                as={StyledInput}
-                icon={<FontAwesomeIcon icon={faUser} />}
-                type="text"
-                label="Username"
-                placeholder="Enter your username"
-                error={errors.userName && touched.userName ? errors.userName : null}
-                required
-              />
-              <Field
-                name="email"
-                as={StyledInput}
-                icon={<FontAwesomeIcon icon={faEnvelope} />}
-                type="email"
-                label="Email"
-                placeholder="Enter your email"
-                error={errors.email && touched.email ? errors.email : null}
-                required
-              />
-              <Field
-                name="password"
-                as={StyledInput}
-                icon={<FontAwesomeIcon icon={faLock} />}
-                type="password"
-                label="Password"
-                placeholder="Enter your password"
-                error={errors.password && touched.password ? errors.password : null}
-                required
-              />
-              <Field
-                name="rePassword"
-                as={StyledInput}
-                icon={<FontAwesomeIcon icon={faLock} />}
-                type="password"
-                label="Re-enter Password"
-                placeholder="Re-enter your password"
-                error={errors.rePassword && touched.rePassword ? errors.rePassword : null}
-                required
-              />
-              <Field
-                name="realName"
-                as={StyledInput}
-                icon={<FontAwesomeIcon icon={faUser} />}
-                type="text"
-                label="Real Name"
-                placeholder="Enter your real name"
-                error={errors.realName && touched.realName ? errors.realName : null}
-                required
-              />
-
-              <StyledDatePicker
-                name="dob"
-                label="Date Of Birth"
-                locale="en-GB"
-                placeholder="Enter your date of birth"
-                value={values.dob}
-                onChange={(e) => setFieldValue("dob", e)}
-                error={errors.dob && touched.dob ? errors.dob : null}
-                required
-              />
-
-              <ButtonContainer>
-                <StyledButton variant="brand" type="submit" disabled={registerState.isLoading}>
-                  Register
-                </StyledButton>
-              </ButtonContainer>
-            </StyledForm>
+    <BackgroundContainer>
+      <Container>
+        <StyledCard>
+          <Title>Create Your Account</Title>
+          {registerState.error && (
+            <StyledNotification title={registerState.error.message} hideCloseButton={true} icon="error" />
           )}
-        </Formik>
-      </StyledCard>
-    </Container>
+          <Formik initialValues={initialValues} validationSchema={validateSchema} onSubmit={onSubmit}>
+            {({ errors, touched, values, setFieldValue }: FormikProps<RegisterFormValues>) => (
+              <StyledForm>
+                <Field
+                  name="userName"
+                  as={StyledInput}
+                  icon={<FontAwesomeIcon icon={faUser} />}
+                  type="text"
+                  label="Username"
+                  placeholder="Enter your username"
+                  error={errors.userName && touched.userName ? errors.userName : null}
+                  required
+                />
+                <Field
+                  name="email"
+                  as={StyledInput}
+                  icon={<FontAwesomeIcon icon={faEnvelope} />}
+                  type="email"
+                  label="Email"
+                  placeholder="Enter your email"
+                  error={errors.email && touched.email ? errors.email : null}
+                  required
+                />
+                <Field
+                  name="password"
+                  as={StyledInput}
+                  icon={<FontAwesomeIcon icon={faLock} />}
+                  type="password"
+                  label="Password"
+                  placeholder="Enter your password"
+                  error={errors.password && touched.password ? errors.password : null}
+                  required
+                />
+                <Field
+                  name="rePassword"
+                  as={StyledInput}
+                  icon={<FontAwesomeIcon icon={faLock} />}
+                  type="password"
+                  label="Re-enter Password"
+                  placeholder="Re-enter your password"
+                  error={errors.rePassword && touched.rePassword ? errors.rePassword : null}
+                  required
+                />
+                <Field
+                  name="realName"
+                  as={StyledInput}
+                  icon={<FontAwesomeIcon icon={faUser} />}
+                  type="text"
+                  label="Real Name"
+                  placeholder="Enter your real name"
+                  error={errors.realName && touched.realName ? errors.realName : null}
+                  required
+                />
+
+                <StyledDatePicker
+                  name="dob"
+                  label="Date Of Birth"
+                  locale="en-GB"
+                  placeholder="Enter your date of birth"
+                  value={values.dob}
+                  onChange={(e) => setFieldValue("dob", e)}
+                  error={errors.dob && touched.dob ? errors.dob : null}
+                  required
+                />
+
+                <ButtonContainer>
+                  <StyledButton variant="brand" type="submit" disabled={registerState.isLoading}>
+                    Register
+                  </StyledButton>
+                </ButtonContainer>
+              </StyledForm>
+            )}
+          </Formik>
+        </StyledCard>
+      </Container>
+    </BackgroundContainer>
   );
 };
 

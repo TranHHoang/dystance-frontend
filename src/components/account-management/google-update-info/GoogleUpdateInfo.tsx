@@ -4,6 +4,7 @@ import { RootState } from "~app/rootReducer";
 import { startGoogleUpdateInfo } from "./googleUpdateInfoSlice";
 import { faUser, faLock, faEnvelope, faCalendar } from "@fortawesome/free-solid-svg-icons";
 import {
+  BackgroundContainer,
   ButtonContainer,
   Container,
   StyledButton,
@@ -44,60 +45,62 @@ const GoogleUpdateInfoForm = () => {
   }
 
   return (
-    <Container>
-      <StyledCard>
-        <Title>Update User Info</Title>
-        {updateInfoState.error && (
-          <StyledNotification title={updateInfoState.error.message} hideCloseButton={true} icon="error" />
-        )}
-        {updateInfoState.isUpdateInfoSuccess && (
-          <StyledNotification title="Update Successful. Redirecting..." hideCloseButton={true} icon="success" />
-        )}
-        <Formik initialValues={initialValues} validationSchema={validateSchema} onSubmit={onSubmit}>
-          {({ errors, touched, values, setFieldValue }: FormikProps<GoogleUpdateInfoFormValues>) => (
-            <StyledForm>
-              <Field
-                name="userName"
-                as={StyledInput}
-                icon={<FontAwesomeIcon icon={faUser} />}
-                type="text"
-                label="Username"
-                placeholder="Enter your username"
-                error={errors.userName && touched.userName ? errors.userName : null}
-                required
-              />
-              <Field
-                name="realName"
-                as={StyledInput}
-                icon={<FontAwesomeIcon icon={faUser} />}
-                type="text"
-                label="Real Name"
-                placeholder="Enter your real name"
-                error={errors.realName && touched.realName ? errors.realName : null}
-                required
-              />
-
-              <StyledDatePicker
-                name="dob"
-                label="Date Of Birth"
-                locale="en-GB"
-                placeholder="Enter your date of birth"
-                value={values.dob}
-                onChange={(e) => setFieldValue("dob", e)}
-                error={errors.dob && touched.dob ? errors.dob : null}
-                required
-              />
-
-              <ButtonContainer>
-                <StyledButton variant="brand" type="submit" disabled={updateInfoState.isLoading}>
-                  Update
-                </StyledButton>
-              </ButtonContainer>
-            </StyledForm>
+    <BackgroundContainer>
+      <Container>
+        <StyledCard>
+          <Title>Update User Info</Title>
+          {updateInfoState.error && (
+            <StyledNotification title={updateInfoState.error.message} hideCloseButton={true} icon="error" />
           )}
-        </Formik>
-      </StyledCard>
-    </Container>
+          {updateInfoState.isUpdateInfoSuccess && (
+            <StyledNotification title="Update Successful. Redirecting..." hideCloseButton={true} icon="success" />
+          )}
+          <Formik initialValues={initialValues} validationSchema={validateSchema} onSubmit={onSubmit}>
+            {({ errors, touched, values, setFieldValue }: FormikProps<GoogleUpdateInfoFormValues>) => (
+              <StyledForm>
+                <Field
+                  name="userName"
+                  as={StyledInput}
+                  icon={<FontAwesomeIcon icon={faUser} />}
+                  type="text"
+                  label="Username"
+                  placeholder="Enter your username"
+                  error={errors.userName && touched.userName ? errors.userName : null}
+                  required
+                />
+                <Field
+                  name="realName"
+                  as={StyledInput}
+                  icon={<FontAwesomeIcon icon={faUser} />}
+                  type="text"
+                  label="Real Name"
+                  placeholder="Enter your real name"
+                  error={errors.realName && touched.realName ? errors.realName : null}
+                  required
+                />
+
+                <StyledDatePicker
+                  name="dob"
+                  label="Date Of Birth"
+                  locale="en-GB"
+                  placeholder="Enter your date of birth"
+                  value={values.dob}
+                  onChange={(e) => setFieldValue("dob", e)}
+                  error={errors.dob && touched.dob ? errors.dob : null}
+                  required
+                />
+
+                <ButtonContainer>
+                  <StyledButton variant="brand" type="submit" disabled={updateInfoState.isLoading}>
+                    Update
+                  </StyledButton>
+                </ButtonContainer>
+              </StyledForm>
+            )}
+          </Formik>
+        </StyledCard>
+      </Container>
+    </BackgroundContainer>
   );
 };
 
