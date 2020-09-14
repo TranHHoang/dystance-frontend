@@ -3,7 +3,7 @@ import { AxiosError } from "axios";
 import moment from "moment";
 import { AppThunk } from "../../../app/store";
 import { CreateRoomFormValues } from "./CreateRoomForm";
-import Axios from "../../../utils/fakeAPI";
+import Axios from "~utils/fakeAPI";
 
 interface ErrorResponse {
   type: number;

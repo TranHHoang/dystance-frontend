@@ -6,7 +6,7 @@ import { hostName } from "~utils/hostUtils";
 const mock = new MockAdapter(Axios, { delayResponse: 1000 });
 
 // Username & password
-mock.onPost(`${hostName}/api/rooms/create`).reply((config) => {
+mock.onPost("/api/rooms/create").reply((config) => {
   const params = config.data as FormData;
   console.log(config.data);
   console.log(config.headers);
@@ -25,7 +25,8 @@ mock.onPost(`${hostName}/api/rooms/create`).reply((config) => {
     return [500, { message: "Server error!!!!!!!!!!!!!!!" }];
   }
 });
-mock.onGet(`${hostName}/api/rooms/getByUserId?id=1`).reply(200, [
+
+mock.onGet("/api/rooms/getByUserId?id=1").reply(200, [
   {
     id: "1",
     name: "Lop nay ten dai vl khong chua duoc vi no qua dai cho nen phai teet",
@@ -120,6 +121,7 @@ mock.onGet(`${hostName}/api/rooms/getByUserId?id=1`).reply(200, [
     description: "Welcome to Math Class"
   }
 ]);
+
 mock.onPost(`${hostName}/api/users/login`).reply((config) => {
   const params = config.data as FormData;
   console.log(config.data);
