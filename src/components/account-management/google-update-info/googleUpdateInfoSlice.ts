@@ -81,7 +81,7 @@ export function startGoogleUpdateInfo({ userName, realName, dob }: GoogleUpdateI
         refreshToken: data.refreshToken
       });
 
-      createHashHistory().push("/");
+      createHashHistory().push("/homepage");
     } catch (ex) {
       console.log(ex);
 

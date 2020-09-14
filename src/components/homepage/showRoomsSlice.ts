@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError, AxiosResponse } from "axios";
-import { AppThunk } from "../../app//store";
+import { AppThunk } from "~app/store";
 import { getFormInitialValues } from "redux-form";
-import Axios from "../../utils/fakeAPI";
+import Axios from "~utils/fakeAPI";
+import { hostName } from "~utils/hostUtils";
 
 enum ShowRoomError {
   OtherError = 2
@@ -12,8 +13,8 @@ interface ErrorResponse {
   message: string;
 }
 interface Room {
-  id: string;
-  name: string;
+  roomId: string;
+  roomName: string;
   creatorId: string;
   image: string;
   description: string;
@@ -54,7 +55,7 @@ export const { fetchRoomSuccess, fetchRoomFailed } = showRoomSlice.actions;
 export function showRoom(): AppThunk {
   return async (dispatch) => {
     try {
-      const response = await Axios.get("/api/rooms/getByUserId?id=1");
+      const response = await Axios.get(`${hostName}/api/Rooms/getByUserId?id=1`);
       const data = response.data as Room[];
       console.log(data);
 
