@@ -5,3 +5,8 @@ export interface UserLoginData {
   refreshToken: string;
   expires?: string;
 }
+
+export interface ErrorResponse {
+  type: number;
+  message: string;
+}

@@ -25,6 +25,7 @@ import {
 } from "./styles";
 import { Formik, Field, FormikProps } from "formik";
 import * as Yup from "yup";
+import * as resetPasswordSlice from "../reset-password/resetPasswordSlice";
 
 interface LoginFormValues {
   emailOrUserName: string;
@@ -180,7 +181,9 @@ const LoginForm = () => {
                   />
                 </ButtonContainer>
 
-                <StyledLink href="#">Forgot your password?</StyledLink>
+                <StyledLink href="#" onClick={() => dispatch(resetPasswordSlice.resetState())}>
+                  Forgot your password?
+                </StyledLink>
               </StyledForm>
             )}
           </Formik>
