@@ -63,7 +63,7 @@ export const SingleRoom = (props: any) => {
   return (
     <div>
       <StyledCard
-        className="rainbow-flex rainbow-flex_column 
+        className="rainbow-flex rainbow-flex_column
     rainbow-align_flex-start rainbow-p-vertical_small rainbow-m-around_small"
       >
         <Separator />

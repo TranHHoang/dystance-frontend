@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { Modal, Button, Input, TimePicker, DatePicker, Textarea, Notification } from "react-rainbow-components";
-import { RootState } from "../../../app/rootReducer";
+import { RootState } from "~app/rootReducer";
 import { useSelector, useDispatch } from "react-redux";
 import { createRoom, setRoomCreateModalOpen } from "./createRoomSlice";
 import styled from "styled-components";

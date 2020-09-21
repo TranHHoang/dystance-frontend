@@ -1,139 +1,121 @@
 import createRoomReducer, * as CreateRoomSlice from "./createRoomSlice";
 import React from "react";
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import { reducer as formReducer, submit, initialize } from "redux-form";
+import { reducer as formReducer } from "redux-form";
 import CreateRoomForm from "./CreateRoomForm";
 import { shallow, mount } from "enzyme";
 import { Provider } from "react-redux";
 
-import {
-    render,
-    fireEvent,
-    screen,
-    cleanup,
-    waitFor,
-    getByLabelText,
-    getByTestId,
-    getByTitle,
-    getByText
-} from "@testing-library/react";
+import { fireEvent, cleanup, waitFor } from "@testing-library/react";
 import { Modal } from "react-rainbow-components";
 
 let store: ReturnType<typeof configureStore>;
 let wrapper: ReturnType<typeof mount>;
-let container: HTMLElement;
 
 describe("CreateRoomForm", () => {
-    beforeEach(() => {
-        store = configureStore({
-            reducer: combineReducers({
-                createRoomState: createRoomReducer,
-                form: formReducer
-            })
-        });
-        wrapper = mount(
-            <Provider store={store}>
-                <CreateRoomForm />
-            </Provider>
-        );
-        container = render(
-            <Provider store={store}>
-                <CreateRoomForm />
-            </Provider>
-        ).container;
+  beforeEach(() => {
+    store = configureStore({
+      reducer: combineReducers({
+        createRoomState: createRoomReducer,
+        form: formReducer
+      })
+    });
+    wrapper = mount(
+      <Provider store={store}>
+        <CreateRoomForm />
+      </Provider>
+    );
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
+
+  it("renders", () => {
+    const wrapper = shallow(
+      <Provider store={store}>
+        <CreateRoomForm />
+      </Provider>
+    ).dive();
+    expect(wrapper.exists()).toBe(true);
+  });
+
+  it("opens modal when create room button is clicked", () => {
+    wrapper.find("button").simulate("click");
+    expect(wrapper.find(Modal).first().prop("isOpen")).toBe(true);
+  });
+
+  it("dispatch to store when form values are correct", async () => {
+    const spy = jest.spyOn(CreateRoomSlice, "createRoom").mockReturnValue(jest.fn());
+
+    wrapper.find("button").simulate("click");
+
+    await waitFor(() => {
+      const classroomName = wrapper.find("input[name='classroomName']");
+      fireEvent.change(classroomName.getDOMNode(), { target: { value: "SWD" } });
     });
 
-    afterEach(() => {
-        jest.clearAllMocks();
-        cleanup();
+    const startTime = wrapper.find("input[name='startTime']");
+
+    await waitFor(() => {
+      fireEvent.change(startTime.getDOMNode(), { target: { value: "01:00" } });
     });
 
-    it("renders", () => {
-        const wrapper = shallow(
-            <Provider store={store}>
-                <CreateRoomForm />
-            </Provider>
-        ).dive();
-        expect(wrapper.exists()).toBe(true);
+    console.log(startTime.debug());
+
+    await waitFor(() => {
+      const endTime = wrapper.find("input[name='endTime']");
+      fireEvent.change(endTime.getDOMNode(), { target: { value: "02:00" } });
     });
 
-    it("opens modal when create room button is clicked", () => {
-        wrapper.find("button").simulate("click");
-        expect(wrapper.find(Modal).first().prop("isOpen")).toBe(true);
+    await waitFor(() => {
+      const submitButton = wrapper.find("button[type='submit']");
+      fireEvent.click(submitButton.getDOMNode());
     });
 
-    it("dispatch to store when form values are correct", async () => {
-        const spy = jest.spyOn(CreateRoomSlice, "createRoom").mockReturnValue(jest.fn());
+    expect(spy).toBeCalled();
+  });
 
-        wrapper.find("button").simulate("click");
+  it("render modal correctly", () => {
+    expect(wrapper.find(Modal).exists()).toBe(true);
+  });
 
-        await waitFor(() => {
-            const classroomName = wrapper.find("input[name='classroomName']");
-            fireEvent.change(classroomName.getDOMNode(), { target: { value: "SWD" } });
-        });
+  it("default Cancel & Save button state when modal is open", async () => {
+    // jest.spyOn(CreateRoomSlice, "createRoom").mockReturnValue((dispatch) => {
+    //   dispatch(CreateRoomSlice.roomCreateStart());
+    // });
+    wrapper.find("button").simulate("click");
+    // wrapper.update();
 
-        const startTime = wrapper.find("input[name='startTime']");
+    // console.log(wrapper.debug());
 
-        await waitFor(() => {
-            fireEvent.change(startTime.getDOMNode(), { target: { value: "01:00" } });
-        });
+    const cancelButton = wrapper
+      .findWhere((node) => node.type() && node.name() && node.text() === "Cancel")
+      .hostNodes();
 
-        console.log(startTime.debug());
+    const saveButton = wrapper.findWhere((node) => node.type() && node.name() && node.text() === "Save").hostNodes();
 
-        await waitFor(() => {
-            const endTime = wrapper.find("input[name='endTime']");
-            fireEvent.change(endTime.getDOMNode(), { target: { value: "02:00" } });
-        });
+    expect(cancelButton.getDOMNode()).toBeEnabled();
+    expect(saveButton.getDOMNode()).toBeEnabled();
+    // expect(saveButton).toBeEnabled();
 
-        await waitFor(() => {
-            const submitButton = wrapper.find("button[type='submit']");
-            fireEvent.click(submitButton.getDOMNode());
-        });
+    // const showModalButton = container.querySelector("button");
 
-        expect(spy).toBeCalled();
-    });
+    // await waitFor(() => {
+    //   fireEvent.click(showModalButton);
+    // });
 
-    it("render modal correctly", () => {
-        expect(wrapper.find(Modal).exists()).toBe(true);
-    });
+    // const classroomName = container.querySelector("input[name='classroomName']");
+    // await waitFor(() => {
+    //   fireEvent.change(classroomName, { target: { value: "SWD" } });
+    // });
 
-    it("default Cancel & Save button state when modal is open", async () => {
-        // jest.spyOn(CreateRoomSlice, "createRoom").mockReturnValue((dispatch) => {
-        //   dispatch(CreateRoomSlice.roomCreateStart());
-        // });
-        wrapper.find("button").simulate("click");
-        // wrapper.update();
+    // const submitButton = container.querySelector("button[type='submit']");
+    // await waitFor(() => {
+    //   fireEvent.click(submitButton);
+    // });
 
-        // console.log(wrapper.debug());
-
-        const cancelButton = wrapper
-            .findWhere((node) => node.type() && node.name() && node.text() === "Cancel")
-            .hostNodes();
-
-        const saveButton = wrapper
-            .findWhere((node) => node.type() && node.name() && node.text() === "Save")
-            .hostNodes();
-
-        expect(cancelButton.getDOMNode()).toBeEnabled();
-        expect(saveButton.getDOMNode()).toBeEnabled();
-        // expect(saveButton).toBeEnabled();
-
-        // const showModalButton = container.querySelector("button");
-
-        // await waitFor(() => {
-        //   fireEvent.click(showModalButton);
-        // });
-
-        // const classroomName = container.querySelector("input[name='classroomName']");
-        // await waitFor(() => {
-        //   fireEvent.change(classroomName, { target: { value: "SWD" } });
-        // });
-
-        // const submitButton = container.querySelector("button[type='submit']");
-        // await waitFor(() => {
-        //   fireEvent.click(submitButton);
-        // });
-
-        // expect(submitButton).toBeDisabled();
-    });
+    // expect(submitButton).toBeDisabled();
+  });
 });

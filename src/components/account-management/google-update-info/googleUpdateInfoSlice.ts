@@ -4,11 +4,12 @@ import { hostName } from "~utils/hostUtils";
 import { AppThunk } from "~app/store";
 import { createHashHistory } from "history";
 import { saveLoginData } from "~utils/tokenStorage";
-import { ErrorResponse, OkResponse } from "../login/loginSlice";
+import { OkResponse } from "../login/loginSlice";
+import { LoginLocalStorageKey } from "../login/LoginForm";
 import { GoogleUpdateInfoFormValues } from "./GoogleUpdateInfo";
 import Axios from "~utils/fakeAPI";
 import moment from "moment";
-import { LoginLocalStorageKey } from "~utils/types";
+import { ErrorResponse } from "~utils/types";
 
 export enum GoogleUpdateInfoError {
   UserNameAlreadyExists,

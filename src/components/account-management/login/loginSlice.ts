@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosResponse, AxiosError } from "axios";
 import { hostName } from "~utils/hostUtils";
-import { UserLoginData } from "~utils/types";
+import { ErrorResponse, UserLoginData } from "~utils/types";
 import { AppThunk } from "~app/store";
 import { createHashHistory } from "history";
 import Axios from "~utils/fakeAPI";
@@ -12,11 +12,6 @@ export enum LoginError {
   NameEmailPasswordIncorrect,
   EmailIsNotConfirmed,
   Other
-}
-
-export interface ErrorResponse {
-  type: number;
-  message: string;
 }
 
 export type OkResponse = UserLoginData;

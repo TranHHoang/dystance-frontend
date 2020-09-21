@@ -5,17 +5,13 @@ import { AppThunk } from "~app/store";
 import { createHashHistory } from "history";
 import Axios from "~utils/fakeAPI";
 import { RegisterFormValues } from "./RegisterForm";
-import { resetLoginState } from "../login/loginSlice";
 import moment from "moment";
+import { ErrorResponse } from "~utils/types";
+
 export enum RegisterError {
   EmailExists,
   UserNameExists,
   Other
-}
-
-interface ErrorResponse {
-  type: number;
-  message: string;
 }
 
 interface RegisterFormState {

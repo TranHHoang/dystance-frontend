@@ -1,5 +1,4 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import postReducer from "../example/post/postSlice";
 import loginReducer from "../components/account-management/login/loginSlice";
 import googleUpdateInfoReducer from "../components/account-management/google-update-info/googleUpdateInfoSlice";
 import registerReducer from "../components/account-management/register/registerSlice";
@@ -12,7 +11,6 @@ import resetPasswordReducer from "../components/account-management/reset-passwor
 import inviteReducer from "../components/room/invite/inviteSlice";
 
 const rootReducer = combineReducers({
-  posts: postReducer,
   roomCreation: createRoomReducer,
   showRoomState: showRoomReducer,
   loginState: loginReducer,

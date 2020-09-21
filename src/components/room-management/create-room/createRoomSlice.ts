@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import moment from "moment";
-import { AppThunk } from "../../../app/store";
+import { AppThunk } from "~app/store";
 import { CreateRoomFormValues } from "./CreateRoomForm";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
