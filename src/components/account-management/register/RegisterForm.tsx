@@ -133,8 +133,9 @@ const RegisterForm = () => {
                 />
 
                 <ButtonContainer>
-                  <StyledButton variant="brand" type="submit" disabled={registerState.isLoading}>
-                    Register
+                  <StyledButton variant="brand" type="submit" disabled={registerState.isLoading} label="Register" />
+                  <StyledButton variant="base" onClick={() => (location.href = "#/")}>
+                    I already have an account
                   </StyledButton>
                 </ButtonContainer>
               </StyledForm>
