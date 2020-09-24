@@ -1,20 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ChatBox from "./ChatBox";
 import ChatHistory from "./ChatHistory";
 import styled from "styled-components";
 import { Button, Modal } from "react-rainbow-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFile } from "@fortawesome/free-solid-svg-icons";
+import { RootState } from "~app/rootReducer";
+import { useDispatch, useSelector } from "react-redux";
+import { broadcastMessage, ChatType } from "./chatSlice";
 
 const ChatHistoryArea = styled.div`
   overflow: auto;
   transform: translate3d(0, 0, 0); /* Faster scrolling */
   max-height: 90vh;
+  min-height: 90vh;
 `;
 
 const StyledChatArea = styled.div`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
-  /* overflow: auto; */
+  overflow: auto;
 `;
 
 const StyledModal = styled(Modal)`
@@ -43,12 +47,16 @@ const StyledModal = styled(Modal)`
 `;
 
 const ChatArea = () => {
-  const [hasFile, setHasFile] = useState(false);
-  const [file, setFile] = useState(null as File);
+  const chatState = useSelector((root: RootState) => root.chatState);
+  // const [hasFile, setHasFile] = useState(false);
+  const [file, setFile] = useState<File>();
   const [imagePreview, setImagePreview] = useState("");
+  const chatBox = useRef<HTMLDivElement>();
+
+  const dispatch = useDispatch();
 
   function isImageFile(file: File) {
-    return /(jpg|png|jpeg)$/.test(file?.name);
+    return file?.type.includes("image") ?? false;
   }
 
   function bytesToSize(bytes: number) {
@@ -68,13 +76,22 @@ const ChatArea = () => {
     }
   }, [file]);
 
+  useEffect(() => {
+    chatBox.current.scrollTop = chatBox.current.scrollHeight + 500;
+  }, [chatState]);
+
   function onDrop(e: React.DragEvent<HTMLDivElement>) {
     e.preventDefault();
-    setHasFile(true);
+    // setHasFile(true);
 
     if (e.dataTransfer.items[0]?.kind === "file") {
       setFile(e.dataTransfer.items[0].getAsFile());
     }
+  }
+
+  function sendFile() {
+    dispatch(broadcastMessage("1", file, isImageFile(file) ? ChatType.Image : ChatType.File));
+    setFile(undefined);
   }
 
   return (
@@ -87,13 +104,11 @@ const ChatArea = () => {
       onDrop={onDrop}
     >
       <StyledModal
-        isOpen={hasFile}
+        isOpen={file !== undefined}
         footer={
           <div id="group">
-            <Button onClick={() => setHasFile(false)}>Cancel</Button>
-            <Button id="upload" variant="base">
-              Upload
-            </Button>
+            <Button label="Cancel" onClick={() => setFile(undefined)} />
+            <Button id="upload" label="Upload" variant="base" onClick={sendFile} />
           </div>
         }
         hideCloseButton={true}
@@ -109,10 +124,10 @@ const ChatArea = () => {
         </div>
       </StyledModal>
       <StyledChatArea>
-        <ChatHistoryArea>
+        <ChatHistoryArea id="chatbox" ref={chatBox}>
           <ChatHistory />
         </ChatHistoryArea>
-        <ChatBox />
+        <ChatBox setFile={setFile} />
       </StyledChatArea>
     </div>
   );
