@@ -1,53 +1,43 @@
 import * as React from "react";
-import { useState } from "react";
-import { Card, Button } from "react-rainbow-components";
-import styled from "styled-components";
+import {
+  Description,
+  FlexRowContainer,
+  ImageContainer,
+  Separator,
+  StyledButton,
+  StyledCard,
+  StyledImage,
+  TextContainer,
+  Time,
+  Title
+} from "./SingleRoomStyles";
 
-const StyledCard = styled(Card)`
-  width: 350px;
-  height: 450px;
-`;
-const Title = styled.h1`
-  font-size: 3em;
-  text-overflow: ellipsis;
-  overflow: hidden;
-`;
-const Time = styled.h2`
-  font-size: 1.5em;
-`;
-
-const TextContainer = styled.div`
-  line-height: normal;
-  padding: 0 5% 30px 5%;
-  min-width: 0;
-  white-space: nowrap;
-`;
-
-const Description = styled.p`
-  font-size: 1.5em;
-  padding: 5% 0 5% 5%;
-`;
-
-const StyledButton = styled(Button)`
-  align-self: center;
-  width: 50%;
-`;
 export const SingleRoom = (props: any) => {
-  const { id, name, startDate, startHour, endHour, endDate, image, description }: any = props;
+  const { name, startHour, endHour, image, description }: any = props;
 
   return (
     <StyledCard
       className="rainbow-flex rainbow-flex_column 
     rainbow-align_flex-start rainbow-p-vertical_small rainbow-m-around_small"
     >
-      <TextContainer>
-        <Title>{name}</Title>
+      <Separator />
+      <FlexRowContainer>
+        <ImageContainer>
+          <StyledImage src="https://www.w3schools.com/howto/img_avatar.png" alt="" />
+        </ImageContainer>
         <Time>
           {startHour} - {endHour}
         </Time>
+      </FlexRowContainer>
+      <TextContainer>
+        <Title>{name}</Title>
       </TextContainer>
-      <img src={image} alt="" />
-      <Description>{description}</Description>
+      <Description
+        readOnly
+        value={description}
+        rows={3}
+        className="rainbow-m-vertical_x-large rainbow-p-horizontal_medium rainbow-m_auto"
+      />
       <StyledButton label="Join Now" variant="brand" />
     </StyledCard>
   );
