@@ -11,10 +11,20 @@ import {
   Time,
   Title
 } from "./SingleRoomStyles";
+import moment from "moment";
 
 export const SingleRoom = (props: any) => {
   const { name, startHour, endHour, image, description }: any = props;
 
+  function formatTime(time: string): string {
+    const parts = time.split(":");
+    const hours = parseInt(parts[0]);
+    const minutes = parseInt(parts[1]);
+    const date = new Date();
+    date.setHours(hours);
+    date.setMinutes(minutes);
+    return moment(date).format("HH:mm");
+  }
   return (
     <StyledCard
       className="rainbow-flex rainbow-flex_column 
@@ -23,10 +33,17 @@ export const SingleRoom = (props: any) => {
       <Separator />
       <FlexRowContainer>
         <ImageContainer>
-          <StyledImage src="https://www.w3schools.com/howto/img_avatar.png" alt="" />
+          <StyledImage
+            src={
+              image
+                ? image
+                : "https://image.freepik.com/free-vector/empty-classroom-interior-school-college-class_107791-631.jpg"
+            }
+            alt=""
+          />
         </ImageContainer>
         <Time>
-          {startHour} - {endHour}
+          {formatTime(startHour)} - {formatTime(endHour)}
         </Time>
       </FlexRowContainer>
       <TextContainer>

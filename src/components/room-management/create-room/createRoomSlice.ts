@@ -4,7 +4,10 @@ import moment from "moment";
 import { AppThunk } from "../../../app/store";
 import { CreateRoomFormValues } from "./CreateRoomForm";
 import Axios from "~utils/fakeAPI";
-
+import { hostName } from "~utils/hostUtils";
+import { getLoginData } from "~utils/tokenStorage";
+import { showRoom, resetRoom } from "../../homepage/showRoomsSlice";
+import { LoginLocalStorageKey } from "~utils/types";
 interface ErrorResponse {
   type: number;
   message: string;
@@ -72,14 +75,17 @@ export function createRoom({
         }
       };
       fd.append("name", classroomName);
+      fd.append("creatorId", localStorage.getItem(LoginLocalStorageKey.UserId));
       fd.append("description", description);
       fd.append("startDate", moment(startDate).format("YYYY-MM-DD"));
       fd.append("endDate", moment(endDate).format("YYYY-MM-DD"));
       fd.append("startHour", startTime);
       fd.append("endHour", endTime);
 
-      await Axios.post("/api/rooms/create", fd, config);
+      await Axios.post(`${hostName}/api/rooms/create`, fd, config);
       dispatch(createRoomSuccess());
+      dispatch(resetRoom());
+      dispatch(showRoom());
     } catch (ex) {
       // Error code != 200
       const e = ex as AxiosError;

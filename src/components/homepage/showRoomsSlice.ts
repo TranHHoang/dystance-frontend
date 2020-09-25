@@ -4,7 +4,8 @@ import { AppThunk } from "~app/store";
 import { getFormInitialValues } from "redux-form";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
-
+import { getLoginData } from "~utils/tokenStorage";
+import { LoginLocalStorageKey } from "~utils/types";
 enum ShowRoomError {
   OtherError = 2
 }
@@ -45,17 +46,21 @@ const showRoomSlice = createSlice({
     fetchRoomFailed(state, action: PayloadAction<ErrorResponse>) {
       state.isLoading = false;
       state.error = action.payload;
+    },
+    resetRoom() {
+      return initialState;
     }
   }
 });
 
 export default showRoomSlice.reducer;
-export const { fetchRoomSuccess, fetchRoomFailed } = showRoomSlice.actions;
+export const { fetchRoomSuccess, fetchRoomFailed, resetRoom } = showRoomSlice.actions;
 
 export function showRoom(): AppThunk {
   return async (dispatch) => {
     try {
-      const response = await Axios.get(`${hostName}/api/Rooms/getByUserId?id=1`);
+      const id = localStorage.getItem(LoginLocalStorageKey.UserId);
+      const response = await Axios.get(`${hostName}/api/Rooms/getByUserId?id=${id}`);
       const data = response.data as Room[];
       console.log(data);
 
