@@ -25,15 +25,11 @@ import {
 } from "./styles";
 import { Formik, Field, FormikProps } from "formik";
 import * as Yup from "yup";
+import { LoginLocalStorageKey } from "~utils/types";
 
 interface LoginFormValues {
   emailOrUserName: string;
   password: string;
-}
-
-export enum LoginLocalStorageKey {
-  EmailOrUserName = "login/emailOrUserName",
-  GoogleEmail = "login/googleEmail"
 }
 
 const initialValues: LoginFormValues = {

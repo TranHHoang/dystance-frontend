@@ -17,8 +17,8 @@ export const ImageContainer = styled.div`
 `;
 export const StyledImage = styled.img`
   position: relative;
-  max-width: 100%;
-  height: auto;
+  width: 105px;
+  height: 105px;
   border-radius: 50%;
   z-index: 2;
 `;
