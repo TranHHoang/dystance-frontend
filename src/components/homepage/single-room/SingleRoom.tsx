@@ -55,7 +55,9 @@ export const SingleRoom = (props: any) => {
         rows={3}
         className="rainbow-m-vertical_x-large rainbow-p-horizontal_medium rainbow-m_auto"
       />
-      <StyledButton label="Join Now" variant="brand" />
+      <a href="#/camTest">
+        <StyledButton label="Join Now" variant="brand" />
+      </a>
     </StyledCard>
   );
 };

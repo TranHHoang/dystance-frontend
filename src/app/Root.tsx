@@ -19,6 +19,7 @@ const Container = styled.div`
 
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
   height: 100%;
+  overflow: auto;
 `;
 ReactDOM.render(
   <Provider store={store}>
