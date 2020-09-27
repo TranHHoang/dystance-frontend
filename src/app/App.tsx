@@ -5,6 +5,7 @@ import GoogleUpdateInfoForm from "../components/account-management/google-update
 import { HomePage } from "../components/homepage/Homepage";
 import { Route, Switch, HashRouter } from "react-router-dom";
 import RegisterForm from "../components/account-management/register/RegisterForm";
+import InviteForm from "../components/room/invite/InviteForm";
 
 export default hot(module)(function App() {
   return (
@@ -18,7 +19,8 @@ export default hot(module)(function App() {
           path="/"
           render={() => (
             <React.Fragment>
-              <LoginForm />
+              <InviteForm />
+              {/* <LoginForm /> */}
               {/*<AddPostForm />*/}
               {/*<PostList />*/}
             </React.Fragment>
