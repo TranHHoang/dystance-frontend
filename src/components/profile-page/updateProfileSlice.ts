@@ -8,7 +8,6 @@ import Axios from "~utils/fakeAPI";
 import { saveLoginData } from "~utils/tokenStorage";
 import { UpdateProfileFormValues } from "./ProfilePage";
 import moment from "moment";
-
 export interface ErrorResponse {
   type: number;
   message: string;
@@ -82,8 +81,9 @@ export function updateProfile({ realName, dob, newAvatar, password, newPassword 
       fd.append("currentPassword", password);
       fd.append("newPassword", newPassword);
 
-      await Axios.post(`${hostName}/api/users/updateInfo?id=1`, fd, config);
+      const response = await Axios.post(`${hostName}/api/users/updateInfo?id=1`, fd, config);
       localStorage.removeItem("profile");
+      localStorage.setItem("profile", JSON.stringify(response.data));
       dispatch(updateProfileSuccess());
     } catch (ex) {
       const e = ex as AxiosError;

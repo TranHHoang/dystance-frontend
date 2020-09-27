@@ -20,26 +20,24 @@ mock.onGet(`${hostName}/api/users/info?id=1`).reply(200, obj);
 mock.onPost(`${hostName}/api/users/updateInfo?id=1`).reply((config) => {
   const params = config.data as FormData;
   console.log(config.data);
-  const realName = params.get("realName");
+  const realName = params.get("realName") as string;
   const avatar = params.get("avatar");
   const dob = params.get("dob");
   const password = params.get("currentPassword");
   const newPassword = params.get("newPassword");
-  if (realName === "Minh Hoe") {
+  if (realName !== obj.realName) {
     if (password && password === "123") {
       obj.realName = realName;
-      return [200, { message: "Success" }];
+      return [200, obj];
     }
     if (!password && newPassword) {
       return [500, { type: 3, message: "Failed to update info" }];
     }
-    obj.realName = realName;
-    return [200, { message: "Success" }];
   }
   if (password === "123") {
-    return [200, { message: "Ok ban ei" }];
+    return [200, obj];
   } else if (password === "wrong" || !password) {
-    return [500, { type: 4, message: "Paaword does not match" }];
+    return [500, { type: 4, message: "Password does not match" }];
   }
   return [500, { message: "Unknown error" }];
 });

@@ -191,7 +191,9 @@ const ProfilePage = () => {
                       type="password"
                       label="Current Password"
                       error={
-                        updateProfileState.error && updateProfileState.error.type === 4 ? updateProfileState : null
+                        updateProfileState.error && updateProfileState.error.type === 4
+                          ? updateProfileState.error.message
+                          : null
                       }
                     />
                     <Field
