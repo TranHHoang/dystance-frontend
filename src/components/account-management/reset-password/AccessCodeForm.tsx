@@ -1,11 +1,10 @@
 import React from "react";
-import { Formik, Form, Field, FormikProps } from "formik";
+import { Formik, Form, FormikProps } from "formik";
 import * as Yup from "yup";
 import { Button, CodeInput } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import { startVerifyCode } from "./resetPasswordSlice";
 import { RootState } from "~app/rootReducer";
-import { StyledButton } from "../login/styles";
 
 interface AccessCodeValues {
   accessCode: string;
@@ -31,14 +30,12 @@ const AccessCodeForm = () => {
     <Formik initialValues={initialValues} validationSchema={schema} onSubmit={onSubmit}>
       {({ values, errors, touched, setFieldValue }: FormikProps<AccessCodeValues>) => (
         <Form>
-          <Field
-            name="accessCode"
-            component={CodeInput}
-            placeholder="Enter your access code"
-            error={errors.accessCode && touched.accessCode ? errors.accessCode : null}
-            label="Access code"
+          <CodeInput
             value={values.accessCode}
             onChange={(e: any) => setFieldValue("accessCode", e)}
+            error={errors.accessCode && touched.accessCode ? errors.accessCode : null}
+            length={6}
+            label="Access code"
           />
           <Button type="submit" disabled={resetPasswordState.isLoading} label="Verify access code" />
         </Form>
