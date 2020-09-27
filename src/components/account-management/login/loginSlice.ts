@@ -120,7 +120,7 @@ export function startLogin(email?: string, userName?: string, password?: string,
         refreshToken: data.refreshToken
       });
 
-      createHashHistory().push("/homepage");
+      createHashHistory().push("/profile");
     } catch (ex) {
       const e = ex as AxiosError;
       // Google login first time

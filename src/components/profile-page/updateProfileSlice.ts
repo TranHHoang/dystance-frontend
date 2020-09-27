@@ -68,6 +68,8 @@ export function changePassword({ password, newPassword }: UpdateProfileFormValue
 export function updateProfile({ realName, dob, newAvatar, password, newPassword }: UpdateProfileFormValues): AppThunk {
   return async (dispatch) => {
     dispatch(updateProfileStart());
+    console.log("Update Start");
+
     try {
       const fd = new FormData();
       const config = {
@@ -81,7 +83,7 @@ export function updateProfile({ realName, dob, newAvatar, password, newPassword 
       fd.append("currentPassword", password);
       fd.append("newPassword", newPassword);
 
-      const response = await Axios.post(`${hostName}/api/users/updateInfo?id=1`, fd, config);
+      const response = await Axios.post(`${hostName}/api/users/updateProfile`, fd, config);
       localStorage.removeItem("profile");
       localStorage.setItem("profile", JSON.stringify(response.data));
       dispatch(updateProfileSuccess());

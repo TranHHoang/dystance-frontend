@@ -13,8 +13,8 @@ export default hot(module)(function App() {
         <Route exact path="/homepage" component={HomePage} />
         <Route exact path="/register" component={RegisterForm} />
         <Route exact path="/googleUpdateInfo" component={GoogleUpdateInfoForm} />
-        <Route exact path="/" component={ProfilePage} />
-        <Route exact path="/login" component={LoginForm} />
+        <Route exact path="/profile" component={ProfilePage} />
+        <Route exact path="/" component={LoginForm} />
       </Switch>
     </HashRouter>
   );

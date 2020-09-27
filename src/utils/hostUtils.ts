@@ -1,1 +1,1 @@
-export const hostName = "https://dystanceapi.azurewebsites.net";
+export const hostName = "https://dystancetest.azurewebsites.net";

@@ -3,6 +3,7 @@ import { AxiosResponse, AxiosError } from "axios";
 import { hostName } from "~utils/hostUtils";
 import { AppThunk } from "~app/store";
 import Axios from "~utils/fakeAPI";
+import { getLoginData } from "~utils/tokenStorage";
 
 export interface ErrorResponse {
   type: number;
@@ -50,8 +51,15 @@ export function showProfile(): AppThunk {
   return async (dispatch) => {
     try {
       if (!("profile" in localStorage)) {
-        const response = await Axios.get(`${hostName}/api/users/info?id=1`);
+        const response = await Axios.get(`${hostName}/api/users/info?id=${getLoginData().id}`);
         localStorage.setItem("profile", JSON.stringify(response.data));
+      } else if ("profile" in localStorage) {
+        const profile = JSON.parse(localStorage.getItem("profile")) as User;
+        if (profile.id !== getLoginData().id) {
+          localStorage.removeItem("profile");
+          const response = await Axios.get(`${hostName}/api/users/info?id=${getLoginData().id}`);
+          localStorage.setItem("profile", JSON.stringify(response.data));
+        }
       }
       const data = JSON.parse(localStorage.getItem("profile")) as User;
       dispatch(fetchProfileSuccess(data));

@@ -14,7 +14,7 @@ import {
   StyledForm,
   DisabledInput
 } from "./profilePageStyles";
-import { Formik, Field, FormikProps, FormikHelpers } from "formik";
+import { Formik, Field, FormikProps, FormikHelpers, FormikValues } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
@@ -95,6 +95,8 @@ const ProfilePage = () => {
   }, []);
 
   function onSubmit(values: UpdateProfileFormValues) {
+    console.log("Form Submit");
+
     dispatch(updateProfile(values));
   }
   function reset() {
@@ -119,7 +121,10 @@ const ProfilePage = () => {
               label="Save"
               variant="brand"
               type="submit"
-              onClick={() => formRef.current.handleSubmit()}
+              onClick={() => {
+                console.log(formRef.current);
+                formRef?.current.handleSubmit();
+              }}
               disabled={updateProfileState.isLoading}
             />
           </div>
