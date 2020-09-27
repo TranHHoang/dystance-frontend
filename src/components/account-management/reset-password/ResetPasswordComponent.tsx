@@ -13,13 +13,16 @@ const stepNames = ["step-1", "step-2", "step-3"];
 
 const StyledIndicator = styled(ProgressIndicator)`
   width: 50vh;
-  margin: 3vh;
-  margin-bottom: 5vh;
+  margin-bottom: 4vh;
+  span {
+    font-size: 16px;
+  }
 `;
 
-const StyledDiv = styled.div`
-  padding: 10px;
-  color: #fe4849;
+export const ResetErrorNotification = styled(StyledNotification)`
+  a {
+    justify-content: center;
+  }
 `;
 
 const ResetPasswordComponent = () => {
@@ -46,16 +49,17 @@ const ResetPasswordComponent = () => {
   return (
     <BackgroundContainer>
       <Container>
-        <Title>Reset your password</Title>
-
         <StyledCard>
+          <Title>Reset your password</Title>
           <StyledIndicator currentStepName={stepNames[resetPasswordState.currentStep]}>
             <ProgressStep name="step-1" label="Get access code" />
             <ProgressStep name="step-2" label="Verify access code" />
             <ProgressStep name="step-3" label="Reset password" />
           </StyledIndicator>
 
-          {resetPasswordState.error && <StyledDiv>{resetPasswordState.error.message}</StyledDiv>}
+          {resetPasswordState.error && (
+            <ResetErrorNotification title={resetPasswordState.error.message} hideCloseButton={true} icon="error" />
+          )}
 
           {getCurrentStepForm()}
         </StyledCard>

@@ -5,7 +5,7 @@ import { Button } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import { startChangePasword } from "./resetPasswordSlice";
 import { RootState } from "~app/rootReducer";
-import { StyledInput } from "../login/styles";
+import { StyledInput, StyledForm, StyledButton, ButtonContainer } from "../login/styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock } from "@fortawesome/free-solid-svg-icons";
 
@@ -22,7 +22,7 @@ const initialValues: ChangePasswordValues = {
 const schema = Yup.object({
   password: Yup.string().required("Password is required").min(8, "Password must be at least 8 characters"),
   rePassword: Yup.string()
-    .required("You must re-enter the new password")
+    .required("Re-enter Password is required")
     .oneOf([Yup.ref("password"), null], "Re-enter password must match")
 });
 
@@ -37,14 +37,14 @@ const ChangePasswordForm = () => {
   return (
     <Formik initialValues={initialValues} validationSchema={schema} onSubmit={onSubmit}>
       {({ errors, touched }: FormikProps<ChangePasswordValues>) => (
-        <Form>
+        <StyledForm>
           <Field
             name="password"
             as={StyledInput}
             icon={<FontAwesomeIcon icon={faLock} />}
             type="password"
-            label="Password"
-            placeholder="Enter your password"
+            label="New Password"
+            placeholder="Enter your new password"
             error={errors.password && touched.password ? errors.password : null}
             required
           />
@@ -58,8 +58,10 @@ const ChangePasswordForm = () => {
             error={errors.rePassword && touched.rePassword ? errors.rePassword : null}
             required
           />
-          <Button type="submit" disabled={resetPasswordState.isLoading} label="Confirm" />
-        </Form>
+          <ButtonContainer>
+            <StyledButton variant="brand" type="submit" disabled={resetPasswordState.isLoading} label="Confirm" />
+          </ButtonContainer>
+        </StyledForm>
       )}
     </Formik>
   );

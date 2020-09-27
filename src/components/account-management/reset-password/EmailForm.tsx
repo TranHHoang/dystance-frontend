@@ -1,7 +1,6 @@
 import React from "react";
 import { Formik, Form, Field, FormikProps } from "formik";
-import { StyledInput } from "../login/styles";
-import { Button } from "react-rainbow-components";
+import { StyledInput, StyledForm, StyledButton, ButtonContainer } from "../login/styles";
 import { useDispatch, useSelector } from "react-redux";
 import { startSendEmail } from "./resetPasswordSlice";
 import { RootState } from "~app/rootReducer";
@@ -32,17 +31,24 @@ const EmailForm = () => {
   return (
     <Formik enableReinitialize initialValues={initialValues} validationSchema={schema} onSubmit={onSubmit}>
       {({ errors, touched }: FormikProps<EmailFormValues>) => (
-        <Form>
+        <StyledForm>
           <Field
             name="email"
             as={StyledInput}
             placeholder="Enter your email"
             error={errors.email && touched.email ? errors.email : null}
-            label="Email"
+            label="Enter your email to reset password"
             icon={<FontAwesomeIcon icon={faEnvelope} />}
           />
-          <Button type="submit" disabled={resetPasswordState.isLoading} label="Get access code" />
-        </Form>
+          <ButtonContainer>
+            <StyledButton
+              variant="brand"
+              type="submit"
+              disabled={resetPasswordState.isLoading}
+              label="Get access code"
+            />
+          </ButtonContainer>
+        </StyledForm>
       )}
     </Formik>
   );

@@ -71,6 +71,7 @@ export const StyledCard = styled(Card)`
   flex-direction: column;
   margin: 0 auto;
   width: 50%;
+  min-width: 700px;
 `;
 export const StyledInput = styled(Input)`
   margin-bottom: 15px;

@@ -6,6 +6,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { resendAccessCode, startVerifyCode } from "./resetPasswordSlice";
 import { RootState } from "~app/rootReducer";
 import { ResetPasswordError } from "./resetPasswordSlice";
+import styled from "styled-components";
+import { StyledButton, ButtonContainer, StyledForm } from "../login/styles";
+
+export const StyledCodeInput = styled(CodeInput)`
+  legend {
+    font-size: 20px;
+  }
+`;
 
 interface AccessCodeValues {
   accessCode: string;
@@ -30,7 +38,7 @@ const AccessCodeForm = () => {
   return (
     <Formik initialValues={initialValues} validationSchema={schema} onSubmit={onSubmit}>
       {({ values, errors, touched, setFieldValue }: FormikProps<AccessCodeValues>) => (
-        <Form>
+        <StyledForm>
           {resetPasswordState.error && resetPasswordState.error.type === ResetPasswordError.WrongOrExpiredToken && (
             <Button
               label="Resend access code"
@@ -38,16 +46,22 @@ const AccessCodeForm = () => {
               disabled={resetPasswordState.isLoading}
             />
           )}
-
-          <CodeInput
+          <StyledCodeInput
             value={values.accessCode}
             onChange={(e: any) => setFieldValue("accessCode", e)}
             error={errors.accessCode && touched.accessCode ? errors.accessCode : null}
             length={6}
             label="Access code"
           />
-          <Button type="submit" disabled={resetPasswordState.isLoading} label="Verify access code" />
-        </Form>
+          <ButtonContainer>
+            <StyledButton
+              variant="brand"
+              type="submit"
+              disabled={resetPasswordState.isLoading}
+              label="Verify access code"
+            />
+          </ButtonContainer>
+        </StyledForm>
       )}
     </Formik>
   );
