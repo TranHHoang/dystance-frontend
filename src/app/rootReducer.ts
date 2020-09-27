@@ -6,6 +6,8 @@ import registerReducer from "../components/account-management/register/registerS
 import { reducer as formReducer } from "redux-form";
 import createRoomReducer from "../components/room-management/create-room/createRoomSlice";
 import showRoomReducer from "../components/homepage/showRoomsSlice";
+import showProfileReducer from "../components/profile-page/showProfileInfoSlice";
+import updateProfileReducer from "../components/profile-page/updateProfileSlice";
 
 const rootReducer = combineReducers({
   posts: postReducer,
@@ -14,6 +16,8 @@ const rootReducer = combineReducers({
   loginState: loginReducer,
   googleUpdateInfoState: googleUpdateInfoReducer,
   registerState: registerReducer,
+  showProfileState: showProfileReducer,
+  updateProfileState: updateProfileReducer,
   form: formReducer
 });
 
