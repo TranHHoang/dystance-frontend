@@ -5,10 +5,10 @@ import { AppThunk } from "~app/store";
 import { createHashHistory } from "history";
 import { saveLoginData } from "~utils/tokenStorage";
 import { ErrorResponse, OkResponse } from "../login/loginSlice";
-import { LoginLocalStorageKey } from "../login/LoginForm";
 import { GoogleUpdateInfoFormValues } from "./GoogleUpdateInfo";
 import Axios from "~utils/fakeAPI";
 import moment from "moment";
+import { LoginLocalStorageKey } from "~utils/types";
 
 export enum GoogleUpdateInfoError {
   UserNameAlreadyExists,
@@ -74,7 +74,7 @@ export function startGoogleUpdateInfo({ userName, realName, dob }: GoogleUpdateI
 
       const data = response.data as OkResponse;
 
-      await saveLoginData(data.userName, {
+      saveLoginData({
         id: data.id,
         userName: data.userName,
         accessToken: data.accessToken,

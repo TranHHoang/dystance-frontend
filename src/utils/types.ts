@@ -5,3 +5,9 @@ export interface UserLoginData {
   refreshToken: string;
   expires?: string;
 }
+
+export enum LoginLocalStorageKey {
+  EmailOrUserName = "login/emailOrUserName",
+  GoogleEmail = "login/googleEmail",
+  UserInfo = "login/userInfo"
+}
