@@ -5,24 +5,13 @@ import { getFormInitialValues } from "redux-form";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
-import { LoginLocalStorageKey } from "~utils/types";
+import { LoginLocalStorageKey, Room } from "~utils/types";
 enum ShowRoomError {
   OtherError = 2
 }
 interface ErrorResponse {
   type: number;
   message: string;
-}
-interface Room {
-  roomId: string;
-  roomName: string;
-  creatorId: string;
-  image: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  startHour: string;
-  endHour: string;
 }
 
 interface ShowRoomState {

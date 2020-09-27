@@ -11,3 +11,14 @@ export enum LoginLocalStorageKey {
   GoogleEmail = "login/googleEmail",
   UserId = "login/userId"
 }
+export interface Room {
+  roomId: string;
+  roomName: string;
+  creatorId: string;
+  image: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  startHour: string;
+  endHour: string;
+}

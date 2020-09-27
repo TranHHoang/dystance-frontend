@@ -12,9 +12,11 @@ import {
   Title
 } from "./SingleRoomStyles";
 import moment from "moment";
+import { Room } from "~utils/types";
+import { Link } from "react-router-dom";
 
 export const SingleRoom = (props: any) => {
-  const { name, startHour, endHour, image, description }: any = props;
+  const { roomId, creatorId, roomName, startHour, endHour, image, description }: Room = props;
 
   function formatTime(time: string): string {
     const parts = time.split(":");
@@ -47,7 +49,7 @@ export const SingleRoom = (props: any) => {
         </Time>
       </FlexRowContainer>
       <TextContainer>
-        <Title>{name}</Title>
+        <Title>{roomName}</Title>
       </TextContainer>
       <Description
         readOnly
@@ -55,9 +57,9 @@ export const SingleRoom = (props: any) => {
         rows={3}
         className="rainbow-m-vertical_x-large rainbow-p-horizontal_medium rainbow-m_auto"
       />
-      <a href="#/camTest">
+      <Link to={{ pathname: `/voiceCamPreview/${roomId}` }}>
         <StyledButton label="Join Now" variant="brand" />
-      </a>
+      </Link>
     </StyledCard>
   );
 };

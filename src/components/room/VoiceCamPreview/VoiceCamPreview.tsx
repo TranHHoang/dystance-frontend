@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { Button, Picklist, Option, ButtonIcon } from "react-rainbow-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone, faVideo, faVideoSlash, faMicrophoneSlash } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 export const BackgroundContainer = styled.div`
   align-items: center;
@@ -88,7 +89,7 @@ interface Device {
   value: string;
   label: string;
 }
-const VoiceCamPreview = () => {
+const VoiceCamPreview = (props: any) => {
   const userVideo = useRef<HTMLMediaElement>(null);
   const userStream = useRef<MediaStream>(null);
   const [audioInputs, setAudioInputs] = useState<Device[]>([]);
@@ -105,7 +106,7 @@ const VoiceCamPreview = () => {
   const audioInputList: Device[] = [];
   const audioOutputList: Device[] = [];
   const videoInputList: Device[] = [];
-
+  const { roomId } = props.match.params;
   /* TODO: Enable webcam input again if there is no more DOMException error where another app is using the webcam*/
   useEffect(() => {
     if (domError) {
@@ -191,6 +192,7 @@ const VoiceCamPreview = () => {
       .then(gotDevices)
       .then(getUserMedia)
       .catch((err) => console.log(err));
+    console.log(roomId);
   }, []);
 
   useEffect(() => {
@@ -284,7 +286,9 @@ const VoiceCamPreview = () => {
               <Option key={input.value} name={input.label} value={input.value} label={input.label} />
             ))}
           </StyledPicklist>
-          <StyledButton variant="brand">Join the room </StyledButton>
+          <Link to={{ pathname: `/chatRoom/${roomId}` }} replace>
+            <StyledButton variant="brand">Join the room </StyledButton>
+          </Link>
         </SelectionContainer>
       </Container>
     </BackgroundContainer>

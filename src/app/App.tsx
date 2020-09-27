@@ -15,15 +15,16 @@ export default hot(module)(function App() {
         <Route exact path="/homepage" component={HomePage} />
         <Route exact path="/register" component={RegisterForm} />
         <Route exact path="/googleUpdateInfo" component={GoogleUpdateInfoForm} />
-        <Route exact path="/" component={VoiceCamPreview} />
+        <Route exact path="/voiceCamPreview/:roomId" component={VoiceCamPreview} />
+        <Route exact path="/chatRoom/:roomId" component={ChatArea} />
         <Route
           exact
-          path="/login"
+          path="/"
           render={() => (
             <React.Fragment>
-              <ChatArea />
               {/*<AddPostForm />*/}
               {/*<PostList />*/}
+              <LoginForm />
             </React.Fragment>
           )}
         />

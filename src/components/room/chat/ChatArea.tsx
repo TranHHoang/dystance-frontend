@@ -4,7 +4,7 @@ import ChatHistory from "./ChatHistory";
 import styled from "styled-components";
 import { Button, Modal } from "react-rainbow-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFile } from "@fortawesome/free-solid-svg-icons";
+import { faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { RootState } from "~app/rootReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { broadcastMessage, ChatType } from "./chatSlice";
@@ -32,27 +32,33 @@ const StyledModal = styled(Modal)`
   }
   div {
     margin-left: 80px;
+    /* display: flex; */
   }
   div span {
     font-weight: bold;
     font-size: 18px;
   }
   button#upload {
-    font-size: 18px;
     margin-left: 10px;
   }
   div#group {
     float: right;
   }
+  svg {
+    max-width: 128px;
+    top: -25;
+    left: 40;
+    position: absolute;
+  }
 `;
 
-const ChatArea = () => {
+const ChatArea = (props: any) => {
   const chatState = useSelector((root: RootState) => root.chatState);
   // const [hasFile, setHasFile] = useState(false);
   const [file, setFile] = useState<File>();
   const [imagePreview, setImagePreview] = useState("");
   const chatBox = useRef<HTMLDivElement>();
-
+  const { roomId } = props.match.params;
   const dispatch = useDispatch();
 
   function isImageFile(file: File) {
@@ -89,8 +95,11 @@ const ChatArea = () => {
     }
   }
 
+  useEffect(() => {
+    console.log(roomId);
+  }, []);
   function sendFile() {
-    dispatch(broadcastMessage("1", file, isImageFile(file) ? ChatType.Image : ChatType.File));
+    dispatch(broadcastMessage(roomId, file, isImageFile(file) ? ChatType.Image : ChatType.File));
     setFile(undefined);
   }
 
@@ -108,7 +117,7 @@ const ChatArea = () => {
         footer={
           <div id="group">
             <Button label="Cancel" onClick={() => setFile(undefined)} />
-            <Button id="upload" label="Upload" variant="base" onClick={sendFile} />
+            <Button id="upload" label="Upload" variant="brand" onClick={sendFile} />
           </div>
         }
         hideCloseButton={true}
@@ -116,7 +125,7 @@ const ChatArea = () => {
         {isImageFile(file) ? (
           <img id="img-preview" src={imagePreview} alt="" />
         ) : (
-          <FontAwesomeIcon icon={faFile} size="3x" />
+          <FontAwesomeIcon icon={faFileAlt} size="8x" />
         )}
         <div>
           <span>{file?.name}</span>
@@ -125,9 +134,9 @@ const ChatArea = () => {
       </StyledModal>
       <StyledChatArea>
         <ChatHistoryArea id="chatbox" ref={chatBox}>
-          <ChatHistory />
+          <ChatHistory roomId={roomId} />
         </ChatHistoryArea>
-        <ChatBox setFile={setFile} />
+        <ChatBox setFile={setFile} roomId={roomId} />
       </StyledChatArea>
     </div>
   );

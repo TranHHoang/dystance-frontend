@@ -54,20 +54,21 @@ const StyledModal = styled(Modal)`
   box-shadow: none;
 `;
 
-const ChatBox = ({ setFile }: { setFile: (file: File) => void }) => {
+const ChatBox = ({ setFile, roomId }: { setFile: (file: File) => void; roomId: string }) => {
   const [toggleEmoji, setToggleEmoji] = useState(false);
   const dispatch = useDispatch();
-
   const imageInput = useRef<HTMLInputElement>();
-
+  const messageInput = useRef<HTMLInputElement>();
   function addEmoji(emoji: any) {
-    (document.getElementById("message-box") as HTMLInputElement).value += emoji.native;
+    messageInput.current.value += emoji.native;
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
-      dispatch(broadcastMessage("1", (document.getElementById("message-box") as HTMLInputElement).value));
-      (document.getElementById("message-box") as HTMLInputElement).value = "";
+      if (messageInput.current.value.trim()) {
+        dispatch(broadcastMessage(roomId, messageInput.current.value));
+        messageInput.current.value = "";
+      }
     }
   }
 
@@ -84,7 +85,7 @@ const ChatBox = ({ setFile }: { setFile: (file: File) => void }) => {
         <FontAwesomeIcon icon={faImage} onClick={() => imageInput.current.click()} />
         <FontAwesomeIcon icon={faPaperclip} />
         <input type="file" accept="image/*" hidden ref={imageInput} onChange={handleFile} />
-        <input id="message-box" placeholder="Message classroom" onKeyDown={handleKeyDown} />
+        <input ref={messageInput} placeholder="Message classroom" onKeyDown={handleKeyDown} />
         <FontAwesomeIcon icon={faSmileBeam} onClick={() => setToggleEmoji(!toggleEmoji)} />
         <FontAwesomeIcon icon={faHandPaper} />
       </StyledChatBox>

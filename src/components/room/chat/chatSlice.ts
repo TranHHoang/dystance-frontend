@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import Axios from "~utils/fakeAPI";
 import { AppThunk } from "~app/store";
 import { hostName } from "~utils/hostUtils";
+import { LoginLocalStorageKey } from "~utils/types";
 
 export enum ChatType {
   Text,
@@ -87,12 +88,11 @@ export function broadcastMessage(roomId: string, message: string | File, type = 
     try {
       const form = new FormData();
       form.append("roomId", roomId);
-      form.append("userId", "1");
+      form.append("userId", localStorage.getItem(LoginLocalStorageKey.UserId));
       form.append("content", message);
       form.append("chatType", type.toString());
 
       console.log("broadcasting...");
-
       await Axios.post(`${hostName}/api/rooms/chat/add`, form, {
         headers: { "Content-Type": "multipart/form-data" }
       });
