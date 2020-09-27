@@ -2,7 +2,6 @@ import { combineReducers } from "@reduxjs/toolkit";
 import loginReducer from "../components/account-management/login/loginSlice";
 import googleUpdateInfoReducer from "../components/account-management/google-update-info/googleUpdateInfoSlice";
 import registerReducer from "../components/account-management/register/registerSlice";
-import { reducer as formReducer } from "redux-form";
 import createRoomReducer from "../components/room-management/create-room/createRoomSlice";
 import showRoomReducer from "../components/homepage/showRoomsSlice";
 import chatReducer from "../components/room/chat/chatSlice";
@@ -20,7 +19,6 @@ const rootReducer = combineReducers({
   singleRoomState: singleRoomReducer,
   resetPasswordState: resetPasswordReducer,
   inviteState: inviteReducer,
-  form: formReducer
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

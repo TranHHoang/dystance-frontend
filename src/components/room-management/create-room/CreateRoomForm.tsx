@@ -154,7 +154,6 @@ const CreateRoomForm = () => {
         footer={
           <div className="rainbow-flex rainbow-justify_end">
             <Button
-              form="redux-form-id"
               className="rainbow-m-right_large"
               label="Cancel"
               variant="neutral"
@@ -162,7 +161,6 @@ const CreateRoomForm = () => {
               disabled={createRoomState.isLoading || createRoomState.isCreationSuccess}
             />
             <Button
-              form="redux-form-id"
               label="Save"
               variant="brand"
               type="submit"
