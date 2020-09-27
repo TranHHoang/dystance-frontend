@@ -1,12 +1,13 @@
-import keytar from "keytar";
-import { UserLoginData } from "./types";
+import { LoginLocalStorageKey, UserLoginData } from "./types";
 
-export async function saveLoginData(userName: string, data: UserLoginData) {
-  window.localStorage.setItem("userName", data.userName);
-  return await keytar.setPassword("Dystance", userName, JSON.stringify(data));
+export function saveLoginData(data: UserLoginData) {
+  localStorage.setItem(LoginLocalStorageKey.UserInfo, JSON.stringify(data));
 }
 
-export async function getLoginData(): Promise<UserLoginData> {
-  const result = JSON.parse(await keytar.getPassword("Dystance", window.localStorage.getItem("userName")));
-  return result;
+export function getLoginData(): UserLoginData {
+  return JSON.parse(localStorage.getItem(LoginLocalStorageKey.UserInfo));
+}
+
+export function removeLoginData() {
+  localStorage.removeItem(LoginLocalStorageKey.UserInfo);
 }

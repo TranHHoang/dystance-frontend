@@ -9,7 +9,7 @@ export interface UserLoginData {
 export enum LoginLocalStorageKey {
   EmailOrUserName = "login/emailOrUserName",
   GoogleEmail = "login/googleEmail",
-  UserId = "login/userId"
+  UserInfo = "login/userInfo"
 }
 export interface Room {
   roomId: string;

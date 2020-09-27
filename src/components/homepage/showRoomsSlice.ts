@@ -5,7 +5,7 @@ import { getFormInitialValues } from "redux-form";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
-import { LoginLocalStorageKey, Room } from "~utils/types";
+import { Room } from "~utils/types";
 enum ShowRoomError {
   OtherError = 2
 }
@@ -48,7 +48,7 @@ export const { fetchRoomSuccess, fetchRoomFailed, resetRoom } = showRoomSlice.ac
 export function showRoom(): AppThunk {
   return async (dispatch) => {
     try {
-      const id = localStorage.getItem(LoginLocalStorageKey.UserId);
+      const id = getLoginData().id;
       const response = await Axios.get(`${hostName}/api/Rooms/getByUserId?id=${id}`);
       const data = response.data as Room[];
       console.log(data);

@@ -163,7 +163,6 @@
     "emoji-mart": "^3.0.0",
     "file-loader": "^6.1.0",
     "formik": "^2.1.5",
-    "keytar": "^6.0.1",
     "moment": "^2.27.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
