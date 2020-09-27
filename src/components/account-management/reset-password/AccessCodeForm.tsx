@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Formik, Form, FormikProps } from "formik";
 import * as Yup from "yup";
 import { Button, CodeInput } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
-import { startVerifyCode } from "./resetPasswordSlice";
+import { resetError, startVerifyCode } from "./resetPasswordSlice";
 import { RootState } from "~app/rootReducer";
 
 interface AccessCodeValues {
@@ -22,8 +22,12 @@ const AccessCodeForm = () => {
   const resetPasswordState = useSelector((state: RootState) => state.resetPasswordState);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(resetError());
+  }, [dispatch]);
+
   function onSubmit(values: AccessCodeValues) {
-    dispatch(startVerifyCode(values.accessCode));
+    dispatch(startVerifyCode(resetPasswordState.email, values.accessCode));
   }
 
   return (

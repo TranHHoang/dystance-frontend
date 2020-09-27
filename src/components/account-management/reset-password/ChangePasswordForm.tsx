@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Formik, Form, Field, FormikProps } from "formik";
 import * as Yup from "yup";
 import { Button } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
-import { startChangePasword } from "./resetPasswordSlice";
+import { resetError, startChangePasword } from "./resetPasswordSlice";
 import { RootState } from "~app/rootReducer";
 import { StyledInput } from "../login/styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,7 +20,7 @@ const initialValues: ChangePasswordValues = {
 };
 
 const schema = Yup.object({
-  password: Yup.string().required("Password is required"),
+  password: Yup.string().required("Password is required").min(8, "Password must be at least 8 characters"),
   rePassword: Yup.string()
     .required("You must re-enter the new password")
     .oneOf([Yup.ref("password"), null], "Re-enter password must match")
@@ -30,8 +30,12 @@ const ChangePasswordForm = () => {
   const resetPasswordState = useSelector((state: RootState) => state.resetPasswordState);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(resetError());
+  }, [dispatch]);
+
   function onSubmit(values: ChangePasswordValues) {
-    dispatch(startChangePasword(values.password));
+    dispatch(startChangePasword(resetPasswordState.email, values.password));
   }
 
   return (
