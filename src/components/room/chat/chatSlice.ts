@@ -75,7 +75,7 @@ export function initSocket(roomId: string): AppThunk {
   return async (dispatch) => {
     console.log("Start socket...");
     await socket.start();
-    await socket.invoke("AddToGroup", roomId);
+    await socket.invoke("JoinRoom", roomId, getLoginData().id);
 
     socket.on("Broadcast", () => {
       dispatch(fetchLatestMessage(roomId));
