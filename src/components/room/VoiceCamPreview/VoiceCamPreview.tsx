@@ -77,6 +77,7 @@ export const StyledButton = styled(Button)`
   margin: 10 0 10 0;
   padding: 10px;
   font-size: 20px;
+  width: 100%;
 `;
 export const StyledButtonIcon = styled(ButtonIcon)`
   padding: 20px;
@@ -286,7 +287,7 @@ const VoiceCamPreview = (props: any) => {
               <Option key={input.value} name={input.label} value={input.value} label={input.label} />
             ))}
           </StyledPicklist>
-          <Link to={{ pathname: `/chatRoom/${roomId}` }} replace>
+          <Link style={{ textDecoration: "none" }} to={{ pathname: `/chatRoom/${roomId}` }} replace>
             <StyledButton variant="brand">Join the room </StyledButton>
           </Link>
         </SelectionContainer>
