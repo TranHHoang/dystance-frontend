@@ -7,6 +7,7 @@ import { reducer as formReducer } from "redux-form";
 import createRoomReducer from "../components/room-management/create-room/createRoomSlice";
 import showRoomReducer from "../components/homepage/showRoomsSlice";
 import chatReducer from "../components/room/chat/chatSlice";
+import singleRoomReducer from "../components/homepage/single-room/singleRoomSlice";
 
 const rootReducer = combineReducers({
   posts: postReducer,
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
   googleUpdateInfoState: googleUpdateInfoReducer,
   registerState: registerReducer,
   chatState: chatReducer,
+  singleRoomState: singleRoomReducer,
   form: formReducer
 });
 

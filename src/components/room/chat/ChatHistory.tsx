@@ -57,7 +57,7 @@ const ChatHistory = (props: any) => {
   const dispatch = useDispatch();
   const { roomId } = props;
 
-  function openExternal(e) {
+  function openExternal(e: any) {
     e.preventDefault();
     shell.openExternal(e.target.href);
   }

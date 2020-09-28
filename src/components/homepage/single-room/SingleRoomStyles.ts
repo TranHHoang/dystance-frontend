@@ -51,7 +51,7 @@ export const Description = styled(Textarea)`
 export const StyledButton = styled(Button)`
   align-self: center;
   width: 50%;
-  margin: 10px 0 10px 0;
+  margin: 10px 60px 10px 0;
 `;
 export const Separator = styled.hr`
   color: ${(props) => props.theme.rainbow.palette.text.label};
