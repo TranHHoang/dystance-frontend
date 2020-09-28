@@ -8,6 +8,7 @@ import RegisterForm from "../components/account-management/register/RegisterForm
 import VoiceCamPreview from "../components/room/VoiceCamPreview/VoiceCamPreview";
 import ChatArea from "../components/room/chat/ChatArea";
 import ResetPasswordComponent from "../components/account-management/reset-password/ResetPasswordComponent";
+import InviteForm from "../components/room/invite/InviteForm";
 
 export default hot(module)(function App() {
   return (

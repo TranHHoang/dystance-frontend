@@ -9,6 +9,7 @@ import showRoomReducer from "../components/homepage/showRoomsSlice";
 import chatReducer from "../components/room/chat/chatSlice";
 import singleRoomReducer from "../components/homepage/single-room/singleRoomSlice";
 import resetPasswordReducer from "../components/account-management/reset-password/resetPasswordSlice";
+import inviteReducer from "../components/room/invite/inviteSlice";
 
 const rootReducer = combineReducers({
   posts: postReducer,
@@ -20,6 +21,7 @@ const rootReducer = combineReducers({
   chatState: chatReducer,
   singleRoomState: singleRoomReducer,
   resetPasswordState: resetPasswordReducer,
+  inviteState: inviteReducer,
   form: formReducer
 });
 
