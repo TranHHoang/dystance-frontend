@@ -2,43 +2,56 @@ import React, { useEffect, useRef, useState } from "react";
 import { Button, Textarea, Modal } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
-import { startInvite } from "./inviteSlice";
+import { setInviteModalOpen, startInvite } from "./inviteSlice";
+import { StyledNotification } from "../../account-management/login/styles";
 
-const InviteForm = () => {
+const InviteForm = (props: any) => {
   const inviteState = useSelector((root: RootState) => root.inviteState);
-  const [showModal, setShowModal] = useState(false);
   const dispatch = useDispatch();
-
+  const { roomId } = props;
   const inviteList = useRef<HTMLTextAreaElement>();
-  const message = useRef<HTMLInputElement>();
+  const message = useRef<HTMLTextAreaElement>();
 
   function onSendInvite() {
-    if (inviteList.current.textContent?.trim()) {
-      dispatch(startInvite("1", inviteList.current.textContent.trim().split("\n"), message.current.textContent));
+    if (inviteList.current.value?.trim()) {
+      dispatch(startInvite(inviteState.roomId, inviteList.current.value.trim().split("\n"), message.current.value));
     }
   }
 
   useEffect(() => {
-    setShowModal(inviteState.isSuccess ?? false);
+    dispatch(setInviteModalOpen({ roomId, isModalOpen: false }));
   }, [inviteState.isSuccess]);
 
   return (
-    <Modal
-      title="Invite people to room"
-      hideCloseButton={true}
-      isOpen={showModal}
-      footer={
-        <div className="rainbow-flex rainbow-justify_end">
-          <Button className="rainbow-m-right_large" label="Cancel" variant="neutral" disabled={inviteState.isLoading} />
-          <Button label="Send" variant="brand" onClick={onSendInvite} disabled={inviteState.isLoading} />
-        </div>
-      }
-    >
-      {inviteState.isSuccess && <div>Something went wrong</div>}
-      <Textarea placeholder="Email list" ref={inviteList} />
-      <br />
-      <Textarea placeholder="Message" ref={message} />
-    </Modal>
+    <div>
+      <Modal
+        title="Invite people to room"
+        hideCloseButton={true}
+        isOpen={inviteState.roomId === roomId && inviteState.isModalOpen}
+        footer={
+          <div className="rainbow-flex rainbow-justify_end">
+            <Button
+              className="rainbow-m-right_large"
+              onClick={() => dispatch(setInviteModalOpen({ roomId, isModalOpen: false }))}
+              label="Cancel"
+              variant="neutral"
+              disabled={inviteState.isLoading || inviteState.isSuccess}
+            />
+            <Button
+              label="Send"
+              variant="brand"
+              onClick={onSendInvite}
+              disabled={inviteState.isLoading || inviteState.isSuccess}
+            />
+          </div>
+        }
+      >
+        {inviteState.isSuccess && <StyledNotification title="Something went wrong" icon="error" />}
+        <textarea placeholder="Email list" ref={inviteList} />
+        <br />
+        <textarea placeholder="Message" ref={message} />
+      </Modal>
+    </div>
   );
 };
 

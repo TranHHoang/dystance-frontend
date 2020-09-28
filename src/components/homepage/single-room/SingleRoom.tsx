@@ -23,6 +23,8 @@ import { StyledNotification } from "../../account-management/login/styles";
 import styled from "styled-components";
 import { getLoginData } from "~utils/tokenStorage";
 import { RootState } from "~app/rootReducer";
+import InviteForm from "../../room/invite/InviteForm";
+import { setInviteModalOpen } from "../../room/invite/inviteSlice";
 
 export const JoinRoomButtonContainer = styled.div`
   display: flex;
@@ -47,6 +49,7 @@ export const SingleRoom = (props: any) => {
   const { roomId, creatorId, roomName, startHour, endHour, image, description }: Room = props;
   const dispatch = useDispatch();
   const singleRoomState = useSelector((state: RootState) => state.singleRoomState);
+  const inviteState = useSelector((state: RootState) => state.inviteState);
 
   function formatTime(time: string): string {
     const parts = time.split(":");
@@ -100,14 +103,21 @@ export const SingleRoom = (props: any) => {
             icon={<FontAwesomeIcon icon={faEllipsisV} />}
           >
             {creatorId === getLoginData().id ? (
-              <MenuItem
-                label="Delete Room"
-                onClick={() => dispatch(setConfirmDeleteModalOpen({ roomId, isConfirmDeleteModalOpen: true }))}
-              />
+              <div>
+                <MenuItem
+                  label="Invite people to room"
+                  onClick={() => dispatch(setInviteModalOpen({ roomId, isModalOpen: true }))}
+                />
+                <MenuItem
+                  label="Delete Room"
+                  onClick={() => dispatch(setConfirmDeleteModalOpen({ roomId, isConfirmDeleteModalOpen: true }))}
+                />
+              </div>
             ) : null}
           </StyledButtonMenu>
         </JoinRoomButtonContainer>
       </StyledCard>
+      <InviteForm roomId={roomId} />
       <Modal
         id="delete-room-modal"
         title="Confirm Room Delete"

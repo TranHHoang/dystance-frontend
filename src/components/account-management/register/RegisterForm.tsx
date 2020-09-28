@@ -13,17 +13,14 @@ import {
   StyledForm,
   StyledInput,
   StyledNotification,
-  Title
+  Title,
+  StyledLink
 } from "../login/styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Formik, Field, FormikProps, yupToFormErrors } from "formik";
 import * as Yup from "yup";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-
-const StyledLink = styled(Link)`
-  color: ${(props) => props.theme.rainbow.palette.brand.main};
-`;
 
 export interface RegisterFormValues {
   userName: string;

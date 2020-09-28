@@ -137,7 +137,7 @@ export function startChangePasword(email: string, newPassword: string): AppThunk
       });
 
       dispatch(requestSuccess());
-      createHashHistory().replace("/login");
+      createHashHistory().replace("/");
     } catch (ex) {
       dispatch(getAxiosError(ex as AxiosError));
     }
