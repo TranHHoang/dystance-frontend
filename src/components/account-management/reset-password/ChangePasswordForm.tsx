@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Formik, Form, Field, FormikProps } from "formik";
 import * as Yup from "yup";
 import { Button } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
-import { resetError, startChangePasword } from "./resetPasswordSlice";
+import { startChangePasword } from "./resetPasswordSlice";
 import { RootState } from "~app/rootReducer";
 import { StyledInput } from "../login/styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -29,10 +29,6 @@ const schema = Yup.object({
 const ChangePasswordForm = () => {
   const resetPasswordState = useSelector((state: RootState) => state.resetPasswordState);
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(resetError());
-  }, [dispatch]);
 
   function onSubmit(values: ChangePasswordValues) {
     dispatch(startChangePasword(resetPasswordState.email, values.password));

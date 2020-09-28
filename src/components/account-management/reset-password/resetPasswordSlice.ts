@@ -15,6 +15,7 @@ interface ResetPasswordState {
 
 export enum ResetPasswordError {
   EmailIsInvalid,
+  WrongOrExpiredToken,
   Other
 }
 
@@ -35,6 +36,9 @@ const resetPasswordSlice = createSlice({
     addEmail(state, action: PayloadAction<string>) {
       state.email = action.payload;
     },
+    resendAccessCode(state) {
+      state.currentStep--;
+    },
     resetError(state) {
       state.error = undefined;
     },
@@ -54,7 +58,14 @@ const resetPasswordSlice = createSlice({
 
 export default resetPasswordSlice.reducer;
 
-export const { addEmail, resetError, requestStart, requestSuccess, requestFailed } = resetPasswordSlice.actions;
+export const {
+  resendAccessCode,
+  addEmail,
+  resetError,
+  requestStart,
+  requestSuccess,
+  requestFailed
+} = resetPasswordSlice.actions;
 
 function getAxiosError(e: AxiosError) {
   return requestFailed(

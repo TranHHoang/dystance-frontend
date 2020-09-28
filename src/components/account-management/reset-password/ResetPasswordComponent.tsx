@@ -1,12 +1,13 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
-import { BackgroundContainer, Container, StyledCard, StyledNotification, Title } from "../login/styles";
+import { BackgroundContainer, Container, StyledCard, Title } from "../login/styles";
 import EmailForm from "./EmailForm";
 import AccessCodeForm from "./AccessCodeForm";
 import ChangePasswordForm from "./ChangePasswordForm";
-import { ProgressIndicator, ProgressStep, Notification } from "react-rainbow-components";
+import { ProgressIndicator, ProgressStep } from "react-rainbow-components";
 import styled from "styled-components";
+import { resetError } from "./resetPasswordSlice";
 
 const stepNames = ["step-1", "step-2", "step-3"];
 
@@ -23,6 +24,13 @@ const StyledDiv = styled.div`
 
 const ResetPasswordComponent = () => {
   const resetPasswordState = useSelector((state: RootState) => state.resetPasswordState);
+  const dispatch = useDispatch();
+
+  console.log(resetPasswordState);
+
+  useEffect(() => {
+    dispatch(resetError());
+  }, [resetPasswordState.currentStep, dispatch]);
 
   function getCurrentStepForm() {
     switch (resetPasswordState.currentStep) {
@@ -42,21 +50,9 @@ const ResetPasswordComponent = () => {
 
         <StyledCard>
           <StyledIndicator currentStepName={stepNames[resetPasswordState.currentStep]}>
-            <ProgressStep
-              name="step-1"
-              label="Get access code"
-              hasError={resetPasswordState.error && resetPasswordState.currentStep === 0}
-            />
-            <ProgressStep
-              name="step-2"
-              label="Verify access code"
-              hasError={resetPasswordState.error && resetPasswordState.currentStep === 1}
-            />
-            <ProgressStep
-              name="step-3"
-              label="Reset password"
-              hasError={resetPasswordState.error && resetPasswordState.currentStep === 2}
-            />
+            <ProgressStep name="step-1" label="Get access code" />
+            <ProgressStep name="step-2" label="Verify access code" />
+            <ProgressStep name="step-3" label="Reset password" />
           </StyledIndicator>
 
           {resetPasswordState.error && <StyledDiv>{resetPasswordState.error.message}</StyledDiv>}

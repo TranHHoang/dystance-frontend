@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Formik, Form, FormikProps } from "formik";
 import * as Yup from "yup";
 import { Button, CodeInput } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
-import { resetError, startVerifyCode } from "./resetPasswordSlice";
+import { resendAccessCode, startVerifyCode } from "./resetPasswordSlice";
 import { RootState } from "~app/rootReducer";
+import { ResetPasswordError } from "./resetPasswordSlice";
 
 interface AccessCodeValues {
   accessCode: string;
@@ -22,10 +23,6 @@ const AccessCodeForm = () => {
   const resetPasswordState = useSelector((state: RootState) => state.resetPasswordState);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(resetError());
-  }, [dispatch]);
-
   function onSubmit(values: AccessCodeValues) {
     dispatch(startVerifyCode(resetPasswordState.email, values.accessCode));
   }
@@ -34,6 +31,14 @@ const AccessCodeForm = () => {
     <Formik initialValues={initialValues} validationSchema={schema} onSubmit={onSubmit}>
       {({ values, errors, touched, setFieldValue }: FormikProps<AccessCodeValues>) => (
         <Form>
+          {resetPasswordState.error && resetPasswordState.error.type === ResetPasswordError.WrongOrExpiredToken && (
+            <Button
+              label="Resend access code"
+              onClick={() => dispatch(resendAccessCode())}
+              disabled={resetPasswordState.isLoading}
+            />
+          )}
+
           <CodeInput
             value={values.accessCode}
             onChange={(e: any) => setFieldValue("accessCode", e)}

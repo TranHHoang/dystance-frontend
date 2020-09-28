@@ -13,10 +13,6 @@ interface EmailFormValues {
   email: string;
 }
 
-const initialValues: EmailFormValues = {
-  email: ""
-};
-
 const schema = Yup.object({
   email: Yup.string().email("Invalid email").required("Email is required")
 });
@@ -25,12 +21,16 @@ const EmailForm = () => {
   const resetPasswordState = useSelector((state: RootState) => state.resetPasswordState);
   const dispatch = useDispatch();
 
+  const initialValues: EmailFormValues = {
+    email: resetPasswordState.email
+  };
+
   function onSubmit(values: EmailFormValues) {
     dispatch(startSendEmail(values.email));
   }
 
   return (
-    <Formik initialValues={initialValues} validationSchema={schema} onSubmit={onSubmit}>
+    <Formik enableReinitialize initialValues={initialValues} validationSchema={schema} onSubmit={onSubmit}>
       {({ errors, touched }: FormikProps<EmailFormValues>) => (
         <Form>
           <Field
