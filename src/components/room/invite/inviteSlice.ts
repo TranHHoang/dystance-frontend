@@ -34,13 +34,14 @@ export default inviteSlice.reducer;
 
 const { inviteStart, inviteSuccess, inviteFailed } = inviteSlice.actions;
 
-export function startInvite(roomId: string, emails: string[]): AppThunk {
+export function startInvite(roomId: string, emails: string[], message: string): AppThunk {
   return async (dispatch) => {
     try {
       dispatch(inviteStart());
       const form = new FormData();
       form.append("roomId", roomId);
       form.append("emailList", emails.join(","));
+      form.append("message", message ?? "");
 
       await Axios.post(`${hostName}/api/rooms/invite`, form, {
         headers: {

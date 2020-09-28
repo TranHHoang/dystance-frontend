@@ -6,13 +6,15 @@ import { startInvite } from "./inviteSlice";
 
 const InviteForm = () => {
   const inviteState = useSelector((root: RootState) => root.inviteState);
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const dispatch = useDispatch();
+
   const inviteList = useRef<HTMLTextAreaElement>();
+  const message = useRef<HTMLInputElement>();
 
   function onSendInvite() {
     if (inviteList.current.textContent?.trim()) {
-      dispatch(startInvite("1", inviteList.current.textContent.trim().split("\n")));
+      dispatch(startInvite("1", inviteList.current.textContent.trim().split("\n"), message.current.textContent));
     }
   }
 
@@ -35,7 +37,7 @@ const InviteForm = () => {
       {inviteState.isSuccess && <div>Something went wrong</div>}
       <Textarea placeholder="Email list" ref={inviteList} />
       <br />
-      {/* <Textarea placeholder="Message" /> */}
+      <Textarea placeholder="Message" ref={message} />
     </Modal>
   );
 };
