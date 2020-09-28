@@ -6,6 +6,7 @@ import registerReducer from "../components/account-management/register/registerS
 import { reducer as formReducer } from "redux-form";
 import createRoomReducer from "../components/room-management/create-room/createRoomSlice";
 import showRoomReducer from "../components/homepage/showRoomsSlice";
+import chatReducer from "../components/room/chat/chatSlice";
 
 const rootReducer = combineReducers({
   posts: postReducer,
@@ -14,6 +15,7 @@ const rootReducer = combineReducers({
   loginState: loginReducer,
   googleUpdateInfoState: googleUpdateInfoReducer,
   registerState: registerReducer,
+  chatState: chatReducer,
   form: formReducer
 });
 

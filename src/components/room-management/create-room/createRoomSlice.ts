@@ -75,7 +75,7 @@ export function createRoom({
         }
       };
       fd.append("name", classroomName);
-      fd.append("creatorId", localStorage.getItem(LoginLocalStorageKey.UserId));
+      fd.append("creatorId", getLoginData().id);
       fd.append("description", description);
       fd.append("startDate", moment(startDate).format("YYYY-MM-DD"));
       fd.append("endDate", moment(endDate).format("YYYY-MM-DD"));

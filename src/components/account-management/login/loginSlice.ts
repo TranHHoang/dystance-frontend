@@ -114,13 +114,12 @@ export function startLogin(email?: string, userName?: string, password?: string,
       const data = response.data as OkResponse;
       dispatch(loginSuccess());
 
-      await saveLoginData(data.userName, {
+      saveLoginData({
         id: data.id,
         userName: data.userName,
         accessToken: data.accessToken,
         refreshToken: data.refreshToken
       });
-      localStorage.setItem(LoginLocalStorageKey.UserId, data.id);
       createHashHistory().push("/homepage");
     } catch (ex) {
       const e = ex as AxiosError;

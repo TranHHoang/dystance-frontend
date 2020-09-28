@@ -9,5 +9,16 @@ export interface UserLoginData {
 export enum LoginLocalStorageKey {
   EmailOrUserName = "login/emailOrUserName",
   GoogleEmail = "login/googleEmail",
-  UserId = "login/userId"
+  UserInfo = "login/userInfo"
+}
+export interface Room {
+  roomId: string;
+  roomName: string;
+  creatorId: string;
+  image: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  startHour: string;
+  endHour: string;
 }

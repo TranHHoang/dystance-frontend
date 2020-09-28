@@ -32,7 +32,9 @@ export const AllRooms = () => {
         {showRoomState.rooms.map((room) => (
           <div key={room.roomId}>
             <SingleRoom
-              name={room.roomName}
+              roomId={room.roomId}
+              creatorId={room.creatorId}
+              roomName={room.roomName}
               startHour={room.startHour}
               endHour={room.endHour}
               image={room.image}
