@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { Input, Button, Card, Notification, DatePicker } from "react-rainbow-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form } from "formik";
+import { Link } from "react-router-dom";
 
 export const BackgroundContainer = styled.div`
   background-image: url("https://images.wallpaperscraft.com/image/minimalism_sky_clouds_sun_mountains_lake_landscape_95458_1920x1080.jpg");
@@ -53,13 +54,14 @@ export const Register = styled.p`
   color: ${(props) => props.theme.rainbow.palette.text.label};
 `;
 
-export const StyledLink = styled.a`
+export const StyledLink = styled(Link)`
   text-decoration: none;
   color: ${(props) => props.theme.rainbow.palette.brand.main};
   transition: 0.3s;
   :hover {
     text-decoration: underline;
-    color: #006dcc;
+    color: ${(props) => props.theme.rainbow.palette.brand.main};
+    filter: brightness(80%);
   }
 `;
 

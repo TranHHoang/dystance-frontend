@@ -129,7 +129,7 @@ const LoginForm = () => {
 
         <Register>
           Don&apos;t have an account? &nbsp;
-          <StyledLink href="#/register">Create Account Here</StyledLink>
+          <StyledLink to="/register">Create Account Here</StyledLink>
         </Register>
 
         <StyledCard>
@@ -177,7 +177,7 @@ const LoginForm = () => {
                   />
                 </ButtonContainer>
 
-                <StyledLink href="#/resetPassword" onClick={() => dispatch(resetPasswordSlice.resetState())}>
+                <StyledLink to="/resetPassword" onClick={() => dispatch(resetPasswordSlice.resetState())}>
                   Forgot your password?
                 </StyledLink>
               </StyledForm>
