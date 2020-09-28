@@ -61,7 +61,7 @@ export function deleteRoom(roomId: string): AppThunk {
   return async (dispatch) => {
     try {
       dispatch(deleteRoomStart());
-      await Axios.get(`${hostName}/api/rooms/delete?id=${roomId}`);
+      await Axios.delete(`${hostName}/api/rooms?id=${roomId}`);
       dispatch(deleteRoomSuccess());
       dispatch(resetRoom());
       dispatch(showRoom());

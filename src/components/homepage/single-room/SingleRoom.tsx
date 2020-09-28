@@ -36,6 +36,13 @@ export const StyledLink = styled(Link)`
   display: flex;
   justify-content: flex-end;
 `;
+export const StyledText = styled.p`
+  font-size: 20px;
+  margin-left: 12px;
+`;
+const Error = styled(StyledNotification)`
+  margin: 0;
+`;
 export const SingleRoom = (props: any) => {
   const { roomId, creatorId, roomName, startHour, endHour, image, description }: Room = props;
   const dispatch = useDispatch();
@@ -125,10 +132,8 @@ export const SingleRoom = (props: any) => {
           </div>
         }
       >
-        {singleRoomState.error && (
-          <StyledNotification title={singleRoomState.error.message} hideCloseButton={true} icon="error" />
-        )}
-        <p>Are you sure you want to delete this room?</p>
+        {singleRoomState.error && <Error title={singleRoomState.error.message} hideCloseButton={true} icon="error" />}
+        <StyledText>Are you sure you want to delete this room?</StyledText>
       </Modal>
     </div>
   );
