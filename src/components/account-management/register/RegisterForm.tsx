@@ -18,6 +18,12 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Formik, Field, FormikProps, yupToFormErrors } from "formik";
 import * as Yup from "yup";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
+
+const StyledLink = styled(Link)`
+  color: ${(props) => props.theme.rainbow.palette.brand.main};
+`;
 
 export interface RegisterFormValues {
   userName: string;
@@ -133,9 +139,8 @@ const RegisterForm = () => {
                 />
 
                 <ButtonContainer>
-                  <StyledButton variant="brand" type="submit" disabled={registerState.isLoading}>
-                    Register
-                  </StyledButton>
+                  <StyledButton variant="brand" type="submit" disabled={registerState.isLoading} label="Register" />
+                  <StyledLink to="/">I already have an account</StyledLink>
                 </ButtonContainer>
               </StyledForm>
             )}
