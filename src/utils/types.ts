@@ -22,3 +22,7 @@ export interface Room {
   startHour: string;
   endHour: string;
 }
+export interface ErrorResponse {
+  type: number;
+  message: string;
+}

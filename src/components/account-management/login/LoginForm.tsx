@@ -26,6 +26,7 @@ import {
 import { Formik, Field, FormikProps } from "formik";
 import * as Yup from "yup";
 import { LoginLocalStorageKey } from "~utils/types";
+import * as resetPasswordSlice from "../reset-password/resetPasswordSlice";
 
 interface LoginFormValues {
   emailOrUserName: string;
@@ -176,7 +177,9 @@ const LoginForm = () => {
                   />
                 </ButtonContainer>
 
-                <StyledLink href="#">Forgot your password?</StyledLink>
+                <StyledLink href="#/resetPassword" onClick={() => dispatch(resetPasswordSlice.resetState())}>
+                  Forgot your password?
+                </StyledLink>
               </StyledForm>
             )}
           </Formik>
