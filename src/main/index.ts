@@ -21,7 +21,7 @@ const createWindow = () => {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadURL(APP_WEBPACK_ENTRY);
+  mainWindow.loadURL(APP_WEBPACK_ENTRY + "/login");
   installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS])
     .then((name) => console.log(`Added Extension:  ${name}`))
     .catch((err) => console.log("An error occurred: ", err));

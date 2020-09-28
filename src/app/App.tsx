@@ -17,7 +17,7 @@ export default hot(module)(function App() {
         <Route exact path="/googleUpdateInfo" component={GoogleUpdateInfoForm} />
         <Route
           exact
-          path="/"
+          path="/resetPassword"
           render={() => (
             <React.Fragment>
               <ResetPasswordComponent />

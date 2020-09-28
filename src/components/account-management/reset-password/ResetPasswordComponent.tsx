@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
-import { BackgroundContainer, Container, StyledCard, Title } from "../login/styles";
+import { BackgroundContainer, Container, StyledCard, Title, StyledNotification } from "../login/styles";
 import EmailForm from "./EmailForm";
 import AccessCodeForm from "./AccessCodeForm";
 import ChangePasswordForm from "./ChangePasswordForm";

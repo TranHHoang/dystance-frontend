@@ -33,6 +33,9 @@ const resetPasswordSlice = createSlice({
   name: "resetPassword",
   initialState,
   reducers: {
+    resetState() {
+      return initialState;
+    },
     addEmail(state, action: PayloadAction<string>) {
       state.email = action.payload;
     },
@@ -59,6 +62,7 @@ const resetPasswordSlice = createSlice({
 export default resetPasswordSlice.reducer;
 
 export const {
+  resetState,
   resendAccessCode,
   addEmail,
   resetError,

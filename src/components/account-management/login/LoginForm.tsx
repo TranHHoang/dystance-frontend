@@ -181,7 +181,7 @@ const LoginForm = () => {
                   />
                 </ButtonContainer>
 
-                <StyledLink href="#" onClick={() => dispatch(resetPasswordSlice.resetState())}>
+                <StyledLink href="#/resetPassword" onClick={() => dispatch(resetPasswordSlice.resetState())}>
                   Forgot your password?
                 </StyledLink>
               </StyledForm>
