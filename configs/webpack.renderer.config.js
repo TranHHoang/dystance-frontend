@@ -1,18 +1,31 @@
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 
-module.exports = {
+const smp = new SpeedMeasurePlugin();
+
+module.exports = smp.wrap({
   module: {
     rules: [
       {
         test: /\.tsx?$/,
         exclude: /(node_modules|\.webpack)/,
-        use: {
-          loader: "ts-loader",
-          options: {
-            transpileOnly: true
-          }
-        }
+        include: require("path").resolve(__dirname, "../src"),
+        use: [
+          { loader: "cache-loader" },
+          {
+            loader: "thread-loader",
+            options: {
+              // there should be 1 cpu for the fork-ts-checker-webpack-plugin
+              workers: require('os').cpus().length,
+            }
+          },
+          {
+            loader: "ts-loader",
+            options: {
+              happyPackMode: true
+            }
+          }]
       },
       {
         test: /\.css$/,
@@ -33,9 +46,10 @@ module.exports = {
       { test: /\.node$/, loader: 'node-loader' }
     ]
   },
-  plugins: [new ForkTsCheckerWebpackPlugin()],
+  plugins: [new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })],
   resolve: {
     plugins: [new TsconfigPathsPlugin()],
-    extensions: [".js", ".ts", ".jsx", ".tsx", ".css"]
+    extensions: [".js", ".ts", ".jsx", ".tsx", ".css"],
+    symlinks: false
   }
-};
+});
