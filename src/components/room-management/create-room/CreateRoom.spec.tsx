@@ -1,7 +1,6 @@
 import createRoomReducer, * as CreateRoomSlice from "./createRoomSlice";
 import React from "react";
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import { reducer as formReducer } from "redux-form";
 import CreateRoomForm from "./CreateRoomForm";
 import { shallow, mount } from "enzyme";
 import { Provider } from "react-redux";
@@ -16,8 +15,7 @@ describe("CreateRoomForm", () => {
   beforeEach(() => {
     store = configureStore({
       reducer: combineReducers({
-        createRoomState: createRoomReducer,
-        form: formReducer
+        createRoomState: createRoomReducer
       })
     });
     wrapper = mount(

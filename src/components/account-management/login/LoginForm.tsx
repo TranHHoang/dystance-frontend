@@ -22,7 +22,7 @@ import {
   StyledLink,
   StyledNotification,
   Title
-} from "./styles";
+} from "../styles";
 import { Formik, Field, FormikProps } from "formik";
 import * as Yup from "yup";
 import { LoginLocalStorageKey } from "~utils/types";
@@ -53,7 +53,7 @@ const LoginForm = () => {
 
   useEffect(() => {
     dispatch(resetLoginState());
-  }, []);
+  }, [dispatch]);
   const _: any = undefined;
 
   function onSubmit(values: LoginFormValues) {
@@ -99,8 +99,6 @@ const LoginForm = () => {
     } else if (loginState.resendEmailLoading) {
       resendEmailSection = <StyledNotification title="Sending..." hideCloseButton={true} icon="warning" />;
     } else if (!loginState.resendEmailLoading && !loginState.resendEmailError) {
-      console.log(loginState);
-
       resendEmailSection = (
         <NotificationContainer>
           <StyledNotification title="Resend Email Successful!" hideCloseButton={true} icon="success" />

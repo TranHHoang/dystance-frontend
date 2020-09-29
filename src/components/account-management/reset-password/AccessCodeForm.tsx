@@ -1,5 +1,5 @@
 import React from "react";
-import { Formik, Form, FormikProps } from "formik";
+import { Formik, FormikProps } from "formik";
 import * as Yup from "yup";
 import { Button, CodeInput } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,7 +7,7 @@ import { resendAccessCode, startVerifyCode } from "./resetPasswordSlice";
 import { RootState } from "~app/rootReducer";
 import { ResetPasswordError } from "./resetPasswordSlice";
 import styled from "styled-components";
-import { StyledButton, ButtonContainer, StyledForm } from "../login/styles";
+import { StyledButton, ButtonContainer, StyledForm } from "../styles";
 
 export const StyledCodeInput = styled(CodeInput)`
   legend {

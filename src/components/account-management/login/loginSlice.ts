@@ -6,7 +6,6 @@ import { AppThunk } from "~app/store";
 import { createHashHistory } from "history";
 import Axios from "~utils/fakeAPI";
 import { saveLoginData } from "~utils/tokenStorage";
-import { LoginLocalStorageKey } from "~utils/types";
 
 export enum LoginError {
   NameEmailPasswordIncorrect,

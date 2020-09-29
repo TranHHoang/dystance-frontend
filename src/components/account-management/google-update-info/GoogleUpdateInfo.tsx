@@ -14,7 +14,7 @@ import {
   StyledInput,
   StyledNotification,
   Title
-} from "../login/styles";
+} from "../styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Formik, Field, FormikProps } from "formik";
 import * as Yup from "yup";

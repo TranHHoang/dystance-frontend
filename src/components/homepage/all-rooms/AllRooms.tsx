@@ -11,6 +11,7 @@ const BackgroundContainer = styled.div`
   height: 100%;
   overflow: auto;
 `;
+
 const Container = styled.div`
   display: flex;
   flex-direction: row;

@@ -11,6 +11,7 @@ export enum LoginLocalStorageKey {
   GoogleEmail = "login/googleEmail",
   UserInfo = "login/userInfo"
 }
+
 export interface Room {
   roomId: string;
   roomName: string;
@@ -22,6 +23,7 @@ export interface Room {
   startHour: string;
   endHour: string;
 }
+
 export interface ErrorResponse {
   type: number;
   message: string;

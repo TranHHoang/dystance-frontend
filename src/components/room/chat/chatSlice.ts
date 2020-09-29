@@ -29,7 +29,6 @@ const chatSlice = createSlice({
   reducers: {
     initChat(state, action: PayloadAction<ChatMessage[]>) {
       state = action.payload;
-      console.log(state);
       return state;
     },
     addChat(state, action: PayloadAction<ChatMessage>) {
@@ -64,7 +63,7 @@ function fetchLatestMessage(roomId: string): AppThunk {
       dispatch(addChat(message));
     } catch (ex) {
       // TODO: Check this
-      console.log("EX: " + ex);
+      console.log("Exception: " + ex);
     }
   };
 }

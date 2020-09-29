@@ -10,7 +10,7 @@ import {
   TextContainer,
   Time,
   Title
-} from "./SingleRoomStyles";
+} from "./styles";
 import moment from "moment";
 import { Room } from "~utils/types";
 import { Link } from "react-router-dom";
@@ -19,7 +19,7 @@ import { deleteRoom, setConfirmDeleteModalOpen } from "./singleRoomSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import { ButtonMenu, MenuItem, Modal, Button } from "react-rainbow-components";
-import { StyledNotification } from "../../account-management/login/styles";
+import { StyledNotification } from "../../account-management/styles";
 import styled from "styled-components";
 import { getLoginData } from "~utils/tokenStorage";
 import { RootState } from "~app/rootReducer";
@@ -49,7 +49,6 @@ export const SingleRoom = (props: any) => {
   const { roomId, creatorId, roomName, startHour, endHour, image, description }: Room = props;
   const dispatch = useDispatch();
   const singleRoomState = useSelector((state: RootState) => state.singleRoomState);
-  const inviteState = useSelector((state: RootState) => state.inviteState);
 
   function formatTime(time: string): string {
     const parts = time.split(":");

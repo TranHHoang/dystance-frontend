@@ -29,7 +29,7 @@ Axios.interceptors.response.use(
 
     error.config._retry = true;
 
-    const userInfo = await getLoginData();
+    const userInfo = getLoginData();
 
     try {
       const form = new FormData();

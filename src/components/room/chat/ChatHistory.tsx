@@ -9,6 +9,7 @@ import { initSocket, fetchAllMessages, removeListeners, ChatType } from "./chatS
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { shell } from "electron";
+
 const StyledTimeline = styled(ActivityTimeline)`
   padding: 20px;
 `;
@@ -52,6 +53,7 @@ const StyledText = styled.p`
     color: #00b0f4;
   }
 `;
+
 const ChatHistory = (props: any) => {
   const chatState = useSelector((root: RootState) => root.chatState);
   const dispatch = useDispatch();
@@ -72,7 +74,7 @@ const ChatHistory = (props: any) => {
     dispatch(initSocket(roomId));
     dispatch(fetchAllMessages(roomId));
     return removeListeners();
-  }, []);
+  }, [dispatch, roomId]);
 
   return (
     <StyledTimeline>

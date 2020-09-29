@@ -32,7 +32,6 @@ const StyledModal = styled(Modal)`
   }
   div {
     margin-left: 80px;
-    /* display: flex; */
   }
   div span {
     font-weight: bold;
@@ -54,7 +53,6 @@ const StyledModal = styled(Modal)`
 
 const ChatArea = (props: any) => {
   const chatState = useSelector((root: RootState) => root.chatState);
-  // const [hasFile, setHasFile] = useState(false);
   const [file, setFile] = useState<File>();
   const [imagePreview, setImagePreview] = useState("");
   const chatBox = useRef<HTMLDivElement>();
@@ -88,16 +86,12 @@ const ChatArea = (props: any) => {
 
   function onDrop(e: React.DragEvent<HTMLDivElement>) {
     e.preventDefault();
-    // setHasFile(true);
 
     if (e.dataTransfer.items[0]?.kind === "file") {
       setFile(e.dataTransfer.items[0].getAsFile());
     }
   }
 
-  useEffect(() => {
-    console.log(roomId);
-  }, []);
   function sendFile() {
     dispatch(broadcastMessage(roomId, file, isImageFile(file) ? ChatType.Image : ChatType.File));
     setFile(undefined);

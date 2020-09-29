@@ -15,12 +15,10 @@ import {
   StyledNotification,
   Title,
   StyledLink
-} from "../login/styles";
+} from "../styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Formik, Field, FormikProps } from "formik";
 import * as Yup from "yup";
-import { Link } from "react-router-dom";
-import styled from "styled-components";
 
 export interface RegisterFormValues {
   userName: string;

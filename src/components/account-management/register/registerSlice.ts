@@ -64,7 +64,6 @@ export function startRegister({ email, userName, password, realName, dob }: Regi
       createHashHistory().replace("/");
     } catch (ex) {
       const e = ex as AxiosError;
-      console.log(e.response);
 
       if (e.response && e.response.data) {
         // server responsed

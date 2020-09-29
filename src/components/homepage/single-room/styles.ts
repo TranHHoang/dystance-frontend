@@ -1,4 +1,4 @@
-import { Card, Button, Avatar, Textarea } from "react-rainbow-components";
+import { Card, Button, Textarea } from "react-rainbow-components";
 import styled from "styled-components";
 
 export const StyledCard = styled(Card)`

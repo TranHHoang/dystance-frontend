@@ -1,6 +1,6 @@
 import React from "react";
-import { Formik, Form, Field, FormikProps } from "formik";
-import { StyledInput, StyledForm, StyledButton, ButtonContainer } from "../login/styles";
+import { Formik, Field, FormikProps } from "formik";
+import { StyledInput, StyledForm, StyledButton, ButtonContainer } from "../styles";
 import { useDispatch, useSelector } from "react-redux";
 import { startSendEmail } from "./resetPasswordSlice";
 import { RootState } from "~app/rootReducer";
