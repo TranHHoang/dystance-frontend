@@ -37,7 +37,11 @@ const validationSchema = Yup.object({
   dob: Yup.date().required("Date of birth is required"),
   password: Yup.string().test("required if new password filled in", "This field is required", function (value) {
     const { newPassword } = this.parent;
-    return newPassword !== null;
+    console.log(newPassword === undefined);
+    if (newPassword) {
+      return value !== undefined;
+    }
+    return true;
   }),
   newPassword: Yup.string()
     .min(8, "Password must be at least 8 characters")
@@ -95,8 +99,6 @@ const ProfilePage = () => {
   }, []);
 
   function onSubmit(values: UpdateProfileFormValues) {
-    console.log("Form Submit");
-
     dispatch(updateProfile(values));
   }
   function reset() {
@@ -196,8 +198,10 @@ const ProfilePage = () => {
                       type="password"
                       label="Current Password"
                       error={
-                        updateProfileState.error && updateProfileState.error.type === 4
+                        updateProfileState.error && updateProfileState.error.type === 0
                           ? updateProfileState.error.message
+                          : errors.password && touched.password
+                          ? errors.password
                           : null
                       }
                     />

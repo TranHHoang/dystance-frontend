@@ -87,6 +87,7 @@ export function updateProfile({ realName, dob, newAvatar, password, newPassword 
       localStorage.removeItem("profile");
       localStorage.setItem("profile", JSON.stringify(response.data));
       dispatch(updateProfileSuccess());
+      window.location.reload();
     } catch (ex) {
       const e = ex as AxiosError;
 
