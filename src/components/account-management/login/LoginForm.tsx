@@ -22,18 +22,15 @@ import {
   StyledLink,
   StyledNotification,
   Title
-} from "./styles";
+} from "../styles";
 import { Formik, Field, FormikProps } from "formik";
 import * as Yup from "yup";
+import { LoginLocalStorageKey } from "~utils/types";
+import * as resetPasswordSlice from "../reset-password/resetPasswordSlice";
 
 interface LoginFormValues {
   emailOrUserName: string;
   password: string;
-}
-
-export enum LoginLocalStorageKey {
-  EmailOrUserName = "login/emailOrUserName",
-  GoogleEmail = "login/googleEmail"
 }
 
 const initialValues: LoginFormValues = {
@@ -56,7 +53,7 @@ const LoginForm = () => {
 
   useEffect(() => {
     dispatch(resetLoginState());
-  }, []);
+  }, [dispatch]);
   const _: any = undefined;
 
   function onSubmit(values: LoginFormValues) {
@@ -102,8 +99,6 @@ const LoginForm = () => {
     } else if (loginState.resendEmailLoading) {
       resendEmailSection = <StyledNotification title="Sending..." hideCloseButton={true} icon="warning" />;
     } else if (!loginState.resendEmailLoading && !loginState.resendEmailError) {
-      console.log(loginState);
-
       resendEmailSection = (
         <NotificationContainer>
           <StyledNotification title="Resend Email Successful!" hideCloseButton={true} icon="success" />
@@ -132,7 +127,7 @@ const LoginForm = () => {
 
         <Register>
           Don&apos;t have an account? &nbsp;
-          <StyledLink href="#/register">Create Account Here</StyledLink>
+          <StyledLink to="/register">Create Account Here</StyledLink>
         </Register>
 
         <StyledCard>
@@ -180,7 +175,9 @@ const LoginForm = () => {
                   />
                 </ButtonContainer>
 
-                <StyledLink href="#">Forgot your password?</StyledLink>
+                <StyledLink to="/resetPassword" onClick={() => dispatch(resetPasswordSlice.resetState())}>
+                  Forgot your password?
+                </StyledLink>
               </StyledForm>
             )}
           </Formik>

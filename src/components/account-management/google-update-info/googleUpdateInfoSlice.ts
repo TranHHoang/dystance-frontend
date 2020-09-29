@@ -4,11 +4,11 @@ import { hostName } from "~utils/hostUtils";
 import { AppThunk } from "~app/store";
 import { createHashHistory } from "history";
 import { saveLoginData } from "~utils/tokenStorage";
-import { ErrorResponse, OkResponse } from "../login/loginSlice";
-import { LoginLocalStorageKey } from "../login/LoginForm";
+import { OkResponse } from "../login/loginSlice";
 import { GoogleUpdateInfoFormValues } from "./GoogleUpdateInfo";
 import Axios from "~utils/fakeAPI";
 import moment from "moment";
+import { ErrorResponse, LoginLocalStorageKey } from "~utils/types";
 
 export enum GoogleUpdateInfoError {
   UserNameAlreadyExists,
@@ -60,7 +60,7 @@ export function startGoogleUpdateInfo({ userName, realName, dob }: GoogleUpdateI
     dispatch(updateInfoStart());
 
     const form = new FormData();
-    form.append("email", window.localStorage.getItem(LoginLocalStorageKey.GoogleEmail));
+    form.append("email", localStorage.getItem(LoginLocalStorageKey.GoogleEmail));
     form.append("userName", userName);
     form.append("realName", realName);
     form.append("dob", moment(dob).format("YYYY-MM-DD"));
@@ -74,7 +74,7 @@ export function startGoogleUpdateInfo({ userName, realName, dob }: GoogleUpdateI
 
       const data = response.data as OkResponse;
 
-      await saveLoginData(data.userName, {
+      saveLoginData({
         id: data.id,
         userName: data.userName,
         accessToken: data.accessToken,
@@ -83,8 +83,6 @@ export function startGoogleUpdateInfo({ userName, realName, dob }: GoogleUpdateI
 
       createHashHistory().push("/homepage");
     } catch (ex) {
-      console.log(ex);
-
       dispatch(getAxiosError(ex as AxiosError));
     }
   };

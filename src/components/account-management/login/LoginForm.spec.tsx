@@ -1,16 +1,13 @@
 import React from "react";
-import Enzyme, { shallow, render, mount } from "enzyme";
-import toJson from "enzyme-to-json";
+import { mount } from "enzyme";
 import LoginForm from "./LoginForm";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import { reducer as formReducer } from "redux-form";
-import { Provider, useDispatch } from "react-redux";
+import { Provider } from "react-redux";
 import loginReducer, * as LoginSlice from "./loginSlice";
 
 const store = configureStore({
   reducer: combineReducers({
-    loginState: loginReducer,
-    form: formReducer
+    loginState: loginReducer
   })
 });
 
@@ -19,10 +16,6 @@ const wrapper = mount(
     <LoginForm />
   </Provider>
 );
-
-const mockedLoginState = {
-  isLoading: true
-};
 
 describe("Login Form Test Suite", () => {
   describe("render()", () => {

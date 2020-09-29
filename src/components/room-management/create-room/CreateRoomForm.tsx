@@ -1,12 +1,14 @@
 import React, { useRef } from "react";
 import { Modal, Button, Input, TimePicker, DatePicker, Textarea, Notification } from "react-rainbow-components";
-import { RootState } from "../../../app/rootReducer";
+import { RootState } from "~app/rootReducer";
 import { useSelector, useDispatch } from "react-redux";
 import { createRoom, setRoomCreateModalOpen } from "./createRoomSlice";
 import styled from "styled-components";
 import { Formik, Field, Form, FormikProps } from "formik";
 import * as Yup from "yup";
 import moment from "moment";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 const StyledNotification = styled(Notification)`
   width: 100%;
@@ -137,11 +139,13 @@ const CreateRoomForm = () => {
   return (
     <div>
       <Button
-        label="Create Room"
         onClick={() => dispatch(setRoomCreateModalOpen(true))}
         variant="brand"
         className="rainbow-m-around_medium"
-      />
+      >
+        <FontAwesomeIcon icon={faPlus} className="rainbow-m-right_medium" />
+        Create Room
+      </Button>
       <Modal
         id="create-room-modal"
         title="Create Classroom"
@@ -150,7 +154,6 @@ const CreateRoomForm = () => {
         footer={
           <div className="rainbow-flex rainbow-justify_end">
             <Button
-              form="redux-form-id"
               className="rainbow-m-right_large"
               label="Cancel"
               variant="neutral"
@@ -158,7 +161,6 @@ const CreateRoomForm = () => {
               disabled={createRoomState.isLoading || createRoomState.isCreationSuccess}
             />
             <Button
-              form="redux-form-id"
               label="Save"
               variant="brand"
               type="submit"

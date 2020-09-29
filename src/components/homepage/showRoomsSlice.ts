@@ -1,27 +1,18 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError } from "axios";
 import { AppThunk } from "~app/store";
-import { getFormInitialValues } from "redux-form";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
+import { getLoginData } from "~utils/tokenStorage";
+import { Room } from "~utils/types";
 
 enum ShowRoomError {
   OtherError = 2
 }
+
 interface ErrorResponse {
   type: number;
   message: string;
-}
-interface Room {
-  roomId: string;
-  roomName: string;
-  creatorId: string;
-  image: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  startHour: string;
-  endHour: string;
 }
 
 interface ShowRoomState {
@@ -34,6 +25,7 @@ const initialState: ShowRoomState = {
   isLoading: true,
   rooms: []
 };
+
 const showRoomSlice = createSlice({
   name: "showRoom",
   initialState,
@@ -45,19 +37,22 @@ const showRoomSlice = createSlice({
     fetchRoomFailed(state, action: PayloadAction<ErrorResponse>) {
       state.isLoading = false;
       state.error = action.payload;
+    },
+    resetRoom() {
+      return initialState;
     }
   }
 });
 
 export default showRoomSlice.reducer;
-export const { fetchRoomSuccess, fetchRoomFailed } = showRoomSlice.actions;
+export const { fetchRoomSuccess, fetchRoomFailed, resetRoom } = showRoomSlice.actions;
 
 export function showRoom(): AppThunk {
   return async (dispatch) => {
     try {
-      const response = await Axios.get(`${hostName}/api/Rooms/getByUserId?id=1`);
+      const id = getLoginData().id;
+      const response = await Axios.get(`${hostName}/api/Rooms/getByUserId?id=${id}`);
       const data = response.data as Room[];
-      console.log(data);
 
       dispatch(fetchRoomSuccess(data));
     } catch (e) {

@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
 import { startGoogleUpdateInfo } from "./googleUpdateInfoSlice";
-import { faUser, faLock, faEnvelope, faCalendar } from "@fortawesome/free-solid-svg-icons";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
 import {
   BackgroundContainer,
   ButtonContainer,
@@ -14,9 +14,9 @@ import {
   StyledInput,
   StyledNotification,
   Title
-} from "../login/styles";
+} from "../styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Formik, Field, FormikProps, yupToFormErrors } from "formik";
+import { Formik, Field, FormikProps } from "formik";
 import * as Yup from "yup";
 
 export interface GoogleUpdateInfoFormValues {

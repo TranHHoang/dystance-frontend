@@ -1,20 +1,17 @@
 import Axios from "axios";
-import keytar from "keytar";
-import { getLoginData, saveLoginData } from "./tokenStorage";
+import { getLoginData, saveLoginData, removeLoginData } from "./tokenStorage";
 import { hostName } from "~utils/hostUtils";
 import { UserLoginData } from "~utils/types";
 
-const userName = "userName";
-
 Axios.interceptors.request.use(
-  async (config) => {
+  (config) => {
     const url = config.url;
 
     const isPublicRoute = /api\/users\/(login|register|google)/.test(url);
 
     if (!isPublicRoute) {
       // only need token for api access
-      const loginData = await getLoginData();
+      const loginData = getLoginData();
       config.headers["Authorization"] = `Bearer ${loginData.accessToken}`;
     }
 
@@ -32,7 +29,7 @@ Axios.interceptors.response.use(
 
     error.config._retry = true;
 
-    const userInfo = await getLoginData();
+    const userInfo = getLoginData();
 
     try {
       const form = new FormData();
@@ -45,7 +42,7 @@ Axios.interceptors.response.use(
         headers: { "Content-Type": "multipart/form-data" }
       });
 
-      await saveLoginData(userName, {
+      saveLoginData({
         id: response.id,
         userName: response.userName,
         accessToken: response.accessToken,
@@ -58,7 +55,9 @@ Axios.interceptors.response.use(
       error.response.configs.headers["Authorization"] = `Bearer ${response.accessToken}`;
       return Axios(error.response.config);
     } catch (e) {
-      if (e.response.status === 401) await keytar.deletePassword("Dystance", userName);
+      if (e.response.status === 401) {
+        removeLoginData();
+      }
       return Promise.reject(e);
     }
   }
