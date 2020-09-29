@@ -1,17 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import moment from "moment";
-import { AppThunk } from "../../../app/store";
+import { AppThunk } from "~app/store";
 import { CreateRoomFormValues } from "./CreateRoomForm";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { showRoom, resetRoom } from "../../homepage/showRoomsSlice";
-import { LoginLocalStorageKey } from "~utils/types";
-interface ErrorResponse {
-  type: number;
-  message: string;
-}
+import { ErrorResponse } from "~utils/types";
 
 interface CreateRoomState {
   isLoading: boolean;
@@ -65,7 +61,6 @@ export function createRoom({
 }: CreateRoomFormValues): AppThunk {
   return async (dispatch) => {
     dispatch(roomCreateStart());
-    console.log("Thunk started");
 
     try {
       const fd = new FormData();
@@ -89,7 +84,6 @@ export function createRoom({
     } catch (ex) {
       // Error code != 200
       const e = ex as AxiosError;
-      console.log(e);
 
       if (e.response) {
         // Server is online, get data from server

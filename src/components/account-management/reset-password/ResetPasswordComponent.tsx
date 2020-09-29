@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
-import { BackgroundContainer, Container, StyledCard, Title, StyledNotification } from "../login/styles";
+import { BackgroundContainer, Container, StyledCard, Title, StyledNotification } from "../styles";
 import EmailForm from "./EmailForm";
 import AccessCodeForm from "./AccessCodeForm";
 import ChangePasswordForm from "./ChangePasswordForm";
@@ -28,8 +28,6 @@ export const ResetErrorNotification = styled(StyledNotification)`
 const ResetPasswordComponent = () => {
   const resetPasswordState = useSelector((state: RootState) => state.resetPasswordState);
   const dispatch = useDispatch();
-
-  console.log(resetPasswordState);
 
   useEffect(() => {
     dispatch(resetError());

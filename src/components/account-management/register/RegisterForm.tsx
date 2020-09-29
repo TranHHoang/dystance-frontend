@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { startRegister } from "./registerSlice";
 import { RootState } from "~app/rootReducer";
-import { faUser, faLock, faEnvelope, faCalendar } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faLock, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import {
   BackgroundContainer,
   ButtonContainer,
@@ -15,12 +15,10 @@ import {
   StyledNotification,
   Title,
   StyledLink
-} from "../login/styles";
+} from "../styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Formik, Field, FormikProps, yupToFormErrors } from "formik";
+import { Formik, Field, FormikProps } from "formik";
 import * as Yup from "yup";
-import { Link } from "react-router-dom";
-import styled from "styled-components";
 
 export interface RegisterFormValues {
   userName: string;

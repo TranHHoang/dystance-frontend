@@ -1,26 +1,26 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Button, Textarea, Modal } from "react-rainbow-components";
+import React, { useEffect, useState } from "react";
+import { Button, Modal, Textarea } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
 import { setInviteModalOpen, startInvite } from "./inviteSlice";
-import { StyledNotification } from "../../account-management/login/styles";
+import { StyledNotification } from "../../account-management/styles";
 
 const InviteForm = (props: any) => {
   const inviteState = useSelector((root: RootState) => root.inviteState);
   const dispatch = useDispatch();
   const { roomId } = props;
-  const inviteList = useRef<HTMLTextAreaElement>();
-  const message = useRef<HTMLTextAreaElement>();
+  const [emailList, setEmailList] = useState("");
+  const [message, setMessage] = useState("");
 
   function onSendInvite() {
-    if (inviteList.current.value?.trim()) {
-      dispatch(startInvite(inviteState.roomId, inviteList.current.value.trim().split("\n"), message.current.value));
+    if (emailList?.trim()) {
+      dispatch(startInvite(inviteState.roomId, emailList.trim().split("\n"), message));
     }
   }
 
   useEffect(() => {
     dispatch(setInviteModalOpen({ roomId, isModalOpen: false }));
-  }, [inviteState.isSuccess]);
+  }, [dispatch, inviteState.isSuccess, roomId]);
 
   return (
     <div>
@@ -47,9 +47,9 @@ const InviteForm = (props: any) => {
         }
       >
         {inviteState.isSuccess && <StyledNotification title="Something went wrong" icon="error" />}
-        <textarea placeholder="Email list" ref={inviteList} />
+        <Textarea placeholder="Email list" value={emailList} onChange={(e) => setEmailList(e.target.value)} />
         <br />
-        <textarea placeholder="Message" ref={message} />
+        <Textarea placeholder="Message" value={message} onChange={(e) => setMessage(e.target.value)} />
       </Modal>
     </div>
   );

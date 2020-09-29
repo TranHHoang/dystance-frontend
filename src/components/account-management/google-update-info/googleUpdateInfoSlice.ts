@@ -4,11 +4,11 @@ import { hostName } from "~utils/hostUtils";
 import { AppThunk } from "~app/store";
 import { createHashHistory } from "history";
 import { saveLoginData } from "~utils/tokenStorage";
-import { ErrorResponse, OkResponse } from "../login/loginSlice";
+import { OkResponse } from "../login/loginSlice";
 import { GoogleUpdateInfoFormValues } from "./GoogleUpdateInfo";
 import Axios from "~utils/fakeAPI";
 import moment from "moment";
-import { LoginLocalStorageKey } from "~utils/types";
+import { ErrorResponse, LoginLocalStorageKey } from "~utils/types";
 
 export enum GoogleUpdateInfoError {
   UserNameAlreadyExists,
@@ -83,8 +83,6 @@ export function startGoogleUpdateInfo({ userName, realName, dob }: GoogleUpdateI
 
       createHashHistory().push("/homepage");
     } catch (ex) {
-      console.log(ex);
-
       dispatch(getAxiosError(ex as AxiosError));
     }
   };

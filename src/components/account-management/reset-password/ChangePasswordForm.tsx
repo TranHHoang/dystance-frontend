@@ -1,11 +1,10 @@
 import React from "react";
-import { Formik, Form, Field, FormikProps } from "formik";
+import { Formik, Field, FormikProps } from "formik";
 import * as Yup from "yup";
-import { Button } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import { startChangePasword } from "./resetPasswordSlice";
 import { RootState } from "~app/rootReducer";
-import { StyledInput, StyledForm, StyledButton, ButtonContainer } from "../login/styles";
+import { StyledInput, StyledForm, StyledButton, ButtonContainer } from "../styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock } from "@fortawesome/free-solid-svg-icons";
 

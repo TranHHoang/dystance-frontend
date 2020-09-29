@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
-import { AppThunk } from "../../../app/store";
+import { AppThunk } from "~app/store";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { resetRoom, showRoom } from "../showRoomsSlice";

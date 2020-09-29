@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { Modal, Button, Input, TimePicker, DatePicker, Textarea, Notification } from "react-rainbow-components";
-import { RootState } from "../../../app/rootReducer";
+import { RootState } from "~app/rootReducer";
 import { useSelector, useDispatch } from "react-redux";
 import { createRoom, setRoomCreateModalOpen } from "./createRoomSlice";
 import styled from "styled-components";
@@ -154,7 +154,6 @@ const CreateRoomForm = () => {
         footer={
           <div className="rainbow-flex rainbow-justify_end">
             <Button
-              form="redux-form-id"
               className="rainbow-m-right_large"
               label="Cancel"
               variant="neutral"
@@ -162,7 +161,6 @@ const CreateRoomForm = () => {
               disabled={createRoomState.isLoading || createRoomState.isCreationSuccess}
             />
             <Button
-              form="redux-form-id"
               label="Save"
               variant="brand"
               type="submit"

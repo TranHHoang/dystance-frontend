@@ -32,6 +32,7 @@ export const VideoBackground = styled.div`
 export const StyledVideo = styled.video`
   min-width: 500px;
   min-height: 250px;
+  max-width: 600px;
   width: 100%;
   object-fit: contain;
   transform: rotateY(180deg);
@@ -193,7 +194,6 @@ const VoiceCamPreview = (props: any) => {
       .then(gotDevices)
       .then(getUserMedia)
       .catch((err) => console.log(err));
-    console.log(roomId);
   }, []);
 
   useEffect(() => {

@@ -92,4 +92,6 @@ out/
 # Idea folder
 .idea/
 
+dist/
+
 yarn.lock
