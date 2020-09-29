@@ -32,7 +32,7 @@ export const VideoBackground = styled.div`
 export const StyledVideo = styled.video`
   min-width: 500px;
   min-height: 250px;
-  max-width: 600px;
+  max-width: 800px;
   width: 100%;
   object-fit: contain;
   transform: rotateY(180deg);

@@ -21,7 +21,10 @@ const InviteForm = (props: any) => {
   useEffect(() => {
     dispatch(setInviteModalOpen({ roomId, isModalOpen: false }));
   }, [dispatch, inviteState.isSuccess, roomId]);
-
+  useEffect(() => {
+    setEmailList("");
+    setMessage("");
+  }, [inviteState.isModalOpen]);
   return (
     <div>
       <Modal
