@@ -27,6 +27,7 @@ import { Formik, Field, FormikProps } from "formik";
 import * as Yup from "yup";
 import { LoginLocalStorageKey } from "~utils/types";
 import * as resetPasswordSlice from "../reset-password/resetPasswordSlice";
+import { Redirect } from "react-router-dom";
 
 interface LoginFormValues {
   emailOrUserName: string;
@@ -54,6 +55,11 @@ const LoginForm = () => {
   useEffect(() => {
     dispatch(resetLoginState());
   }, [dispatch]);
+
+  if (LoginLocalStorageKey.UserInfo in localStorage) {
+    return <Redirect to="/homepage" />;
+  }
+
   const _: any = undefined;
 
   function onSubmit(values: LoginFormValues) {
