@@ -3,8 +3,10 @@ import CreateRoomForm from "../room-management/create-room/CreateRoomForm";
 import { AllRooms } from "./all-rooms/AllRooms";
 import styled from "styled-components";
 import { Button } from "react-rainbow-components";
-import { signOut } from "../account-management/signout/signOut";
 import { useDispatch } from "react-redux";
+import config from "../account-management/login/googleConfigs.json";
+import { useGoogleLogout } from "react-google-login";
+import { signOut } from "../account-management/signout/signOut";
 
 const AllRoomsDiv = styled.div`
   display: flex;
@@ -22,9 +24,21 @@ const Title = styled.h1`
 export const HomePage = () => {
   const dispatch = useDispatch();
 
+  const googleLogout = useGoogleLogout({
+    clientId: config.GoogleClientId,
+    onLogoutSuccess: () => console.log("Google signed out"),
+    onFailure: () => console.log("Google signed out error")
+  });
+
   return (
     <div>
-      <Button onClick={() => dispatch(signOut())} label="Sign Out" />
+      <Button
+        onClick={() => {
+          googleLogout.signOut();
+          dispatch(signOut());
+        }}
+        label="Sign Out"
+      />
       <AllRoomsDiv>
         <Title>All Rooms</Title>
         <CreateRoomForm />
