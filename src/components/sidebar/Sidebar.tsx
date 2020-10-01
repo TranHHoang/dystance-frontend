@@ -5,7 +5,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faCalendarAlt, faComment, faPencilAlt, faPowerOff, faCog } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import logo from "./logo.png";
-
+import { signOut } from "../account-management/signout/signOut";
+import { useDispatch } from "react-redux";
 const StyledSidebar = styled(Sidebar)`
   background: ${(props) => props.theme.rainbow.palette.background.main};
   position: fixed;
@@ -56,6 +57,7 @@ const Logo = styled.img`
 `;
 const SideNavigationBar = () => {
   const [selectedItem, setSelectedItem] = useState("Homepage");
+  const dispatch = useDispatch();
   return (
     <StyledSidebar selectedItem={selectedItem} onSelect={(_, selectedItem) => setSelectedItem(selectedItem)}>
       <SidebarItemContainer>
@@ -76,7 +78,12 @@ const SideNavigationBar = () => {
         menuSize="small"
       >
         <MenuItem label="Edit Profile" icon={<FontAwesomeIcon icon={faPencilAlt} />} iconPosition="left" />
-        <MenuItem label="Logout" icon={<FontAwesomeIcon icon={faPowerOff} />} iconPosition="left" />
+        <MenuItem
+          label="Logout"
+          icon={<FontAwesomeIcon icon={faPowerOff} />}
+          onClick={() => dispatch(signOut())}
+          iconPosition="left"
+        />
       </StyledAvatarMenu>
     </StyledSidebar>
   );

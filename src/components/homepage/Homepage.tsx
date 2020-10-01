@@ -3,8 +3,6 @@ import CreateRoomForm from "../room-management/create-room/CreateRoomForm";
 import { AllRooms } from "./all-rooms/AllRooms";
 import styled from "styled-components";
 import SideNavigationBar from "../sidebar/Sidebar";
-import { useDispatch } from "react-redux";
-import { signOut } from "../account-management/signout/signOut";
 
 const CreateRoomDiv = styled.div`
   display: flex;
