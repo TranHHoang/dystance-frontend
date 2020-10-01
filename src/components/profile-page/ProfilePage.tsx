@@ -21,6 +21,7 @@ import { RootState } from "~app/rootReducer";
 import { showProfile } from "./showProfileInfoSlice";
 import { updateProfile, changePasswordStart, cancelChangePassword } from "./updateProfileSlice";
 import { Button } from "react-rainbow-components";
+import { hostName } from "~utils/hostUtils";
 
 export interface UpdateProfileFormValues {
   realName: string;
@@ -58,6 +59,7 @@ const ProfilePage = () => {
   const updateProfileState = useSelector((state: RootState) => state.updateProfileState);
   const [imgSrc, setImgSrc] = useState(null);
   const [rejectFile, setRejectFile] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
   const formRef = useRef(null);
   const dispatch = useDispatch();
 
@@ -75,21 +77,27 @@ const ProfilePage = () => {
   const handleChange = (files: File[]) => {
     if (files[0]?.name) {
       if (/(jpg|png|jpeg)$/i.test(files[0].name)) {
-        setRejectFile(false);
-        const reader = new FileReader();
-        const currentFile = files[0];
-        if (currentFile) {
-          reader.addEventListener(
-            "load",
-            () => {
-              setImgSrc(reader.result);
-            },
-            false
-          );
-          reader.readAsDataURL(currentFile);
+        if (files[0].size > 5 * 1024 * 1024) {
+          setRejectFile(true);
+          setRejectReason("File size is too large");
+        } else {
+          setRejectFile(false);
+          const reader = new FileReader();
+          const currentFile = files[0];
+          if (currentFile) {
+            reader.addEventListener(
+              "load",
+              () => {
+                setImgSrc(reader.result);
+              },
+              false
+            );
+            reader.readAsDataURL(currentFile);
+          }
         }
       } else {
         setRejectFile(true);
+        setRejectReason("File type not supported");
       }
     }
   };
@@ -127,14 +135,14 @@ const ProfilePage = () => {
                 console.log(formRef.current);
                 formRef?.current.handleSubmit();
               }}
-              disabled={updateProfileState.isLoading}
+              disabled={updateProfileState.isLoading || rejectFile}
             />
           </div>
         }
       >
         <CardContainer>
           <ImageContainer>
-            <StyledImage src={!imgSrc ? showProfileState.user?.avatar : imgSrc} alt="" />
+            <StyledImage src={!imgSrc ? `${hostName}/${showProfileState.user?.avatar}` : imgSrc} alt="" />
           </ImageContainer>
           <Formik
             enableReinitialize={true}
@@ -164,7 +172,7 @@ const ProfilePage = () => {
                     handleChange(event);
                     setFieldValue("newAvatar", event[0]);
                   }}
-                  error={rejectFile ? "File is not supported" : null}
+                  error={rejectFile ? rejectReason : null}
                   value={values.newAvatar || ""}
                 />
                 <Field

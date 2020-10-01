@@ -22,6 +22,7 @@ export const StyledImage = styled.img`
   min-width: 125px;
   height: 120px;
   border-radius: 50%;
+  object-fit: cover;
 `;
 export const StyledCard = styled(Card)`
   height: auto;
