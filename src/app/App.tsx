@@ -9,6 +9,7 @@ import VoiceCamPreview from "../components/room/VoiceCamPreview/VoiceCamPreview"
 import ChatArea from "../components/room/chat/ChatArea";
 import ResetPasswordComponent from "../components/account-management/reset-password/ResetPasswordComponent";
 
+import ProfilePage from "../components/profile-page/ProfilePage";
 export default hot(module)(function App() {
   return (
     <HashRouter>
@@ -20,6 +21,7 @@ export default hot(module)(function App() {
         <Route exact path="/voiceCamPreview/:roomId" component={VoiceCamPreview} />
         <Route exact path="/chatRoom/:roomId" component={ChatArea} />
         <Route exact path="/resetPassword" component={ResetPasswordComponent} />
+        <Route exact path="/profile" component={ProfilePage} />
       </Switch>
     </HashRouter>
   );

@@ -9,6 +9,8 @@ import singleRoomReducer from "../components/homepage/single-room/singleRoomSlic
 import resetPasswordReducer from "../components/account-management/reset-password/resetPasswordSlice";
 import inviteReducer from "../components/room/invite/inviteSlice";
 import { ResetStoreAction } from "../components/account-management/signout/signOut";
+import showProfileReducer from "../components/profile-page/showProfileInfoSlice";
+import updateProfileReducer from "../components/profile-page/updateProfileSlice";
 
 const appReducer = combineReducers({
   roomCreation: createRoomReducer,
@@ -19,7 +21,9 @@ const appReducer = combineReducers({
   chatState: chatReducer,
   singleRoomState: singleRoomReducer,
   resetPasswordState: resetPasswordReducer,
-  inviteState: inviteReducer
+  inviteState: inviteReducer,
+  showProfileState: showProfileReducer,
+  updateProfileState: updateProfileReducer
 });
 
 const rootReducer = (state: any, action: AnyAction) => {

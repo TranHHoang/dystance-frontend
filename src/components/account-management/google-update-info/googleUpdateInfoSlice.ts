@@ -81,7 +81,7 @@ export function startGoogleUpdateInfo({ userName, realName, dob }: GoogleUpdateI
         refreshToken: data.refreshToken
       });
 
-      createHashHistory().push("/homepage");
+      createHashHistory().push("/profile");
     } catch (ex) {
       dispatch(getAxiosError(ex as AxiosError));
     }
