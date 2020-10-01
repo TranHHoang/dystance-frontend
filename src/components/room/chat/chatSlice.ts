@@ -4,11 +4,19 @@ import Axios from "~utils/fakeAPI";
 import { AppThunk } from "~app/store";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
+import NodeCache from "node-cache";
 
 export enum ChatType {
   Text,
   Image,
   File
+}
+
+export interface UserInfo {
+  id: string;
+  userName: string;
+  realName: string;
+  avatar: string;
 }
 
 interface ChatMessage {
@@ -22,6 +30,7 @@ interface ChatMessage {
 }
 
 const initialState: ChatMessage[] = [];
+const nodeCache = new NodeCache();
 
 const chatSlice = createSlice({
   name: "chatSlice",
@@ -106,4 +115,18 @@ export function broadcastMessage(roomId: string, message: string | File, type = 
 
 export function removeListeners() {
   socket.off("Broadcast");
+}
+
+export async function getUserInfo(userId: string): Promise<UserInfo> {
+  try {
+    if (nodeCache.get(userId)) {
+      return nodeCache.get(userId) as UserInfo;
+    }
+    const response = await Axios.get(`${hostName}/api/users/info?id=${userId}`);
+    nodeCache.set(userId, response.data);
+    return response.data as UserInfo;
+  } catch (ex) {
+    // TODO: Handle this
+    console.log(ex);
+  }
 }
