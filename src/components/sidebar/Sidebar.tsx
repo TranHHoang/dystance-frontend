@@ -6,7 +6,13 @@ import { faHome, faCalendarAlt, faComment, faPencilAlt, faPowerOff, faCog } from
 import styled from "styled-components";
 import logo from "./logo.png";
 import { signOut } from "../account-management/signout/signOut";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { User } from "~utils/types";
+import { hostName } from "~utils/hostUtils";
+import { Link } from "react-router-dom";
+import { RootState } from "~app/rootReducer";
+import { setSidebarValue } from "./sidebarSlice";
+
 const StyledSidebar = styled(Sidebar)`
   background: ${(props) => props.theme.rainbow.palette.background.main};
   position: fixed;
@@ -56,10 +62,14 @@ const Logo = styled.img`
   }
 `;
 const SideNavigationBar = () => {
-  const [selectedItem, setSelectedItem] = useState("Homepage");
+  const sidebarState = useSelector((state: RootState) => state.sidebarState);
   const dispatch = useDispatch();
+  const profile = JSON.parse(localStorage.getItem("profile")) as User;
   return (
-    <StyledSidebar selectedItem={selectedItem} onSelect={(_, selectedItem) => setSelectedItem(selectedItem)}>
+    <StyledSidebar
+      selectedItem={sidebarState.sidebarValue}
+      onSelect={(_, selectedItem) => dispatch(setSidebarValue(selectedItem))}
+    >
       <SidebarItemContainer>
         <Logo src={logo} alt="logo "></Logo>
         <StyledSidebarItem icon={<StyledIcon icon={faHome} size="2x" />} name="Homepage" label="Homepage" />
@@ -70,14 +80,21 @@ const SideNavigationBar = () => {
       </SidebarItemContainer>
 
       <StyledAvatarMenu
-        assistiveText="Minh Ho"
-        initials="MH"
-        title="Minh Ho"
+        assistiveText={profile.realName}
+        title={profile.realName}
+        src={`${hostName}/${profile.avatar}`}
         menuAlignment="bottom-left"
         avatarSize="large"
         menuSize="small"
       >
-        <MenuItem label="Edit Profile" icon={<FontAwesomeIcon icon={faPencilAlt} />} iconPosition="left" />
+        <MenuItem
+          label="Edit Profile"
+          icon={<FontAwesomeIcon icon={faPencilAlt} />}
+          onClick={() => {
+            dispatch(setSidebarValue("Profile"));
+          }}
+          iconPosition="left"
+        />
         <MenuItem
           label="Logout"
           icon={<FontAwesomeIcon icon={faPowerOff} />}

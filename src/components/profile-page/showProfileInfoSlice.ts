@@ -4,22 +4,13 @@ import { hostName } from "~utils/hostUtils";
 import { AppThunk } from "~app/store";
 import Axios from "~utils/fakeAPI";
 import { getLoginData } from "~utils/tokenStorage";
+import { User } from "~utils/types";
 
 export interface ErrorResponse {
   type: number;
   message: string;
 }
 
-interface User {
-  id: string;
-  userName: string;
-  realName: string;
-  email: string;
-  dob: string;
-  password: string;
-  newPassword: string;
-  avatar: string;
-}
 interface ShowProfileState {
   isLoading: boolean;
   user?: User;

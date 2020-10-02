@@ -2,7 +2,7 @@ import * as React from "react";
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "~app/rootReducer";
-import { showRoom } from "../showRoomsSlice";
+import { resetRoom, showRoom } from "../showRoomsSlice";
 import { SingleRoom } from "../single-room/SingleRoom";
 import styled from "styled-components";
 
@@ -25,6 +25,9 @@ export const AllRooms = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(showRoom());
+    return () => {
+      dispatch(resetRoom());
+    };
   }, []);
 
   return (

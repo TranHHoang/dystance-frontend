@@ -5,6 +5,7 @@ import { Form } from "formik";
 export const Container = styled.div`
   padding: 20px;
   width: 100%;
+  margin-left: 130px;
 `;
 export const CardContainer = styled.div`
   padding: 20px;
