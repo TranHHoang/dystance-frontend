@@ -1,6 +1,6 @@
 import { app, BrowserWindow } from "electron";
 import installExtension, { REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
-
+import path from "path";
 declare const APP_WEBPACK_ENTRY: string;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -22,6 +22,9 @@ const createWindow = () => {
 
   // and load the index.html of the app.
   mainWindow.loadURL(APP_WEBPACK_ENTRY);
+  mainWindow.setMenu(null);
+  console.log(__dirname);
+  mainWindow.setIcon(path.join(__dirname, "../../src/components/sidebar/logo.png"));
   // installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS])
   //   .then((name) => console.log(`Added Extension:  ${name}`))
   //   .catch((err) => console.log("An error occurred: ", err));
