@@ -80,9 +80,9 @@ const SideNavigationBar = () => {
       </SidebarItemContainer>
 
       <StyledAvatarMenu
-        assistiveText={profile.realName}
-        title={profile.realName}
-        src={`${hostName}/${profile.avatar}`}
+        assistiveText={profile?.realName}
+        title={profile?.realName}
+        src={`${hostName}/${profile?.avatar}`}
         menuAlignment="bottom-left"
         avatarSize="large"
         menuSize="small"
