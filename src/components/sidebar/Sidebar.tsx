@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sidebar, SidebarItem, Avatar, AvatarMenu, MenuItem } from "react-rainbow-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faCalendarAlt, faComment, faPencilAlt, faPowerOff, faCog } from "@fortawesome/free-solid-svg-icons";
@@ -12,6 +12,7 @@ import { hostName } from "~utils/hostUtils";
 import { Link } from "react-router-dom";
 import { RootState } from "~app/rootReducer";
 import { setSidebarValue } from "./sidebarSlice";
+import { showProfile } from "../profile-page/showProfileInfoSlice";
 
 const StyledSidebar = styled(Sidebar)`
   background: ${(props) => props.theme.rainbow.palette.background.main};
@@ -63,7 +64,9 @@ const Logo = styled.img`
 `;
 const SideNavigationBar = () => {
   const sidebarState = useSelector((state: RootState) => state.sidebarState);
+  const showProfileState = useSelector((state: RootState) => state.showProfileState);
   const dispatch = useDispatch();
+
   const profile = JSON.parse(localStorage.getItem("profile")) as User;
   return (
     <StyledSidebar
@@ -80,9 +83,9 @@ const SideNavigationBar = () => {
       </SidebarItemContainer>
 
       <StyledAvatarMenu
-        assistiveText={profile?.realName}
-        title={profile?.realName}
-        src={`${hostName}/${profile?.avatar}`}
+        assistiveText={"profile" in localStorage ? profile.realName : ""}
+        title={"profile" in localStorage ? profile.realName : ""}
+        src={"profile" in localStorage ? `${hostName}/${profile.avatar}` : ""}
         menuAlignment="bottom-left"
         avatarSize="large"
         menuSize="small"

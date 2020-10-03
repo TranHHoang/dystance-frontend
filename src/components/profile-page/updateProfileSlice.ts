@@ -1,13 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosResponse, AxiosError } from "axios";
 import { hostName } from "~utils/hostUtils";
-import { UserLoginData } from "~utils/types";
+import { User } from "~utils/types";
 import { AppThunk } from "~app/store";
-import { createHashHistory } from "history";
 import Axios from "~utils/fakeAPI";
-import { saveLoginData } from "~utils/tokenStorage";
 import { UpdateProfileFormValues } from "./ProfilePage";
 import moment from "moment";
+import { setProfileInfo } from "./showProfileInfoSlice";
 export interface ErrorResponse {
   type: number;
   message: string;
@@ -60,11 +59,6 @@ export const {
   cancelChangePassword
 } = updateProfileSlice.actions;
 
-export function changePassword({ password, newPassword }: UpdateProfileFormValues): AppThunk {
-  return async (dispatch) => {
-    dispatch(changePasswordStart());
-  };
-}
 export function updateProfile({ realName, dob, newAvatar, password, newPassword }: UpdateProfileFormValues): AppThunk {
   return async (dispatch) => {
     dispatch(updateProfileStart());
@@ -77,17 +71,18 @@ export function updateProfile({ realName, dob, newAvatar, password, newPassword 
           "Content-Type": "application/x-www-form-urlencoded"
         }
       };
-      fd.append("realName", realName);
+      fd.append("realName", realName.trim());
       fd.append("dob", moment(dob).format("YYYY-MM-DD"));
       fd.append("avatar", newAvatar);
-      fd.append("currentPassword", password);
-      fd.append("newPassword", newPassword);
+      fd.append("currentPassword", password.trim());
+      fd.append("newPassword", newPassword.trim());
 
       const response = await Axios.post(`${hostName}/api/users/updateProfile`, fd, config);
+      const data = response.data as User;
       localStorage.removeItem("profile");
       localStorage.setItem("profile", JSON.stringify(response.data));
+      dispatch(setProfileInfo(data));
       dispatch(updateProfileSuccess());
-      window.location.reload();
     } catch (ex) {
       const e = ex as AxiosError;
 

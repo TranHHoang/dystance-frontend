@@ -7,6 +7,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { showProfile } from "../profile-page/showProfileInfoSlice";
 import { RootState } from "~app/rootReducer";
 import ProfilePage from "../profile-page/ProfilePage";
+import { setSidebarValue } from "../sidebar/sidebarSlice";
+import { resetRoom } from "./showRoomsSlice";
+import { User } from "~utils/types";
 
 const CreateRoomDiv = styled.div`
   display: flex;
@@ -51,11 +54,11 @@ export const HomePage = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch(setSidebarValue("Homepage"));
     dispatch(showProfile());
   }, []);
 
   function getCurrentSidebarValue() {
-    console.log(sidebarState.sidebarValue);
     switch (sidebarState.sidebarValue) {
       case "Homepage":
         return <HomePageDisplay />;

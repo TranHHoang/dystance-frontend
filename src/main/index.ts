@@ -22,8 +22,8 @@ const createWindow = () => {
 
   // and load the index.html of the app.
   mainWindow.loadURL(APP_WEBPACK_ENTRY);
-  mainWindow.setMenu(null);
-  console.log(__dirname);
+  // mainWindow.setMenu(null);
+  // console.log(__dirname);
   mainWindow.setIcon(path.join(__dirname, "../../src/components/sidebar/logo.png"));
   // installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS])
   //   .then((name) => console.log(`Added Extension:  ${name}`))

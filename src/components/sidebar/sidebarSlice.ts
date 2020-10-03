@@ -1,15 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AxiosError } from "axios";
-import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
-import { getLoginData } from "~utils/tokenStorage";
 
 interface SidebarState {
   sidebarValue: string;
 }
 const initialState: SidebarState = {
-  sidebarValue: "Homepage"
+  sidebarValue: ""
 };
 const sidebarSlice = createSlice({
   name: "sidebar",
