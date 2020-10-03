@@ -14,11 +14,10 @@ const StyledChatBox = styled.div`
   align-self: center;
   align-content: space-around;
   background-color: rgb(90, 90, 90);
-  padding: 2px;
+  padding: 2 5 2 5;
   border-radius: 10px;
-  margin: 10px;
-  padding-left: 5px;
-  padding-right: 5px;
+  margin: 0 5 0 5;
+  width: 100%;
   input {
     flex: 1;
     border: none;
@@ -90,7 +89,6 @@ const ChatBox = ({ setFile, roomId }: { setFile: (file: File) => void; roomId: s
         <input type="file" hidden ref={fileInput} onChange={handleFile} />
         <input ref={messageInput} placeholder="Message classroom" onKeyDown={handleKeyDown} />
         <FontAwesomeIcon icon={faSmileBeam} onClick={() => setToggleEmoji(!toggleEmoji)} />
-        <FontAwesomeIcon icon={faHandPaper} />
       </StyledChatBox>
     </>
   );

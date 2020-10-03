@@ -287,7 +287,7 @@ const VoiceCamPreview = (props: any) => {
               <Option key={input.value} name={input.label} value={input.value} label={input.label} />
             ))}
           </StyledPicklist>
-          <Link style={{ textDecoration: "none" }} to={{ pathname: `/chatRoom/${roomId}` }} replace>
+          <Link style={{ textDecoration: "none" }} to={{ pathname: `/room/${roomId}` }} replace>
             <StyledButton variant="brand">Join the room </StyledButton>
           </Link>
         </SelectionContainer>

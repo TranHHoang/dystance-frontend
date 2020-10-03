@@ -11,7 +11,7 @@ import { faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { shell } from "electron";
 
 const StyledTimeline = styled(ActivityTimeline)`
-  padding: 20px;
+  padding: 0 20 0 20;
 `;
 
 const StyledMessage = styled(TimelineMarker)`
@@ -25,8 +25,7 @@ const StyledCard = styled(Card)`
   max-width: 512px;
 `;
 const FileCard = styled(Card)`
-  width: 50%;
-  max-width: 40%;
+  width: 80%;
   padding: 15px;
 `;
 const FileContainer = styled.div`

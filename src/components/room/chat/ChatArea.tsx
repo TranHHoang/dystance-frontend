@@ -12,13 +12,14 @@ import { broadcastMessage, ChatType } from "./chatSlice";
 const ChatHistoryArea = styled.div`
   overflow: auto;
   transform: translate3d(0, 0, 0); /* Faster scrolling */
-  max-height: 90vh;
-  min-height: 90vh;
+  min-width: 450px;
 `;
-
 const StyledChatArea = styled.div`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
-  overflow: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 `;
 
 const StyledModal = styled(Modal)`
@@ -56,7 +57,7 @@ const ChatArea = (props: any) => {
   const [file, setFile] = useState<File>();
   const [imagePreview, setImagePreview] = useState("");
   const chatBox = useRef<HTMLDivElement>();
-  const { roomId } = props.match.params;
+  const { roomId } = props;
   const dispatch = useDispatch();
 
   function isImageFile(file: File) {

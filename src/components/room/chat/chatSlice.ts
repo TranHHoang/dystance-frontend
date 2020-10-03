@@ -81,11 +81,13 @@ const socket = new HubConnectionBuilder().withUrl(`${hostName}/socket`).build();
 
 export function initSocket(roomId: string): AppThunk {
   return async (dispatch) => {
-    console.log("Start socket...");
-    await socket.start();
+    if (socket && socket.state === "Disconnected") {
+      console.log("Start socket...");
+      await socket.start();
+    }
     await socket.invoke("JoinRoom", roomId, getLoginData().id);
-
     socket.on("Broadcast", () => {
+      console.log("New Message");
       dispatch(fetchLatestMessage(roomId));
     });
   };
@@ -115,6 +117,7 @@ export function broadcastMessage(roomId: string, message: string | File, type = 
 
 export function removeListeners() {
   socket.off("Broadcast");
+  console.log("Component Unmount");
 }
 
 export async function getUserInfo(userId: string): Promise<UserInfo> {
