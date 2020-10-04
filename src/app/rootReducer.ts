@@ -11,6 +11,7 @@ import inviteReducer from "../components/room/invite/inviteSlice";
 import { ResetStoreAction } from "../components/account-management/signout/signOut";
 import showProfileReducer from "../components/profile-page/showProfileInfoSlice";
 import updateProfileReducer from "../components/profile-page/updateProfileSlice";
+import sidebarReducer from "../components/sidebar/sidebarSlice";
 
 const appReducer = combineReducers({
   roomCreation: createRoomReducer,
@@ -23,7 +24,8 @@ const appReducer = combineReducers({
   resetPasswordState: resetPasswordReducer,
   inviteState: inviteReducer,
   showProfileState: showProfileReducer,
-  updateProfileState: updateProfileReducer
+  updateProfileState: updateProfileReducer,
+  sidebarState: sidebarReducer
 });
 
 const rootReducer = (state: any, action: AnyAction) => {
