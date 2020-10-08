@@ -10,6 +10,7 @@ import ChatArea from "../components/room/chat/ChatArea";
 import ResetPasswordComponent from "../components/account-management/reset-password/ResetPasswordComponent";
 import RoomComponent from "../components/room/roomComponent/RoomComponent";
 import ProfilePage from "../components/profile-page/ProfilePage";
+
 export default hot(module)(function App() {
   return (
     <HashRouter>
@@ -22,7 +23,7 @@ export default hot(module)(function App() {
         <Route exact path="/chatRoom" component={ChatArea} />
         <Route exact path="/resetPassword" component={ResetPasswordComponent} />
         <Route exact path="/profile" component={ProfilePage} />
-        <Route exact path="/room/:roomId" component={RoomComponent} />
+        <Route exact path="/room/:roomId/:creatorId/:roomName" component={RoomComponent} />
       </Switch>
     </HashRouter>
   );

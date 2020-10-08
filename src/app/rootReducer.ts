@@ -13,6 +13,7 @@ import showProfileReducer from "../components/profile-page/showProfileInfoSlice"
 import updateProfileReducer from "../components/profile-page/updateProfileSlice";
 import sidebarReducer from "../components/sidebar/sidebarSlice";
 import roomReducer from "../components/room/roomComponent/roomSlice";
+import jitsiMeetReducer from "../components/room/jitsiMeetComponent/jitsiMeetSlice";
 
 const appReducer = combineReducers({
   roomCreation: createRoomReducer,
@@ -27,7 +28,8 @@ const appReducer = combineReducers({
   showProfileState: showProfileReducer,
   updateProfileState: updateProfileReducer,
   sidebarState: sidebarReducer,
-  roomState: roomReducer
+  roomState: roomReducer,
+  jitisiMeetState: jitsiMeetReducer
 });
 
 const rootReducer = (state: any, action: AnyAction) => {

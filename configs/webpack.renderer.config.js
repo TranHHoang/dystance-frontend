@@ -46,6 +46,9 @@ module.exports = smp.wrap({
       { test: /\.node$/, loader: 'node-loader' }
     ]
   },
+  externals: [{
+    'jitsi-meet-electron-utils': 'require(\'jitsi-meet-electron-utils\')'
+  }],
   plugins: [new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })],
   resolve: {
     plugins: [new TsconfigPathsPlugin()],

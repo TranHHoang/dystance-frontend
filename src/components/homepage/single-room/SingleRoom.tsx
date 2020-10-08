@@ -92,7 +92,10 @@ export const SingleRoom = (props: any) => {
         />
 
         <JoinRoomButtonContainer>
-          <StyledLink style={{ textDecoration: "none", width: "100%" }} to={{ pathname: `/voiceCamPreview/${roomId}` }}>
+          <StyledLink
+            style={{ textDecoration: "none", width: "100%" }}
+            to={{ pathname: `/room/${roomId}/${creatorId}/${roomName}` }}
+          >
             <StyledButton label="Join Now" variant="brand" />
           </StyledLink>
           <StyledButtonMenu
