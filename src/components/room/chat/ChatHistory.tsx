@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
-import { initSocket, fetchAllMessages, removeListeners, ChatType, UserInfo, getUserInfo } from "./chatSlice";
+import { fetchAllMessages, ChatType, UserInfo, getUserInfo } from "./chatSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { shell } from "electron";
@@ -54,7 +54,9 @@ const StyledText = styled.p`
 `;
 
 const StyledAvatar = styled.img`
-  max-width: 32px;
+  max-width: 40px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
 `;
 
@@ -77,21 +79,21 @@ const ChatHistory = (props: any) => {
   }
 
   useEffect(() => {
-    dispatch(initSocket(roomId));
-    dispatch(fetchAllMessages(roomId));
-    return removeListeners();
-  }, [dispatch, roomId]);
-
-  useEffect(() => {
     const fetchUsersInfo = async () => {
-      const usersInfo = chatState.map(async (chat) => {
+      const userDict: { [key: string]: UserInfo } = {};
+      const usersInfoPromise = chatState.map(async (chat) => {
         const info = await getUserInfo(chat.userId);
-        setUsersInfo({ [chat.userId]: info });
+        userDict[chat.userId] = info; // { 1: { avatar: "", }}
       });
-      await Promise.all(usersInfo);
+      await Promise.all(usersInfoPromise);
+      setUsersInfo(userDict);
     };
     fetchUsersInfo();
   }, [chatState]);
+
+  useEffect(() => {
+    console.log(usersInfo);
+  }, [usersInfo]);
 
   return (
     <StyledTimeline>

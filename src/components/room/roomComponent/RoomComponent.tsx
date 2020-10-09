@@ -1,14 +1,17 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Button, Drawer, Tab, Tabset } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
-import { setDrawerOpen, setTabsetValue } from "./roomSlice";
+import { initSocket, removeListeners, setDrawerOpen, setTabsetValue } from "./roomSlice";
 import ChatArea from "../chat/ChatArea";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCommentDots, faUsers } from "@fortawesome/free-solid-svg-icons";
 import JitsiMeetComponent from "../jitsiMeetComponent/JitsiMeetComponent";
+import UserListComponent from "../userList/UserListComponent";
+import { fetchAllMessages } from "../chat/chatSlice";
+import { setUserInfoList, UserInfo } from "../userList/userListSlice";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -76,10 +79,20 @@ const RoomComponent = (props: any) => {
   // const {roomName, creatorId} = props.location.state;
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    const profile = JSON.parse(localStorage.getItem("profile")) as UserInfo;
+    dispatch(initSocket(roomId));
+    dispatch(fetchAllMessages(roomId));
+    dispatch(setUserInfoList([profile]));
+    return removeListeners();
+  }, [roomId]);
+
   function getTabContent() {
     switch (roomState.tabsetValue) {
       case "Chat":
         return <ChatArea roomId={roomId} />;
+      case "People":
+        return <UserListComponent />;
     }
   }
   useEffect(() => {

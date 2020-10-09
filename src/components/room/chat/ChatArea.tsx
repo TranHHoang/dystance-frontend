@@ -19,6 +19,7 @@ const StyledChatArea = styled.div`
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   height: 100%;
 `;
 
