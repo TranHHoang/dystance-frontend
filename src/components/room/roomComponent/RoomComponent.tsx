@@ -1,14 +1,18 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Button, Drawer, Tab, Tabset } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
-import { setDrawerOpen, setTabsetValue } from "./roomSlice";
+import { initSocket, removeListeners, setDrawerOpen, setTabsetValue } from "./roomSlice";
 import ChatArea from "../chat/ChatArea";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCommentDots, faUsers } from "@fortawesome/free-solid-svg-icons";
 import JitsiMeetComponent from "../jitsiMeetComponent/JitsiMeetComponent";
+import UserListComponent from "../userList/UserListComponent";
+import { fetchAllMessages } from "../chat/chatSlice";
+import { setUserInfoList, UserInfo } from "../userList/userListSlice";
+import { setShowUpperToolbar } from "../jitsiMeetComponent/jitsiMeetSlice";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -73,23 +77,42 @@ const RoomComponent = (props: any) => {
   const roomState = useSelector((state: RootState) => state.roomState);
   const jitsiMeetState = useSelector((state: RootState) => state.jitisiMeetState);
   const { roomId, roomName, creatorId } = props.match.params;
-  // const {roomName, creatorId} = props.location.state;
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const profile = JSON.parse(localStorage.getItem("profile")) as UserInfo;
+    dispatch(initSocket(roomId));
+    dispatch(fetchAllMessages(roomId));
+    dispatch(setUserInfoList([profile]));
+    return removeListeners();
+  }, [roomId]);
 
   function getTabContent() {
     switch (roomState.tabsetValue) {
       case "Chat":
         return <ChatArea roomId={roomId} />;
+      case "People":
+        return <UserListComponent />;
     }
   }
+
   useEffect(() => {
     console.log("Room ID: " + roomId);
   }, []);
 
+  // onMouseMove={() => {
+  //   dispatch(setShowUpperToolbar(true));
+  //   console.log("Mouse is moving");
+  //   let timeout;
+  //   (() => {
+  //     clearTimeout(timeout);
+  //     timeout = setTimeout(() => dispatch(setShowUpperToolbar(false)), 4000);
+  //   })();
+  // }}
   return (
     <div>
       {jitsiMeetState.showUpperToolbar ? (
-        <ButtonGroup>
+        <ButtonGroup id="button-group">
           <ChatButton
             variant="neutral"
             onClick={() => {
