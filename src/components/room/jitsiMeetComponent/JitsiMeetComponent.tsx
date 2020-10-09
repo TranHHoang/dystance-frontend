@@ -10,7 +10,6 @@ import { RootState } from "~app/rootReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { setShowUpperToolbar } from "./jitsiMeetSlice";
 import { setupScreenSharingRender } from "jitsi-meet-electron-utils";
-import "./external_api";
 
 const loader = styled.div`
   display: none;
@@ -25,9 +24,7 @@ const JitsiMeetComponent = (props: any) => {
     JitsiMeetAPI.executeCommand("avatarUrl", `${hostName}/${profile.avatar}`);
     JitsiMeetAPI.executeCommand("email", `${profile.email}`);
     JitsiMeetAPI.executeCommand("subject", `${roomName}`);
-    // const iframe = JitsiMeetAPI.getIFrame();
     setupScreenSharingRender(JitsiMeetAPI);
-
     JitsiMeetAPI.addEventListener("videoConferenceJoined", () => {
       console.log("Local User Joined");
       dispatch(setShowUpperToolbar(true));

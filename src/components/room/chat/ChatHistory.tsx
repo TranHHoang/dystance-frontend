@@ -100,7 +100,11 @@ const ChatHistory = (props: any) => {
       {chatState.map((chat) => (
         <StyledMessage
           key={chat.id}
-          label={<b>{usersInfo[chat.userId]?.userName}</b>}
+          label={
+            <b>
+              {usersInfo[chat.userId]?.realName} ({usersInfo[chat.userId]?.userName})
+            </b>
+          }
           datetime={moment(chat.date).calendar()}
           icon={<StyledAvatar src={`${hostName}/${usersInfo[chat.userId]?.avatar}`} alt="avatar" />}
         >

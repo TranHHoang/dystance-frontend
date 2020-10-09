@@ -45,7 +45,7 @@ export function initSocket(roomId: string): AppThunk {
       await socket.start();
       await socket.invoke("JoinRoom", roomId, getLoginData().id);
     }
-    socket.on("Broadcast", () => {
+    socket.on("NewChat", () => {
       console.log("New Message");
       dispatch(fetchLatestMessage(roomId));
     });

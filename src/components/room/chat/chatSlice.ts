@@ -96,7 +96,7 @@ export function broadcastMessage(roomId: string, message: string | File, type = 
       console.log(ex);
     }
 
-    socket.invoke("Broadcast", roomId);
+    socket.invoke("NewChat", roomId);
   };
 }
 

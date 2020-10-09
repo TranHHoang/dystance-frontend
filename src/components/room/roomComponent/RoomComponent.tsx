@@ -12,6 +12,7 @@ import JitsiMeetComponent from "../jitsiMeetComponent/JitsiMeetComponent";
 import UserListComponent from "../userList/UserListComponent";
 import { fetchAllMessages } from "../chat/chatSlice";
 import { setUserInfoList, UserInfo } from "../userList/userListSlice";
+import { setShowUpperToolbar } from "../jitsiMeetComponent/jitsiMeetSlice";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -76,7 +77,6 @@ const RoomComponent = (props: any) => {
   const roomState = useSelector((state: RootState) => state.roomState);
   const jitsiMeetState = useSelector((state: RootState) => state.jitisiMeetState);
   const { roomId, roomName, creatorId } = props.match.params;
-  // const {roomName, creatorId} = props.location.state;
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -95,14 +95,24 @@ const RoomComponent = (props: any) => {
         return <UserListComponent />;
     }
   }
+
   useEffect(() => {
     console.log("Room ID: " + roomId);
   }, []);
 
+  // onMouseMove={() => {
+  //   dispatch(setShowUpperToolbar(true));
+  //   console.log("Mouse is moving");
+  //   let timeout;
+  //   (() => {
+  //     clearTimeout(timeout);
+  //     timeout = setTimeout(() => dispatch(setShowUpperToolbar(false)), 4000);
+  //   })();
+  // }}
   return (
     <div>
       {jitsiMeetState.showUpperToolbar ? (
-        <ButtonGroup>
+        <ButtonGroup id="button-group">
           <ChatButton
             variant="neutral"
             onClick={() => {
