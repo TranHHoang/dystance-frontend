@@ -13,6 +13,7 @@ import UserListComponent from "../userList/UserListComponent";
 import { fetchAllMessages } from "../chat/chatSlice";
 import { setUserInfoList, UserInfo } from "../userList/userListSlice";
 import { setShowUpperToolbar } from "../jitsiMeetComponent/jitsiMeetSlice";
+import Whiteboard from "../whiteboard/Whiteboard";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -43,6 +44,7 @@ const StyledTab = styled(Tab)`
 `;
 const ButtonGroup = styled.div`
   position: absolute;
+  z-index: 1000;
 `;
 const ChatButton = styled(Button)`
   border-radius: 0;
@@ -77,6 +79,8 @@ const RoomComponent = (props: any) => {
   const roomState = useSelector((state: RootState) => state.roomState);
   const jitsiMeetState = useSelector((state: RootState) => state.jitisiMeetState);
   const { roomId, roomName, creatorId } = props.match.params;
+  const [whiteboardOpen, setWhiteboardOpen] = useState(false);
+  // const {roomName, creatorId} = props.location.state;
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -131,6 +135,9 @@ const RoomComponent = (props: any) => {
           >
             <FontAwesomeIcon icon={faUsers} size="2x" />
           </PeopleButton>
+          <ChatButton variant="neutral" onClick={() => setWhiteboardOpen(!whiteboardOpen)}>
+            Whiteboard
+          </ChatButton>
         </ButtonGroup>
       ) : null}
       <StyledDrawer
@@ -151,6 +158,8 @@ const RoomComponent = (props: any) => {
       >
         {getTabContent()}
       </StyledDrawer>
+      {/* <Whiteboard roomId={roomId} style={whiteboardOpen ? {visibility: "visible"} : {visibility: "hidden"}}/> */}
+      {whiteboardOpen ? <Whiteboard roomId={roomId} /> : null}
       <JitsiMeetComponent roomId={roomId} roomName={roomName} creatorId={creatorId} />
     </div>
   );
