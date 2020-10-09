@@ -7,7 +7,7 @@ import { RootState } from "~app/rootReducer";
 import { initSocket, removeListeners, setDrawerOpen, setTabsetValue } from "./roomSlice";
 import ChatArea from "../chat/ChatArea";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCommentDots, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faCommentDots, faUsers, faChalkboard } from "@fortawesome/free-solid-svg-icons";
 import JitsiMeetComponent from "../jitsiMeetComponent/JitsiMeetComponent";
 import UserListComponent from "../userList/UserListComponent";
 import { fetchAllMessages } from "../chat/chatSlice";
@@ -46,7 +46,7 @@ const ButtonGroup = styled.div`
   position: absolute;
   z-index: 1000;
 `;
-const ChatButton = styled(Button)`
+const NormalButton = styled(Button)`
   border-radius: 0;
   padding-top: 10px;
   padding-bottom: 10px;
@@ -55,12 +55,12 @@ const ChatButton = styled(Button)`
     width: 24px;
     height: 24px;
   }
-  width: 10vw;
+  width: 5vw;
   height: 50px;
   color: white;
   transition: 0.3s;
 `;
-const PeopleButton = styled(Button)`
+const RearButton = styled(Button)`
   border-radius: 0;
   padding-top: 10px;
   padding-bottom: 10px;
@@ -69,7 +69,7 @@ const PeopleButton = styled(Button)`
     width: 24px;
     height: 24px;
   }
-  width: 10vw;
+  width: 5vw;
   border-bottom-right-radius: 10px;
   height: 50px;
   color: white;
@@ -117,7 +117,7 @@ const RoomComponent = (props: any) => {
     <div>
       {jitsiMeetState.showUpperToolbar ? (
         <ButtonGroup id="button-group">
-          <ChatButton
+          <NormalButton
             variant="neutral"
             onClick={() => {
               dispatch(setTabsetValue("Chat"));
@@ -125,8 +125,8 @@ const RoomComponent = (props: any) => {
             }}
           >
             <FontAwesomeIcon icon={faCommentDots} size="2x" />
-          </ChatButton>
-          <PeopleButton
+          </NormalButton>
+          <NormalButton
             variant="neutral"
             onClick={() => {
               dispatch(setTabsetValue("People"));
@@ -134,10 +134,10 @@ const RoomComponent = (props: any) => {
             }}
           >
             <FontAwesomeIcon icon={faUsers} size="2x" />
-          </PeopleButton>
-          <ChatButton variant="neutral" onClick={() => setWhiteboardOpen(!whiteboardOpen)}>
-            Whiteboard
-          </ChatButton>
+          </NormalButton>
+          <RearButton variant="neutral" onClick={() => setWhiteboardOpen(!whiteboardOpen)}>
+            <FontAwesomeIcon icon={faChalkboard} size="2x" />
+          </RearButton>
         </ButtonGroup>
       ) : null}
       <StyledDrawer

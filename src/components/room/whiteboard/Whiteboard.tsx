@@ -16,9 +16,11 @@ declare module "react" {
 
 const Toolbar = styled.div`
   position: absolute;
-  top: 10px;
+  top: 90%;
   left: 10px;
+  width: 100%;
   display: flex;
+  justify-content: center;
 `;
 
 const WhiteboardLockButton = styled.button`
