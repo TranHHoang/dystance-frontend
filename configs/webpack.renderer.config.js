@@ -1,12 +1,21 @@
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
+const webpack = require("webpack");
 
 const smp = new SpeedMeasurePlugin();
 
 module.exports = smp.wrap({
   module: {
     rules: [
+      {
+        test: /\.js?$/,
+        exclude: /(node_modules|\.webpack)/,
+        use: [
+          { loader: "shebang-loader" },
+          { loader: require.resolve("ts-loader") },
+        ]
+      },
       {
         test: /\.tsx?$/,
         exclude: /(node_modules|\.webpack)/,
@@ -43,13 +52,29 @@ module.exports = smp.wrap({
           }
         ]
       },
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+          {
+            loader: "file-loader",
+          },
+        ],
+      },
       { test: /\.node$/, loader: 'node-loader' }
     ]
   },
   externals: [{
     'jitsi-meet-electron-utils': 'require(\'jitsi-meet-electron-utils\')'
   }],
-  plugins: [new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })],
+  plugins: [
+    // new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
+    new webpack.ProvidePlugin({
+      $: "jquery",
+      jQuery: "jquery",
+      "window.jQuery": "jquery",
+      "window.$": "jquery",
+    }),
+  ],
   resolve: {
     plugins: [new TsconfigPathsPlugin()],
     extensions: [".js", ".ts", ".jsx", ".tsx", ".css"],
