@@ -1,6 +1,5 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
-import { Sidebar, SidebarItem, Avatar, AvatarMenu, MenuItem } from "react-rainbow-components";
+import { Sidebar, SidebarItem, AvatarMenu, MenuItem } from "react-rainbow-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faCalendarAlt, faComment, faPencilAlt, faPowerOff, faCog } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
@@ -9,10 +8,10 @@ import { signOut } from "../account-management/signout/signOut";
 import { useDispatch, useSelector } from "react-redux";
 import { User } from "~utils/types";
 import { hostName } from "~utils/hostUtils";
-import { Link } from "react-router-dom";
 import { RootState } from "~app/rootReducer";
 import { setSidebarValue } from "./sidebarSlice";
-import { showProfile } from "../profile-page/showProfileInfoSlice";
+import { useGoogleLogout } from "react-google-login";
+import config from "../account-management/login/googleConfigs.json";
 
 const StyledSidebar = styled(Sidebar)`
   background: ${(props) => props.theme.rainbow.palette.background.main};
@@ -64,10 +63,16 @@ const Logo = styled.img`
 `;
 const SideNavigationBar = () => {
   const sidebarState = useSelector((state: RootState) => state.sidebarState);
-  const showProfileState = useSelector((state: RootState) => state.showProfileState);
   const dispatch = useDispatch();
 
+  const googleLogout = useGoogleLogout({
+    clientId: config.GoogleClientId,
+    onLogoutSuccess: () => console.log("Google signed out"),
+    onFailure: () => console.log("Google signed out error")
+  });
+
   const profile = JSON.parse(localStorage.getItem("profile")) as User;
+
   return (
     <StyledSidebar
       selectedItem={sidebarState.sidebarValue}
@@ -101,7 +106,10 @@ const SideNavigationBar = () => {
         <MenuItem
           label="Logout"
           icon={<FontAwesomeIcon icon={faPowerOff} />}
-          onClick={() => dispatch(signOut())}
+          onClick={() => {
+            googleLogout.signOut();
+            dispatch(signOut());
+          }}
           iconPosition="left"
         />
       </StyledAvatarMenu>

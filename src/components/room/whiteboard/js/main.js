@@ -7,14 +7,13 @@ import Picker from "vanilla-picker";
 import shortcutFunctions from "./shortcutFunctions";
 import ReadOnlyService from "./services/ReadOnlyService";
 import ConfigService from "./services/ConfigService";
-import { HubConnectionBuilder } from "@microsoft/signalr";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { socket } from "../../roomComponent/roomSlice";
 import { getLoginData } from "~utils/tokenStorage";
 
 let whiteboardId;
-const myUsername = getLoginData().userName;
+const myUsername = (getLoginData() || {}).userName;
 
 function main(roomId) {
   whiteboardId = roomId;
@@ -33,11 +32,6 @@ function main(roomId) {
     whiteboard.refreshUserBadges();
   });
   socket.invoke("JoinWhiteboard", whiteboardId);
-
-  // socket.start().then(() => {
-  //   console.log("Websocket connected!");
-
-  // });
 }
 
 function showBasicAlert(html, newOptions) {

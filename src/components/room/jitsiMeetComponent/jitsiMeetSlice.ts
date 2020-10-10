@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ErrorResponse } from "~utils/types";
 
 interface JitsiMeetState {
   showUpperToolbar: boolean;

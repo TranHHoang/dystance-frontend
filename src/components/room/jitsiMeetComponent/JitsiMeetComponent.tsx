@@ -1,13 +1,10 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
-import { Spinner } from "react-rainbow-components";
+import React from "react";
 import { hostName } from "~utils/hostUtils";
 import { User } from "~utils/types";
 import styled from "styled-components";
 import { createHashHistory } from "history";
 import Jitsi from "react-jitsi";
-import { RootState } from "~app/rootReducer";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setShowUpperToolbar } from "./jitsiMeetSlice";
 import { setupScreenSharingRender } from "jitsi-meet-electron-utils";
 
@@ -19,7 +16,7 @@ const JitsiMeetComponent = (props: any) => {
   const dispatch = useDispatch();
   const { roomId, creatorId, roomName } = props;
 
-  const handleAPI = (JitsiMeetAPI) => {
+  const handleAPI = (JitsiMeetAPI: any) => {
     JitsiMeetAPI.executeCommand("displayName", `${profile.realName} (${profile.userName})`);
     JitsiMeetAPI.executeCommand("avatarUrl", `${hostName}/${profile.avatar}`);
     JitsiMeetAPI.executeCommand("email", `${profile.email}`);

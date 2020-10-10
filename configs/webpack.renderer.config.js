@@ -14,7 +14,7 @@ module.exports = smp.wrap({
         use: [
           { loader: "shebang-loader" },
           {
-            loader: require.resolve("ts-loader"), 
+            loader: require.resolve("ts-loader"),
             options: {
               transpileOnly: true,
               happyPackMode: true
@@ -66,7 +66,7 @@ module.exports = smp.wrap({
     'jitsi-meet-electron-utils': 'require(\'jitsi-meet-electron-utils\')'
   }],
   plugins: [
-    // new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
+    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
     new webpack.ProvidePlugin({
       $: "jquery",
       jQuery: "jquery",
