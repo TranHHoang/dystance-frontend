@@ -7,7 +7,7 @@ import { Route, Switch, HashRouter } from "react-router-dom";
 import RegisterForm from "../components/account-management/register/RegisterForm";
 import ChatArea from "../components/room/chat/ChatArea";
 import ResetPasswordComponent from "../components/account-management/reset-password/ResetPasswordComponent";
-import RoomComponent from "../components/room/roomComponent/RoomComponent";
+import RoomComponent from "../components/room/room-component/RoomComponent";
 import ProfilePage from "../components/profile-page/ProfilePage";
 
 export default hot(module)(function App() {

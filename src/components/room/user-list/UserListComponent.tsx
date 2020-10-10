@@ -9,6 +9,7 @@ import styled from "styled-components";
 const UserListContainer = styled.div`
   display: grid;
   grid-row-gap: 20px;
+  border-radius: 0%;
 `;
 const StyledCard = styled(Card)`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};

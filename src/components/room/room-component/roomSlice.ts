@@ -6,7 +6,7 @@ import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { ErrorResponse } from "~utils/types";
 import { fetchLatestMessage } from "../chat/chatSlice";
-import { setUserInfoList, UserInfo } from "../userList/userListSlice";
+import { setUserInfoList, UserInfo } from "../user-list/userListSlice";
 
 interface RoomState {
   roomId: string;
@@ -52,14 +52,12 @@ export function initSocket(roomId: string): AppThunk {
     socket.on("join", async (userIdList: string) => {
       console.log("Joined Room");
       const userInfoList: UserInfo[] = [];
-      // console.log(userIdList);
       for (const id of JSON.parse(userIdList)) {
         console.log(id);
         const response = await Axios.get(`${hostName}/api/users/info?id=${id}`);
         const data = response.data as UserInfo;
         userInfoList.push(data);
       }
-      // console.log(userInfoList);
       dispatch(setUserInfoList(userInfoList));
     });
   };

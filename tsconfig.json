@@ -17,6 +17,6 @@
     },
     "jsx": "react"
   },
-  "include": ["src/**/*", "src/components/room/jitsiMeetComponent/module.d.ts"],
+  "include": ["src/**/*", "src/components/room/jitsi-meet-component/module.d.ts"],
   "exclude": ["**/node_modules/*"]
 }

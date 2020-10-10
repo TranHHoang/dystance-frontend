@@ -21,10 +21,22 @@ const JitsiMeetComponent = (props: any) => {
     JitsiMeetAPI.executeCommand("avatarUrl", `${hostName}/${profile.avatar}`);
     JitsiMeetAPI.executeCommand("email", `${profile.email}`);
     JitsiMeetAPI.executeCommand("subject", `${roomName}`);
+
     setupScreenSharingRender(JitsiMeetAPI);
     JitsiMeetAPI.addEventListener("videoConferenceJoined", () => {
       console.log("Local User Joined");
       dispatch(setShowUpperToolbar(true));
+      // (() => {
+      //   document.getElementById("root").onmousemove = () => {
+      //     dispatch(setShowUpperToolbar(true));
+      //     console.log("Mouse is moving");
+      //     let timeout;
+      //     (() => {
+      //       clearTimeout(timeout);
+      //       timeout = setTimeout(() => dispatch(setShowUpperToolbar(false)), 4000);
+      //     })();
+      //   }
+      // })();
     });
     JitsiMeetAPI.on("readyToClose", () => {
       dispatch(setShowUpperToolbar(false));

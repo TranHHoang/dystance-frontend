@@ -9,7 +9,7 @@ import ReadOnlyService from "./services/ReadOnlyService";
 import ConfigService from "./services/ConfigService";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
-import { socket } from "../../roomComponent/roomSlice";
+import { socket } from "../../room-component/roomSlice";
 import { getLoginData } from "~utils/tokenStorage";
 
 let whiteboardId;

@@ -12,9 +12,9 @@ import { ResetStoreAction } from "../components/account-management/signout/signO
 import showProfileReducer from "../components/profile-page/showProfileInfoSlice";
 import updateProfileReducer from "../components/profile-page/updateProfileSlice";
 import sidebarReducer from "../components/sidebar/sidebarSlice";
-import roomReducer from "../components/room/roomComponent/roomSlice";
-import jitsiMeetReducer from "../components/room/jitsiMeetComponent/jitsiMeetSlice";
-import userListReducer from "../components/room/userList/userListSlice";
+import roomReducer from "../components/room/room-component/roomSlice";
+import jitsiMeetReducer from "../components/room/jitsi-meet-component/jitsiMeetSlice";
+import userListReducer from "../components/room/user-list/userListSlice";
 
 const appReducer = combineReducers({
   roomCreation: createRoomReducer,

@@ -53,6 +53,9 @@ const StyledIcon = styled(FontAwesomeIcon)`
 const StyledAvatarMenu = styled(AvatarMenu)`
   display: flex;
   justify-content: center;
+  img {
+    object-fit: cover;
+  }
 `;
 
 const Logo = styled.img`
