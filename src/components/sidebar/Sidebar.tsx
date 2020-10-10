@@ -63,6 +63,7 @@ const Logo = styled.img`
 `;
 const SideNavigationBar = () => {
   const sidebarState = useSelector((state: RootState) => state.sidebarState);
+  const showProfileState = useSelector((state: RootState) => state.showProfileState);
   const dispatch = useDispatch();
 
   const googleLogout = useGoogleLogout({
@@ -70,8 +71,6 @@ const SideNavigationBar = () => {
     onLogoutSuccess: () => console.log("Google signed out"),
     onFailure: () => console.log("Google signed out error")
   });
-
-  const profile = JSON.parse(localStorage.getItem("profile")) as User;
 
   return (
     <StyledSidebar
@@ -88,9 +87,9 @@ const SideNavigationBar = () => {
       </SidebarItemContainer>
 
       <StyledAvatarMenu
-        assistiveText={"profile" in localStorage ? profile.realName : ""}
-        title={"profile" in localStorage ? profile.realName : ""}
-        src={"profile" in localStorage ? `${hostName}/${profile.avatar}` : ""}
+        assistiveText={showProfileState.user.userName}
+        title={showProfileState.user.realName}
+        src={`${hostName}/${showProfileState.user.avatar}`}
         menuAlignment="bottom-left"
         avatarSize="large"
         menuSize="small"
