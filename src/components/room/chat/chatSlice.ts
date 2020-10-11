@@ -1,4 +1,3 @@
-import { HubConnectionBuilder } from "@microsoft/signalr";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import Axios from "~utils/fakeAPI";
 import { AppThunk } from "~app/store";
@@ -78,7 +77,12 @@ export function fetchLatestMessage(roomId: string): AppThunk {
   };
 }
 
-export function broadcastMessage(roomId: string, message: string | File, type = ChatType.Text): AppThunk {
+export function broadcastMessage(
+  roomId: string,
+  message: string | File,
+  type = ChatType.Text,
+  onProgressEvent?: (percentage: number) => void
+): AppThunk {
   return async () => {
     try {
       const form = new FormData();
@@ -89,7 +93,10 @@ export function broadcastMessage(roomId: string, message: string | File, type = 
 
       console.log("broadcasting...");
       await Axios.post(`${hostName}/api/rooms/chat/add`, form, {
-        headers: { "Content-Type": "multipart/form-data" }
+        headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress: (progressEvent) => {
+          onProgressEvent(Math.round((progressEvent.loaded * 100) / progressEvent.total));
+        }
       });
     } catch (ex) {
       // TODO: Check this later
