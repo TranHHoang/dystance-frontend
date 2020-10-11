@@ -53,7 +53,7 @@ const StyledModal = styled(Modal)`
   }
 `;
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 const ChatArea = (props: any) => {
   const chatState = useSelector((root: RootState) => root.chatState);
