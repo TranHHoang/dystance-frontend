@@ -33,7 +33,7 @@ const initialValues: CreateRoomFormValues = {
 };
 
 const validationSchema = Yup.object({
-  classroomName: Yup.string().required("Classroom name is required"),
+  classroomName: Yup.string().required("Classroom name is required").max(15, "Maximum of 15 characters"),
   startDate: Yup.date()
     .default(() => new Date())
     .required("Start date is required"),
@@ -50,7 +50,8 @@ const validationSchema = Yup.object({
     .test("is-date-greater", "End date must be after start date", function (value) {
       const { startDate } = this.parent;
       return moment(value).isSameOrAfter(moment(startDate), "day");
-    })
+    }),
+  description: Yup.string().max(150, "Maximum of 150 characters")
 });
 
 const RoomFormComponent = (props: any) => {
@@ -117,7 +118,13 @@ const RoomFormComponent = (props: any) => {
               formatStyle="large"
             />
           </div>
-          <Field as={Textarea} name="description" label="Description" placeholder="Add description" />
+          <Field
+            as={Textarea}
+            name="description"
+            label="Description"
+            placeholder="Add description"
+            error={errors.description && touched.description ? errors.description : null}
+          />
         </Form>
       )}
     </Formik>
@@ -131,9 +138,7 @@ const CreateRoomForm = () => {
   const formRef = useRef(null);
 
   if (createRoomState.isCreationSuccess) {
-    setTimeout(() => {
-      dispatch(setRoomCreateModalOpen(false));
-    }, 2000);
+    dispatch(setRoomCreateModalOpen(false));
   }
 
   return (

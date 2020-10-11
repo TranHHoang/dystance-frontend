@@ -38,7 +38,7 @@ function showBasicAlert(html, newOptions) {
   const options = {
     header: "INFO MESSAGE",
     okBtnText: "Ok",
-    headercolor: "#d25d5d",
+    headercolor: "#FE4849",
     hideAfter: false,
     onOkClick: false
   };
@@ -48,14 +48,14 @@ function showBasicAlert(html, newOptions) {
     }
   }
   const alertHtml = $(
-    '<div class="basicalert" style="position:absolute; left:0px; width:100%; top:70px; font-family: monospace;">' +
-      '<div style="width: 30%; margin: auto; background: #aaaaaa; border-radius: 5px; font-size: 1.2em; border: 1px solid gray;">' +
+    '<div class="basicalert" style="position:absolute; left:0px; width:100%; top:70px;">' +
+      '<div style="width: 30%; margin: auto; background: rgba(74,76,82,1);  border-radius: 5px; font-size: 1.2em; border: 1px solid gray;">' +
       '<div style="border-bottom: 1px solid #676767; background: ' +
       options["headercolor"] +
-      '; padding-left: 5px; font-size: 0.8em;">' +
+      '; padding-left: 5px; font-size: 0.8em; color: white">' +
       options["header"] +
       '<div style="float: right; margin-right: 4px; color: #373737; cursor: pointer;" class="closeAlert">x</div></div>' +
-      '<div style="padding: 10px;" class="htmlcontent"></div>' +
+      '<div style="padding: 10px; color: white;" class="htmlcontent"></div>' +
       '<div style="height: 20px; padding: 10px;"><button class="modalBtn okbtn" style="float: right;">' +
       options["okBtnText"] +
       "</button></div>" +
