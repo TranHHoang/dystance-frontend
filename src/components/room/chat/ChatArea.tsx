@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import ChatBox from "./ChatBox";
 import ChatHistory from "./ChatHistory";
 import styled from "styled-components";
-import { Button, Modal } from "react-rainbow-components";
+import { Button, Modal, ProgressBar, Notification } from "react-rainbow-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { RootState } from "~app/rootReducer";
@@ -53,10 +53,13 @@ const StyledModal = styled(Modal)`
   }
 `;
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
 const ChatArea = (props: any) => {
   const chatState = useSelector((root: RootState) => root.chatState);
   const [file, setFile] = useState<File>();
   const [imagePreview, setImagePreview] = useState("");
+  const [uploadPercentage, setUploadPercentage] = useState(0);
   const chatBox = useRef<HTMLDivElement>();
   const { roomId } = props;
   const dispatch = useDispatch();
@@ -90,14 +93,26 @@ const ChatArea = (props: any) => {
     e.preventDefault();
 
     if (e.dataTransfer.items[0]?.kind === "file") {
-      setFile(e.dataTransfer.items[0].getAsFile());
+      const file = e.dataTransfer.items[0].getAsFile();
+      setFile(file);
     }
   }
 
   function sendFile() {
-    dispatch(broadcastMessage(roomId, file, isImageFile(file) ? ChatType.Image : ChatType.File));
-    setFile(undefined);
+    if (file.size < MAX_FILE_SIZE)
+      dispatch(
+        broadcastMessage(roomId, file, isImageFile(file) ? ChatType.Image : ChatType.File, (percentage) => {
+          setUploadPercentage(percentage);
+        })
+      );
   }
+
+  useEffect(() => {
+    if (uploadPercentage === 100) {
+      setFile(undefined);
+      setUploadPercentage(0);
+    }
+  }, [uploadPercentage]);
 
   return (
     <div
@@ -109,7 +124,27 @@ const ChatArea = (props: any) => {
       onDrop={onDrop}
     >
       <StyledModal
-        isOpen={file !== undefined}
+        hideCloseButton={true}
+        isOpen={uploadPercentage !== 0 || file?.size > MAX_FILE_SIZE}
+        onRequestClose={() => setFile(undefined)}
+      >
+        {isImageFile(file) ? (
+          <img id="img-preview" src={imagePreview} alt="" />
+        ) : (
+          <FontAwesomeIcon icon={faFileAlt} size="8x" />
+        )}
+        <div>
+          <span>{file?.name}</span>
+          <p>{bytesToSize(file?.size)}</p>
+          {file?.size > MAX_FILE_SIZE && (
+            <div style={{ color: "#FE4849", fontWeight: "bold", fontSize: "16px" }}>This file is too large</div>
+          )}
+          {uploadPercentage !== 0 && <ProgressBar style={{ marginLeft: "0px" }} value={uploadPercentage} />}
+        </div>
+      </StyledModal>
+
+      <StyledModal
+        isOpen={file !== undefined && file?.size < MAX_FILE_SIZE}
         footer={
           <div id="group">
             <Button label="Cancel" onClick={() => setFile(undefined)} />
