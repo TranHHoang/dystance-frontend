@@ -5,7 +5,7 @@ import { AppThunk } from "~app/store";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import NodeCache from "node-cache";
-import { socket } from "../roomComponent/roomSlice";
+import { socket } from "../room-component/roomSlice";
 
 export enum ChatType {
   Text,

@@ -9,11 +9,17 @@ module.exports = smp.wrap({
   module: {
     rules: [
       {
-        test: /\.js?$/,
+        test: /\.jsx?$/,
         exclude: /(node_modules|\.webpack)/,
         use: [
           { loader: "shebang-loader" },
-          { loader: require.resolve("ts-loader") },
+          {
+            loader: require.resolve("ts-loader"),
+            options: {
+              transpileOnly: true,
+              happyPackMode: true
+            }
+          },
         ]
       },
       {
@@ -26,12 +32,13 @@ module.exports = smp.wrap({
             loader: "thread-loader",
             options: {
               // there should be 1 cpu for the fork-ts-checker-webpack-plugin
-              workers: require('os').cpus().length,
+              workers: require('os').cpus().length - 1,
             }
           },
           {
             loader: "ts-loader",
             options: {
+              transpileOnly: true,
               happyPackMode: true
             }
           }]
@@ -52,14 +59,6 @@ module.exports = smp.wrap({
           }
         ]
       },
-      {
-        test: /\.(png|jpe?g|gif)$/i,
-        use: [
-          {
-            loader: "file-loader",
-          },
-        ],
-      },
       { test: /\.node$/, loader: 'node-loader' }
     ]
   },
@@ -67,7 +66,7 @@ module.exports = smp.wrap({
     'jitsi-meet-electron-utils': 'require(\'jitsi-meet-electron-utils\')'
   }],
   plugins: [
-    // new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
+    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
     new webpack.ProvidePlugin({
       $: "jquery",
       jQuery: "jquery",

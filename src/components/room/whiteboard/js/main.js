@@ -7,37 +7,31 @@ import Picker from "vanilla-picker";
 import shortcutFunctions from "./shortcutFunctions";
 import ReadOnlyService from "./services/ReadOnlyService";
 import ConfigService from "./services/ConfigService";
-import { HubConnectionBuilder } from "@microsoft/signalr";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
+import { socket } from "../../room-component/roomSlice";
+import { getLoginData } from "~utils/tokenStorage";
 
 let whiteboardId;
-const myUsername = (JSON.parse(localStorage.getItem("profile")) || {}).userName;
-const socket = new HubConnectionBuilder().withUrl(`${hostName}/socket`).build();
+const myUsername = (getLoginData() || {}).userName;
 
 function main(roomId) {
   whiteboardId = roomId;
-
-  socket.start().then(() => {
-    console.log("Websocket connected!");
-
-    socket.on("WhiteboardConfig", (serverResponse) => {
-      console.log("WhiteboardConfig", JSON.parse(serverResponse));
-      ConfigService.initFromServer(JSON.parse(serverResponse));
-      // Inti whiteboard only when we have the config from the server
-      initWhiteboard();
-    });
-
-    socket.on("DrawToWhiteboard", function (content) {
-      whiteboard.handleEventsAndData(content, true);
-    });
-
-    socket.on("RefreshUserBadges", function () {
-      whiteboard.refreshUserBadges();
-    });
-
-    socket.invoke("JoinWhiteboard", whiteboardId);
+  socket.on("WhiteboardConfig", (serverResponse) => {
+    console.log("WhiteboardConfig", JSON.parse(serverResponse));
+    ConfigService.initFromServer(JSON.parse(serverResponse));
+    // Inti whiteboard only when we have the config from the server
+    initWhiteboard();
   });
+
+  socket.on("DrawToWhiteboard", function (content) {
+    whiteboard.handleEventsAndData(content, true);
+  });
+
+  socket.on("RefreshUserBadges", function () {
+    whiteboard.refreshUserBadges();
+  });
+  socket.invoke("JoinWhiteboard", whiteboardId);
 }
 
 function showBasicAlert(html, newOptions) {

@@ -7,12 +7,13 @@ import { RootState } from "~app/rootReducer";
 import { initSocket, removeListeners, setDrawerOpen, setTabsetValue } from "./roomSlice";
 import ChatArea from "../chat/ChatArea";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCommentDots, faUsers } from "@fortawesome/free-solid-svg-icons";
-import JitsiMeetComponent from "../jitsiMeetComponent/JitsiMeetComponent";
-import UserListComponent from "../userList/UserListComponent";
+import { faCommentDots, faUsers, faChalkboard, faBars } from "@fortawesome/free-solid-svg-icons";
+import JitsiMeetComponent from "../jitsi-meet-component/JitsiMeetComponent";
+import UserListComponent from "../user-list/UserListComponent";
 import { fetchAllMessages } from "../chat/chatSlice";
-import { setUserInfoList, UserInfo } from "../userList/userListSlice";
-import { setShowUpperToolbar } from "../jitsiMeetComponent/jitsiMeetSlice";
+import { setUserInfoList, UserInfo } from "../user-list/userListSlice";
+import { setShowUpperToolbar } from "../jitsi-meet-component/jitsiMeetSlice";
+import Whiteboard from "../whiteboard/Whiteboard";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -43,8 +44,9 @@ const StyledTab = styled(Tab)`
 `;
 const ButtonGroup = styled.div`
   position: absolute;
+  z-index: 1000;
 `;
-const ChatButton = styled(Button)`
+const NormalButton = styled(Button)`
   border-radius: 0;
   padding-top: 10px;
   padding-bottom: 10px;
@@ -53,30 +55,24 @@ const ChatButton = styled(Button)`
     width: 24px;
     height: 24px;
   }
-  width: 10vw;
+  width: 5vw;
   height: 50px;
   color: white;
-  transition: 0.3s;
-`;
-const PeopleButton = styled(Button)`
-  border-radius: 0;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  border: 0;
-  svg {
-    width: 24px;
-    height: 24px;
+  transition: 0.2s;
+  opacity: 50%;
+  min-width: 64px;
+  :hover {
+    opacity: 100%;
   }
-  width: 10vw;
+`;
+const RearButton = styled(NormalButton)`
   border-bottom-right-radius: 10px;
-  height: 50px;
-  color: white;
-  transition: 0.3s;
 `;
 const RoomComponent = (props: any) => {
   const roomState = useSelector((state: RootState) => state.roomState);
   const jitsiMeetState = useSelector((state: RootState) => state.jitisiMeetState);
   const { roomId, roomName, creatorId } = props.match.params;
+  const [whiteboardOpen, setWhiteboardOpen] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -100,37 +96,22 @@ const RoomComponent = (props: any) => {
     console.log("Room ID: " + roomId);
   }, []);
 
-  // onMouseMove={() => {
-  //   dispatch(setShowUpperToolbar(true));
-  //   console.log("Mouse is moving");
-  //   let timeout;
-  //   (() => {
-  //     clearTimeout(timeout);
-  //     timeout = setTimeout(() => dispatch(setShowUpperToolbar(false)), 4000);
-  //   })();
-  // }}
   return (
     <div>
       {jitsiMeetState.showUpperToolbar ? (
         <ButtonGroup id="button-group">
-          <ChatButton
+          <NormalButton
             variant="neutral"
             onClick={() => {
               dispatch(setTabsetValue("Chat"));
               dispatch(setDrawerOpen(true));
             }}
           >
-            <FontAwesomeIcon icon={faCommentDots} size="2x" />
-          </ChatButton>
-          <PeopleButton
-            variant="neutral"
-            onClick={() => {
-              dispatch(setTabsetValue("People"));
-              dispatch(setDrawerOpen(true));
-            }}
-          >
-            <FontAwesomeIcon icon={faUsers} size="2x" />
-          </PeopleButton>
+            <FontAwesomeIcon icon={faBars} size="2x" />
+          </NormalButton>
+          <RearButton variant="neutral" onClick={() => setWhiteboardOpen(!whiteboardOpen)}>
+            <FontAwesomeIcon icon={faChalkboard} size="2x" />
+          </RearButton>
         </ButtonGroup>
       ) : null}
       <StyledDrawer
@@ -151,6 +132,7 @@ const RoomComponent = (props: any) => {
       >
         {getTabContent()}
       </StyledDrawer>
+      {whiteboardOpen ? <Whiteboard roomId={roomId} /> : null}
       <JitsiMeetComponent roomId={roomId} roomName={roomName} creatorId={creatorId} />
     </div>
   );

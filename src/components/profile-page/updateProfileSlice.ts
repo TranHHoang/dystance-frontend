@@ -79,8 +79,9 @@ export function updateProfile({ realName, dob, newAvatar, password, newPassword 
 
       const response = await Axios.post(`${hostName}/api/users/updateProfile`, fd, config);
       const data = response.data as User;
-      localStorage.removeItem("profile");
+
       localStorage.setItem("profile", JSON.stringify(response.data));
+
       dispatch(setProfileInfo(data));
       dispatch(updateProfileSuccess());
     } catch (ex) {

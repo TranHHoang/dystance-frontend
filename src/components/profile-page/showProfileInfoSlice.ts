@@ -13,13 +13,15 @@ export interface ErrorResponse {
 
 interface ShowProfileState {
   isLoading: boolean;
-  user?: User;
+  user: User;
   error?: ErrorResponse;
 }
 
 const initialState: ShowProfileState = {
-  isLoading: false
+  isLoading: false,
+  user: JSON.parse(localStorage.getItem("profile")) as User
 };
+
 const showProfileSlice = createSlice({
   name: "updateProfile",
   initialState,
@@ -46,7 +48,8 @@ export function showProfile(): AppThunk {
     try {
       const response = await Axios.get(`${hostName}/api/users/info?id=${getLoginData().id}`);
       localStorage.setItem("profile", JSON.stringify(response.data));
-      const data = JSON.parse(localStorage.getItem("profile")) as User;
+
+      const data = response.data as User;
       dispatch(fetchProfileSuccess(data));
     } catch (ex) {
       const e = ex as AxiosError;
