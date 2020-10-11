@@ -35,10 +35,10 @@ export interface UpdateProfileFormValues {
 
 const validationSchema = Yup.object({
   userName: Yup.string().required("Username is required"),
+  realName: Yup.string().required("Real Name cannot be empty").max(50, "Maximum of 50 characters"),
   dob: Yup.date().required("Date of birth is required"),
   password: Yup.string().test("required if new password filled in", "This field is required", function (value) {
     const { newPassword } = this.parent;
-    console.log(newPassword === undefined);
     if (newPassword) {
       return value !== undefined;
     }
