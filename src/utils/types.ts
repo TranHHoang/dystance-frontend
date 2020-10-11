@@ -39,3 +39,10 @@ export interface User {
   newPassword: string;
   avatar: string;
 }
+
+export interface UserInfo {
+  userName: string;
+  realName: string;
+  avatar: string;
+  id: string;
+}

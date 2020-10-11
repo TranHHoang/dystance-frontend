@@ -1,10 +1,9 @@
 import * as React from "react";
-import { useState } from "react";
 import { Avatar, Card } from "react-rainbow-components";
 import { useSelector } from "react-redux";
+import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
-import styled from "styled-components";
 
 const UserListContainer = styled.div`
   display: grid;
@@ -14,7 +13,7 @@ const UserListContainer = styled.div`
 const StyledCard = styled(Card)`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
 `;
-const UserListComponent = (props: any) => {
+const UserListComponent = () => {
   const userListState = useSelector((state: RootState) => state.userListState);
   return (
     <UserListContainer>

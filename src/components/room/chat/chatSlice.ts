@@ -1,22 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import Axios from "~utils/fakeAPI";
+import NodeCache from "node-cache";
 import { AppThunk } from "~app/store";
+import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
-import NodeCache from "node-cache";
+import { UserInfo } from "~utils/types";
 import { socket } from "../room-component/roomSlice";
 
 export enum ChatType {
   Text,
   Image,
   File
-}
-
-export interface UserInfo {
-  id: string;
-  userName: string;
-  realName: string;
-  avatar: string;
 }
 
 interface ChatMessage {

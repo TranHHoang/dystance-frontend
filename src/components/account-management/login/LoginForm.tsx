@@ -1,12 +1,15 @@
+import { faGoogle } from "@fortawesome/free-brands-svg-icons";
+import { faLock, faUser } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Field, Formik, FormikProps } from "formik";
 import React, { useEffect } from "react";
 import GoogleLogin, { GoogleLoginResponse } from "react-google-login";
-import config from "./googleConfigs.json";
 import { useDispatch, useSelector } from "react-redux";
-import { startLogin, LoginError, resendEmail, resetLoginState } from "./loginSlice";
+import { Redirect } from "react-router-dom";
+import * as Yup from "yup";
 import { RootState } from "~app/rootReducer";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
-import { faGoogle } from "@fortawesome/free-brands-svg-icons";
+import { LoginLocalStorageKey } from "~utils/types";
+import * as resetPasswordSlice from "../reset-password/resetPasswordSlice";
 import {
   BackgroundContainer,
   ButtonContainer,
@@ -23,11 +26,8 @@ import {
   StyledNotification,
   Title
 } from "../styles";
-import { Formik, Field, FormikProps } from "formik";
-import * as Yup from "yup";
-import { LoginLocalStorageKey } from "~utils/types";
-import * as resetPasswordSlice from "../reset-password/resetPasswordSlice";
-import { Redirect } from "react-router-dom";
+import config from "./googleConfigs.json";
+import { LoginError, resendEmail, resetLoginState, startLogin } from "./loginSlice";
 
 interface LoginFormValues {
   emailOrUserName: string;

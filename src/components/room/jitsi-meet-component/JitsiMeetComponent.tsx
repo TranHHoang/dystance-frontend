@@ -1,12 +1,12 @@
-import React from "react";
-import { hostName } from "~utils/hostUtils";
-import { User } from "~utils/types";
-import styled from "styled-components";
 import { createHashHistory } from "history";
+import { setupScreenSharingRender } from "jitsi-meet-electron-utils";
+import React from "react";
 import Jitsi from "react-jitsi";
 import { useDispatch } from "react-redux";
+import styled from "styled-components";
+import { hostName } from "~utils/hostUtils";
+import { User } from "~utils/types";
 import { setShowUpperToolbar } from "./jitsiMeetSlice";
-import { setupScreenSharingRender } from "jitsi-meet-electron-utils";
 
 const loader = styled.div`
   display: none;

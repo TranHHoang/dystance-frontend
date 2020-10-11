@@ -1,17 +1,16 @@
-import * as React from "react";
-import { Sidebar, SidebarItem, AvatarMenu, MenuItem } from "react-rainbow-components";
+import { faCalendarAlt, faCog, faComment, faHome, faPencilAlt, faPowerOff } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome, faCalendarAlt, faComment, faPencilAlt, faPowerOff, faCog } from "@fortawesome/free-solid-svg-icons";
-import styled from "styled-components";
-import logo from "./logo.png";
-import { signOut } from "../account-management/signout/signOut";
-import { useDispatch, useSelector } from "react-redux";
-import { User } from "~utils/types";
-import { hostName } from "~utils/hostUtils";
-import { RootState } from "~app/rootReducer";
-import { setSidebarValue } from "./sidebarSlice";
+import * as React from "react";
 import { useGoogleLogout } from "react-google-login";
+import { AvatarMenu, MenuItem, Sidebar, SidebarItem } from "react-rainbow-components";
+import { useDispatch, useSelector } from "react-redux";
+import styled from "styled-components";
+import { RootState } from "~app/rootReducer";
+import { hostName } from "~utils/hostUtils";
 import config from "../account-management/login/googleConfigs.json";
+import { signOut } from "../account-management/signout/signOut";
+import logo from "./logo.png";
+import { setSidebarValue } from "./sidebarSlice";
 
 const StyledSidebar = styled(Sidebar)`
   background: ${(props) => props.theme.rainbow.palette.background.main};
@@ -64,6 +63,7 @@ const Logo = styled.img`
     display: none;
   }
 `;
+
 const SideNavigationBar = () => {
   const sidebarState = useSelector((state: RootState) => state.sidebarState);
   const showProfileState = useSelector((state: RootState) => state.showProfileState);

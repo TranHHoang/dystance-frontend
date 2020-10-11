@@ -1,15 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AxiosResponse, AxiosError } from "axios";
-import { hostName } from "~utils/hostUtils";
+import { AxiosError } from "axios";
 import { AppThunk } from "~app/store";
 import Axios from "~utils/fakeAPI";
+import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
-import { User } from "~utils/types";
-
-export interface ErrorResponse {
-  type: number;
-  message: string;
-}
+import { ErrorResponse, User } from "~utils/types";
 
 interface ShowProfileState {
   isLoading: boolean;

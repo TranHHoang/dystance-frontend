@@ -6,7 +6,8 @@ import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { ErrorResponse } from "~utils/types";
 import { fetchLatestMessage } from "../chat/chatSlice";
-import { setUserInfoList, UserInfo } from "../user-list/userListSlice";
+import { setUserInfoList } from "../user-list/userListSlice";
+import { UserInfo } from "~utils/types";
 
 interface RoomState {
   roomId: string;

@@ -1,11 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-export interface UserInfo {
-  id: string;
-  userName: string;
-  realName: string;
-  avatar: string;
-}
+import { UserInfo } from "~utils/types";
 
 const initialState: UserInfo[] = [];
 

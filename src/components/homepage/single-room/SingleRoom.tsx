@@ -1,4 +1,18 @@
+import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import moment from "moment";
 import * as React from "react";
+import { Button, ButtonMenu, MenuItem, Modal } from "react-rainbow-components";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
+import { RootState } from "~app/rootReducer";
+import { getLoginData } from "~utils/tokenStorage";
+import { Room } from "~utils/types";
+import { StyledNotification } from "../../account-management/styles";
+import InviteForm from "../../room/invite/InviteForm";
+import { setInviteModalOpen } from "../../room/invite/inviteSlice";
+import { deleteRoom, setConfirmDeleteModalOpen } from "./singleRoomSlice";
 import {
   Description,
   FlexRowContainer,
@@ -11,20 +25,6 @@ import {
   Time,
   Title
 } from "./styles";
-import moment from "moment";
-import { Room } from "~utils/types";
-import { Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { deleteRoom, setConfirmDeleteModalOpen } from "./singleRoomSlice";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
-import { ButtonMenu, MenuItem, Modal, Button } from "react-rainbow-components";
-import { StyledNotification } from "../../account-management/styles";
-import styled from "styled-components";
-import { getLoginData } from "~utils/tokenStorage";
-import { RootState } from "~app/rootReducer";
-import InviteForm from "../../room/invite/InviteForm";
-import { setInviteModalOpen } from "../../room/invite/inviteSlice";
 
 export const JoinRoomButtonContainer = styled.div`
   display: flex;

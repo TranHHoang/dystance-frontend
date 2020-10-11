@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AxiosResponse, AxiosError } from "axios";
-import { hostName } from "~utils/hostUtils";
-import { ErrorResponse, UserLoginData } from "~utils/types";
-import { AppThunk } from "~app/store";
+import { AxiosError, AxiosResponse } from "axios";
 import { createHashHistory } from "history";
+import { AppThunk } from "~app/store";
 import Axios from "~utils/fakeAPI";
+import { hostName } from "~utils/hostUtils";
 import { saveLoginData } from "~utils/tokenStorage";
+import { ErrorResponse, UserLoginData } from "~utils/types";
 
 export enum LoginError {
   NameEmailPasswordIncorrect,

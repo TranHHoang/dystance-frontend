@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
+import { ProgressIndicator, ProgressStep } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
+import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { BackgroundContainer, Container, StyledCard, Title, StyledNotification } from "../styles";
-import EmailForm from "./EmailForm";
+import { BackgroundContainer, Container, StyledCard, StyledNotification, Title } from "../styles";
 import AccessCodeForm from "./AccessCodeForm";
 import ChangePasswordForm from "./ChangePasswordForm";
-import { ProgressIndicator, ProgressStep } from "react-rainbow-components";
-import styled from "styled-components";
+import EmailForm from "./EmailForm";
 import { resetError } from "./resetPasswordSlice";
 
 const stepNames = ["step-1", "step-2", "step-3"];

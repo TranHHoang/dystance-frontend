@@ -1,12 +1,12 @@
+import { faFileAlt } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
+import { Button, Modal, ProgressBar } from "react-rainbow-components";
+import { useDispatch, useSelector } from "react-redux";
+import styled from "styled-components";
+import { RootState } from "~app/rootReducer";
 import ChatBox from "./ChatBox";
 import ChatHistory from "./ChatHistory";
-import styled from "styled-components";
-import { Button, Modal, ProgressBar, Notification } from "react-rainbow-components";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileAlt } from "@fortawesome/free-solid-svg-icons";
-import { RootState } from "~app/rootReducer";
-import { useDispatch, useSelector } from "react-redux";
 import { broadcastMessage, ChatType } from "./chatSlice";
 
 const ChatHistoryArea = styled.div`
@@ -165,7 +165,7 @@ const ChatArea = (props: any) => {
       </StyledModal>
       <StyledChatArea>
         <ChatHistoryArea id="chatbox" ref={chatBox}>
-          <ChatHistory roomId={roomId} />
+          <ChatHistory />
         </ChatHistoryArea>
         <ChatBox setFile={setFile} roomId={roomId} />
       </StyledChatArea>

@@ -1,12 +1,11 @@
-import createRoomReducer, * as CreateRoomSlice from "./createRoomSlice";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { cleanup, fireEvent, waitFor } from "@testing-library/react";
+import { mount, shallow } from "enzyme";
 import React from "react";
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import CreateRoomForm from "./CreateRoomForm";
-import { shallow, mount } from "enzyme";
-import { Provider } from "react-redux";
-
-import { fireEvent, cleanup, waitFor } from "@testing-library/react";
 import { Modal } from "react-rainbow-components";
+import { Provider } from "react-redux";
+import CreateRoomForm from "./CreateRoomForm";
+import createRoomReducer, * as CreateRoomSlice from "./createRoomSlice";
 
 let store: ReturnType<typeof configureStore>;
 let wrapper: ReturnType<typeof mount>;

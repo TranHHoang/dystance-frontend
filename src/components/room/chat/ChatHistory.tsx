@@ -1,14 +1,15 @@
+import { faFileAlt } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { shell } from "electron";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { ActivityTimeline, Card, TimelineMarker } from "react-rainbow-components";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
-import { fetchAllMessages, ChatType, UserInfo, getUserInfo } from "./chatSlice";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileAlt } from "@fortawesome/free-solid-svg-icons";
-import { shell } from "electron";
+import { ChatType, getUserInfo } from "./chatSlice";
+import { UserInfo } from "~utils/types";
 
 const StyledTimeline = styled(ActivityTimeline)`
   padding: 0 20 0 20;
@@ -60,11 +61,9 @@ const StyledAvatar = styled.img`
   border-radius: 50%;
 `;
 
-const ChatHistory = (props: any) => {
+const ChatHistory = () => {
   const [usersInfo, setUsersInfo] = useState<{ [key: string]: UserInfo }>({});
   const chatState = useSelector((root: RootState) => root.chatState);
-  const dispatch = useDispatch();
-  const { roomId } = props;
 
   function openExternal(e: any) {
     e.preventDefault();

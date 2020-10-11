@@ -1,12 +1,12 @@
-import React from "react";
-import { Formik, Field, FormikProps } from "formik";
-import { StyledInput, StyledForm, StyledButton, ButtonContainer } from "../styles";
-import { useDispatch, useSelector } from "react-redux";
-import { startSendEmail } from "./resetPasswordSlice";
-import { RootState } from "~app/rootReducer";
-import * as Yup from "yup";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Field, Formik, FormikProps } from "formik";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import * as Yup from "yup";
+import { RootState } from "~app/rootReducer";
+import { ButtonContainer, StyledButton, StyledForm, StyledInput } from "../styles";
+import { startSendEmail } from "./resetPasswordSlice";
 
 interface EmailFormValues {
   email: string;

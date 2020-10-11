@@ -1,7 +1,6 @@
-import styled from "styled-components";
-import { Card, FileSelector, Input, DatePicker, Button } from "react-rainbow-components";
-import { configureStore } from "@reduxjs/toolkit";
 import { Form } from "formik";
+import { Button, Card, DatePicker, FileSelector, Input } from "react-rainbow-components";
+import styled from "styled-components";
 export const Container = styled.div`
   padding: 20px;
   width: 100%;

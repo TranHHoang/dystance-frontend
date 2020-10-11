@@ -1,15 +1,13 @@
 import React, { useEffect } from "react";
-import CreateRoomForm from "../room-management/create-room/CreateRoomForm";
-import { AllRooms } from "./all-rooms/AllRooms";
-import styled from "styled-components";
-import SideNavigationBar from "../sidebar/Sidebar";
 import { useDispatch, useSelector } from "react-redux";
-import { showProfile } from "../profile-page/showProfileInfoSlice";
+import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import ProfilePage from "../profile-page/ProfilePage";
+import { showProfile } from "../profile-page/showProfileInfoSlice";
+import CreateRoomForm from "../room-management/create-room/CreateRoomForm";
+import SideNavigationBar from "../sidebar/Sidebar";
 import { setSidebarValue } from "../sidebar/sidebarSlice";
-import { resetRoom } from "./showRoomsSlice";
-import { User } from "~utils/types";
+import { AllRooms } from "./all-rooms/AllRooms";
 
 const CreateRoomDiv = styled.div`
   display: flex;
@@ -49,6 +47,7 @@ export const HomePageDisplay = () => {
     </HomePageContainer>
   );
 };
+
 export const HomePage = () => {
   const sidebarState = useSelector((state: RootState) => state.sidebarState);
   const dispatch = useDispatch();
