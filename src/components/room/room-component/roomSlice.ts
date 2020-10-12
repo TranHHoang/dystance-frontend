@@ -44,33 +44,37 @@ export function initSocket(roomId: string): AppThunk {
     if (socket && socket.state === "Disconnected") {
       console.log("Start socket...");
       await socket.start();
-      await socket.invoke("JoinRoom", roomId, getLoginData().id);
     }
-    console.log("Online again");
+    await socket.invoke("JoinRoom", roomId, getLoginData().id);
+    setTimeout(async () => {
+      console.log("Someone joined");
+      await socket.invoke("JoinRoom", roomId, "1a449bd8-ccd8-4572-b907-f6003f7e902d");
+      setTimeout(async () => {
+        console.log("User Left");
+        await socket.invoke("LeaveRoom", roomId, "1a449bd8-ccd8-4572-b907-f6003f7e902d");
+      }, 4000);
+    }, 5000);
     socket.on("NewChat", () => {
       console.log("New Message");
       dispatch(fetchLatestMessage(roomId));
     });
-    // socket.on("Join", async (userIdList: string) => {
-    //   console.log("Joined Room");
-    //   const userInfoList: UserInfo[] = [];
-    //   for (const id of JSON.parse(userIdList)) {
-    //     console.log(id);
-    //     const response = await Axios.get(`${hostName}/api/users/info?id=${id}`);
-    //     const data = response.data as UserInfo;
-    //     userInfoList.push(data);
-    //   }
-    //   dispatch(setUserInfoList(userInfoList));
-    // });
-    // socket.on("Join", () => {
-    //   console.log("Joined Room");
-    // })
+    socket.on("UserListChange", async (userIdList: string) => {
+      console.log("Joined Room");
+      console.log(userIdList);
+      const userInfoList: UserInfo[] = [];
+      for (const id of JSON.parse(userIdList)) {
+        console.log(id);
+        const response = await Axios.get(`${hostName}/api/users/info?id=${id}`);
+        const data = response.data as UserInfo;
+        userInfoList.push(data);
+      }
+      dispatch(setUserInfoList(userInfoList));
+    });
   };
 }
 
 export function removeListeners() {
   socket.off("NewChat");
   socket.off("Join");
-  socket.stop();
   console.log("Component Unmount");
 }

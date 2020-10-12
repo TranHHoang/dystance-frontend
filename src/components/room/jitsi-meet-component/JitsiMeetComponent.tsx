@@ -31,19 +31,6 @@ const JitsiMeetComponent = (props: any) => {
       console.log("Local User Joined");
       dispatch(setShowUpperToolbar(true));
     });
-    JitsiMeetAPI.on("participantJoined", () => {
-      socket.on("Join", async (userIdList: string) => {
-        console.log("Joined Room");
-        const userInfoList: UserInfo[] = [];
-        for (const id of JSON.parse(userIdList)) {
-          console.log(id);
-          const response = await Axios.get(`${hostName}/api/users/info?id=${id}`);
-          const data = response.data as UserInfo;
-          userInfoList.push(data);
-        }
-        dispatch(setUserInfoList(userInfoList));
-      });
-    });
     JitsiMeetAPI.on("readyToClose", () => {
       socket.invoke("LeaveRoom", roomId, getLoginData().id);
       dispatch(setShowUpperToolbar(false));

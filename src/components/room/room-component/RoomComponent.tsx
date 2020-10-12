@@ -6,6 +6,7 @@ import { Button, Drawer, Tab, Tabset } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
+import { getLoginData } from "~utils/tokenStorage";
 import { UserInfo } from "~utils/types";
 import ChatArea from "../chat/ChatArea";
 import { fetchAllMessages } from "../chat/chatSlice";
@@ -13,7 +14,7 @@ import JitsiMeetComponent from "../jitsi-meet-component/JitsiMeetComponent";
 import UserListComponent from "../user-list/UserListComponent";
 import { setUserInfoList } from "../user-list/userListSlice";
 import Whiteboard from "../whiteboard/Whiteboard";
-import { initSocket, removeListeners, setDrawerOpen, setTabsetValue } from "./roomSlice";
+import { initSocket, removeListeners, setDrawerOpen, setTabsetValue, socket } from "./roomSlice";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -83,7 +84,7 @@ const RoomComponent = (props: any) => {
     return () => {
       removeListeners();
     };
-  }, [roomId]);
+  }, []);
 
   function getTabContent() {
     switch (roomState.tabsetValue) {
