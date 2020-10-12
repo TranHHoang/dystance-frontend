@@ -80,7 +80,9 @@ const RoomComponent = (props: any) => {
     dispatch(initSocket(roomId));
     dispatch(fetchAllMessages(roomId));
     dispatch(setUserInfoList([profile]));
-    return removeListeners();
+    return () => {
+      removeListeners();
+    };
   }, [roomId]);
 
   function getTabContent() {

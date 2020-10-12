@@ -13,6 +13,11 @@ const UserListContainer = styled.div`
 const StyledCard = styled(Card)`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
 `;
+const StyledAvatar = styled(Avatar)`
+  img {
+    object-fit: cover;
+  }
+`;
 const UserListComponent = () => {
   const userListState = useSelector((state: RootState) => state.userListState);
   return (
@@ -20,7 +25,7 @@ const UserListComponent = () => {
       {userListState.map((user) => (
         <StyledCard
           key={user.id}
-          icon={<Avatar src={`${hostName}/${user.avatar}`} />}
+          icon={<StyledAvatar src={`${hostName}/${user.avatar}`} />}
           title={`${user.realName} (${user.userName})`}
         />
       ))}

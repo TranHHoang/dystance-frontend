@@ -4,8 +4,12 @@ import React from "react";
 import Jitsi from "react-jitsi";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
+import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
-import { User } from "~utils/types";
+import { getLoginData } from "~utils/tokenStorage";
+import { User, UserInfo } from "~utils/types";
+import { removeListeners, socket } from "../room-component/roomSlice";
+import { setUserInfoList } from "../user-list/userListSlice";
 import { setShowUpperToolbar } from "./jitsiMeetSlice";
 
 const loader = styled.div`
@@ -26,19 +30,22 @@ const JitsiMeetComponent = (props: any) => {
     JitsiMeetAPI.addEventListener("videoConferenceJoined", () => {
       console.log("Local User Joined");
       dispatch(setShowUpperToolbar(true));
-      // (() => {
-      //   document.getElementById("root").onmousemove = () => {
-      //     dispatch(setShowUpperToolbar(true));
-      //     console.log("Mouse is moving");
-      //     let timeout;
-      //     (() => {
-      //       clearTimeout(timeout);
-      //       timeout = setTimeout(() => dispatch(setShowUpperToolbar(false)), 4000);
-      //     })();
-      //   }
-      // })();
+    });
+    JitsiMeetAPI.on("participantJoined", () => {
+      socket.on("Join", async (userIdList: string) => {
+        console.log("Joined Room");
+        const userInfoList: UserInfo[] = [];
+        for (const id of JSON.parse(userIdList)) {
+          console.log(id);
+          const response = await Axios.get(`${hostName}/api/users/info?id=${id}`);
+          const data = response.data as UserInfo;
+          userInfoList.push(data);
+        }
+        dispatch(setUserInfoList(userInfoList));
+      });
     });
     JitsiMeetAPI.on("readyToClose", () => {
+      socket.invoke("LeaveRoom", roomId, getLoginData().id);
       dispatch(setShowUpperToolbar(false));
       createHashHistory().push("/homepage");
       JitsiMeetAPI.dispose();

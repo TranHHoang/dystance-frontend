@@ -46,26 +46,31 @@ export function initSocket(roomId: string): AppThunk {
       await socket.start();
       await socket.invoke("JoinRoom", roomId, getLoginData().id);
     }
+    console.log("Online again");
     socket.on("NewChat", () => {
       console.log("New Message");
       dispatch(fetchLatestMessage(roomId));
     });
-    socket.on("join", async (userIdList: string) => {
-      console.log("Joined Room");
-      const userInfoList: UserInfo[] = [];
-      for (const id of JSON.parse(userIdList)) {
-        console.log(id);
-        const response = await Axios.get(`${hostName}/api/users/info?id=${id}`);
-        const data = response.data as UserInfo;
-        userInfoList.push(data);
-      }
-      dispatch(setUserInfoList(userInfoList));
-    });
+    // socket.on("Join", async (userIdList: string) => {
+    //   console.log("Joined Room");
+    //   const userInfoList: UserInfo[] = [];
+    //   for (const id of JSON.parse(userIdList)) {
+    //     console.log(id);
+    //     const response = await Axios.get(`${hostName}/api/users/info?id=${id}`);
+    //     const data = response.data as UserInfo;
+    //     userInfoList.push(data);
+    //   }
+    //   dispatch(setUserInfoList(userInfoList));
+    // });
+    // socket.on("Join", () => {
+    //   console.log("Joined Room");
+    // })
   };
 }
 
 export function removeListeners() {
-  socket.off("Broadcast");
-  socket.off("join");
+  socket.off("NewChat");
+  socket.off("Join");
+  socket.stop();
   console.log("Component Unmount");
 }
