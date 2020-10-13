@@ -29,8 +29,6 @@ const PeopleProfilePage = (props: any) => {
   useEffect(() => {
     console.log(userId);
     dispatch(showPeopleProfile(userId));
-    // console.log(peopleProfileState.user?.email);
-    // console.log(peopleProfileState.user?.userName);
   }, []);
   return (
     <PeopleProfileContainer>

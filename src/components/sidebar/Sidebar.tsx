@@ -60,8 +60,8 @@ const StyledAvatarMenu = styled(AvatarMenu)`
 `;
 
 const Logo = styled.img`
-  margin-bottom: 100px;
-  @media (max-height: 800px) {
+  margin-bottom: 10vh;
+  @media (max-height: 700px) {
     display: none;
   }
 `;

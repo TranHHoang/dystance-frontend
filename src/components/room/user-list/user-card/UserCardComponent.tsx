@@ -2,12 +2,11 @@ import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { setPeopleProfileModalOpen } from "../../../profile-page/people-profile/peopleProfileSlice";
 import * as React from "react";
-import { Card, ButtonMenu, MenuItem, Modal } from "react-rainbow-components";
+import { Card, ButtonMenu, MenuItem } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { getLoginData } from "~utils/tokenStorage";
-import PeopleProfilePage from "../../../profile-page/people-profile/PeopleProfilePage";
 
 const StyledCard = styled(Card)`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
