@@ -91,7 +91,7 @@ const RoomComponent = (props: any) => {
       case "Chat":
         return <ChatArea roomId={roomId} />;
       case "People":
-        return <UserListComponent />;
+        return <UserListComponent creatorId={creatorId} />;
     }
   }
 

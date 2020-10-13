@@ -1,9 +1,12 @@
+import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as React from "react";
-import { Avatar, Card } from "react-rainbow-components";
+import { Avatar, ButtonMenu, Card, MenuItem } from "react-rainbow-components";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
+import { getLoginData } from "~utils/tokenStorage";
 
 const UserListContainer = styled.div`
   display: grid;
@@ -18,8 +21,9 @@ const StyledAvatar = styled(Avatar)`
     object-fit: cover;
   }
 `;
-const UserListComponent = () => {
+const UserListComponent = (props: any) => {
   const userListState = useSelector((state: RootState) => state.userListState);
+  const { creatorId } = props;
   return (
     <UserListContainer>
       {userListState.map((user) => (
@@ -27,6 +31,19 @@ const UserListComponent = () => {
           key={user.id}
           icon={<StyledAvatar src={`${hostName}/${user.avatar}`} />}
           title={`${user.realName} (${user.userName})`}
+          actions={
+            user.id !== getLoginData().id ? (
+              <ButtonMenu menuAlignment="right" menuSize="x-small" icon={<FontAwesomeIcon icon={faEllipsisV} />}>
+                <MenuItem label="View Profile"></MenuItem>
+                {getLoginData().id === creatorId ? (
+                  <div>
+                    <MenuItem label="Kick User Out"></MenuItem>
+                    <MenuItem label="Mute"></MenuItem>
+                  </div>
+                ) : null}
+              </ButtonMenu>
+            ) : null
+          }
         />
       ))}
     </UserListContainer>
