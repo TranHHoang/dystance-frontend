@@ -38,11 +38,14 @@ const createWindow = () => {
       allowRunningInsecureContent: true,
       nativeWindowOpen: true,
       webSecurity: false
-    }
+    },
+    show: false
   });
-
+  const splash = new BrowserWindow({ width: 500, height: 400, frame: false, resizable: false });
   // and load the index.html of the app.
   if (isDebug()) {
+    console.log(__dirname);
+    splash.loadFile(path.join(__dirname, "../../src/main/splash.html"));
     mainWindow.loadURL(APP_WEBPACK_ENTRY);
   } else {
     const exApp = express();
@@ -58,6 +61,10 @@ const createWindow = () => {
   mainWindow.setIcon(path.join(__dirname, "../../src/components/sidebar/logo.png"));
   initPopupsConfigurationMain(mainWindow);
   setupScreenSharingMain(mainWindow, "DYSTANCE");
+  mainWindow.once("ready-to-show", () => {
+    splash.destroy();
+    mainWindow.show();
+  });
   // mainWindow.setMenu(null);
   // console.log(__dirname);
 };
