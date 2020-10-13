@@ -38,26 +38,32 @@ const createWindow = () => {
       allowRunningInsecureContent: true,
       nativeWindowOpen: true,
       webSecurity: false
-    }
+    },
+    show: false
   });
+  const splash = new BrowserWindow({ width: 500, height: 400, frame: false, resizable: false });
+  splash.loadURL(path.join(__dirname, "../../src/main/splash.html"));
 
   // and load the index.html of the app.
   if (isDebug()) {
+    console.log(__dirname);
     mainWindow.loadURL(APP_WEBPACK_ENTRY);
   } else {
     const exApp = express();
     exApp.set("port", process.env.PORT || 3000);
     exApp.use(express.static(path.resolve(__dirname, "..", "renderer")));
     exApp.use("/app/assets", express.static(path.resolve(__dirname, "..", "renderer/assets")));
-    // console.log(path.resolve(__dirname, "..", "renderer", "res"));
     const server = exApp.listen(exApp.get("port"), () => {
       mainWindow.loadURL(`http://localhost:${(server.address() as any).port}/app`);
     });
-    // mainWindow.setIcon(path.resolve(__dirname, "..", "renderer/res/logo.png"));
   }
   mainWindow.setIcon(path.join(__dirname, "../../src/components/sidebar/logo.png"));
   initPopupsConfigurationMain(mainWindow);
   setupScreenSharingMain(mainWindow, "DYSTANCE");
+  mainWindow.once("ready-to-show", () => {
+    splash.destroy();
+    mainWindow.show();
+  });
   // mainWindow.setMenu(null);
   // console.log(__dirname);
 };
