@@ -1,8 +1,10 @@
 import { faBars, faChalkboard, faCommentDots, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import PeopleProfilePage from "../../profile-page/people-profile/PeopleProfilePage";
+import { setPeopleProfileModalOpen } from "../../profile-page/people-profile/peopleProfileSlice";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Button, Drawer, Tab, Tabset } from "react-rainbow-components";
+import { Button, Drawer, Modal, Tab, Tabset } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
@@ -69,8 +71,14 @@ const NormalButton = styled(Button)`
 const RearButton = styled(NormalButton)`
   border-bottom-right-radius: 10px;
 `;
+const StyledModal = styled(Modal)`
+  /* width: 50%; */
+  width: fit-content;
+`;
+
 const RoomComponent = (props: any) => {
   const roomState = useSelector((state: RootState) => state.roomState);
+  const peopleProfileState = useSelector((state: RootState) => state.peopleProfileState);
   const jitsiMeetState = useSelector((state: RootState) => state.jitisiMeetState);
   const { roomId, roomName, creatorId } = props.match.params;
   const [whiteboardOpen, setWhiteboardOpen] = useState(false);
@@ -131,12 +139,25 @@ const RoomComponent = (props: any) => {
           </span>
         }
         isOpen={roomState.isDrawerOpen}
-        onRequestClose={() => dispatch(setDrawerOpen(false))}
+        onRequestClose={() => {
+          if (peopleProfileState.peopleProfileModalOpen === false) {
+            console.log(peopleProfileState.peopleProfileModalOpen);
+            dispatch(setDrawerOpen(false));
+          } else {
+            console.log(peopleProfileState.peopleProfileModalOpen);
+          }
+        }}
       >
         {getTabContent()}
       </StyledDrawer>
       {whiteboardOpen ? <Whiteboard roomId={roomId} /> : null}
       <JitsiMeetComponent roomId={roomId} roomName={roomName} creatorId={creatorId} />
+      <StyledModal
+        isOpen={peopleProfileState.peopleProfileModalOpen}
+        onRequestClose={() => dispatch(setPeopleProfileModalOpen({ userId: null, peopleProfileModalOpen: false }))}
+      >
+        <PeopleProfilePage userId={peopleProfileState.userId} />
+      </StyledModal>
     </div>
   );
 };

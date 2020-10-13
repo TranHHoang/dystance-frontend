@@ -46,6 +46,14 @@ export function initSocket(roomId: string): AppThunk {
       await socket.start();
     }
     await socket.invoke("JoinRoom", roomId, getLoginData().id);
+    setTimeout(async () => {
+      console.log("Someone joined");
+      await socket.invoke("JoinRoom", roomId, "1a449bd8-ccd8-4572-b907-f6003f7e902d");
+      // setTimeout(async () => {
+      //   console.log("User Left");
+      //   await socket.invoke("LeaveRoom", roomId, "1a449bd8-ccd8-4572-b907-f6003f7e902d");
+      // }, 4000);
+    }, 5000);
     socket.on("NewChat", () => {
       console.log("New Message");
       dispatch(fetchLatestMessage(roomId));

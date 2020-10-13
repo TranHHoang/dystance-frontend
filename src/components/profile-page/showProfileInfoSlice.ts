@@ -18,7 +18,7 @@ const initialState: ShowProfileState = {
 };
 
 const showProfileSlice = createSlice({
-  name: "updateProfile",
+  name: "showProfile",
   initialState,
   reducers: {
     fetchProfileSuccess(state, action: PayloadAction<User>) {
