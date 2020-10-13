@@ -1,12 +1,16 @@
-import React from "react";
-import { hostName } from "~utils/hostUtils";
-import { User } from "~utils/types";
-import styled from "styled-components";
 import { createHashHistory } from "history";
+import { setupScreenSharingRender } from "jitsi-meet-electron-utils";
+import React from "react";
 import Jitsi from "react-jitsi";
 import { useDispatch } from "react-redux";
+import styled from "styled-components";
+import Axios from "~utils/fakeAPI";
+import { hostName } from "~utils/hostUtils";
+import { getLoginData } from "~utils/tokenStorage";
+import { User, UserInfo } from "~utils/types";
+import { socket } from "../room-component/roomSlice";
+import { setUserInfoList } from "../user-list/userListSlice";
 import { setShowUpperToolbar } from "./jitsiMeetSlice";
-import { setupScreenSharingRender } from "jitsi-meet-electron-utils";
 
 const loader = styled.div`
   display: none;
@@ -14,7 +18,7 @@ const loader = styled.div`
 const JitsiMeetComponent = (props: any) => {
   const profile = JSON.parse(localStorage.getItem("profile")) as User;
   const dispatch = useDispatch();
-  const { roomId, creatorId, roomName } = props;
+  const { roomId, roomName } = props;
 
   const handleAPI = (JitsiMeetAPI: any) => {
     JitsiMeetAPI.executeCommand("displayName", `${profile.realName} (${profile.userName})`);
@@ -26,19 +30,9 @@ const JitsiMeetComponent = (props: any) => {
     JitsiMeetAPI.addEventListener("videoConferenceJoined", () => {
       console.log("Local User Joined");
       dispatch(setShowUpperToolbar(true));
-      // (() => {
-      //   document.getElementById("root").onmousemove = () => {
-      //     dispatch(setShowUpperToolbar(true));
-      //     console.log("Mouse is moving");
-      //     let timeout;
-      //     (() => {
-      //       clearTimeout(timeout);
-      //       timeout = setTimeout(() => dispatch(setShowUpperToolbar(false)), 4000);
-      //     })();
-      //   }
-      // })();
     });
     JitsiMeetAPI.on("readyToClose", () => {
+      socket.invoke("LeaveRoom", roomId, getLoginData().id);
       dispatch(setShowUpperToolbar(false));
       createHashHistory().push("/homepage");
       JitsiMeetAPI.dispose();

@@ -1,14 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
-import { hostName } from "~utils/hostUtils";
-import { AppThunk } from "~app/store";
 import { createHashHistory } from "history";
+import moment from "moment";
+import { AppThunk } from "~app/store";
+import Axios from "~utils/fakeAPI";
+import { hostName } from "~utils/hostUtils";
 import { saveLoginData } from "~utils/tokenStorage";
+import { ErrorResponse, LoginLocalStorageKey } from "~utils/types";
 import { OkResponse } from "../login/loginSlice";
 import { GoogleUpdateInfoFormValues } from "./GoogleUpdateInfo";
-import Axios from "~utils/fakeAPI";
-import moment from "moment";
-import { ErrorResponse, LoginLocalStorageKey } from "~utils/types";
 
 export enum GoogleUpdateInfoError {
   UserNameAlreadyExists,

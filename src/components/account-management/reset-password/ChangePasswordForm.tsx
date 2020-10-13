@@ -1,12 +1,12 @@
-import React from "react";
-import { Formik, Field, FormikProps } from "formik";
-import * as Yup from "yup";
-import { useDispatch, useSelector } from "react-redux";
-import { startChangePasword } from "./resetPasswordSlice";
-import { RootState } from "~app/rootReducer";
-import { StyledInput, StyledForm, StyledButton, ButtonContainer } from "../styles";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Field, Formik, FormikProps } from "formik";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import * as Yup from "yup";
+import { RootState } from "~app/rootReducer";
+import { ButtonContainer, StyledButton, StyledForm, StyledInput } from "../styles";
+import { startChangePasword } from "./resetPasswordSlice";
 
 interface ChangePasswordValues {
   password: string;

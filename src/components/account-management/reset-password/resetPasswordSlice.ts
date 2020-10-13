@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AxiosError, AxiosResponse } from "axios";
 import { createHashHistory } from "history";
+import { AppThunk } from "~app/store";
+import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { ErrorResponse } from "~utils/types";
-import Axios from "~utils/fakeAPI";
-import { AxiosError, AxiosResponse } from "axios";
-import { AppThunk } from "~app/store";
 
 interface ResetPasswordState {
   isLoading: boolean;

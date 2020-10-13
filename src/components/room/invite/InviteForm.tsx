@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Button, Modal, Textarea } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
-import { setInviteModalOpen, startInvite } from "./inviteSlice";
 import { StyledNotification } from "../../account-management/styles";
+import { setInviteModalOpen, startInvite } from "./inviteSlice";
 
 const InviteForm = (props: any) => {
   const inviteState = useSelector((root: RootState) => root.inviteState);

@@ -6,7 +6,8 @@ import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { ErrorResponse } from "~utils/types";
 import { fetchLatestMessage } from "../chat/chatSlice";
-import { setUserInfoList, UserInfo } from "../user-list/userListSlice";
+import { setUserInfoList } from "../user-list/userListSlice";
+import { UserInfo } from "~utils/types";
 
 interface RoomState {
   roomId: string;
@@ -43,14 +44,15 @@ export function initSocket(roomId: string): AppThunk {
     if (socket && socket.state === "Disconnected") {
       console.log("Start socket...");
       await socket.start();
-      await socket.invoke("JoinRoom", roomId, getLoginData().id);
     }
+    await socket.invoke("JoinRoom", roomId, getLoginData().id);
     socket.on("NewChat", () => {
       console.log("New Message");
       dispatch(fetchLatestMessage(roomId));
     });
-    socket.on("join", async (userIdList: string) => {
+    socket.on("UserListChange", async (userIdList: string) => {
       console.log("Joined Room");
+      console.log(userIdList);
       const userInfoList: UserInfo[] = [];
       for (const id of JSON.parse(userIdList)) {
         console.log(id);
@@ -64,7 +66,7 @@ export function initSocket(roomId: string): AppThunk {
 }
 
 export function removeListeners() {
-  socket.off("Broadcast");
-  socket.off("join");
+  socket.off("NewChat");
+  socket.off("Join");
   console.log("Component Unmount");
 }

@@ -1,27 +1,27 @@
+import { Field, Formik, FormikProps } from "formik";
 import * as React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Button } from "react-rainbow-components";
+import { useDispatch, useSelector } from "react-redux";
+import * as Yup from "yup";
+import { RootState } from "~app/rootReducer";
+import { hostName } from "~utils/hostUtils";
 import {
-  StyledButton,
-  Container,
-  ImageContainer,
-  StyledCard,
-  StyledImage,
-  Title,
   CardContainer,
-  StyledInput,
+  Container,
+  DisabledInput,
+  ImageContainer,
+  StyledButton,
+  StyledCard,
   StyledDatePicker,
   StyledFileSelector,
   StyledForm,
-  DisabledInput
+  StyledImage,
+  StyledInput,
+  Title
 } from "./profilePageStyles";
-import { Formik, Field, FormikProps, FormikHelpers, FormikValues } from "formik";
-import * as Yup from "yup";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "~app/rootReducer";
 import { showProfile } from "./showProfileInfoSlice";
-import { updateProfile, changePasswordStart, cancelChangePassword } from "./updateProfileSlice";
-import { Button } from "react-rainbow-components";
-import { hostName } from "~utils/hostUtils";
+import { cancelChangePassword, changePasswordStart, updateProfile } from "./updateProfileSlice";
 
 export interface UpdateProfileFormValues {
   realName: string;

@@ -1,6 +1,6 @@
 import { createAction } from "@reduxjs/toolkit";
-import { AppThunk } from "~app/store";
 import { createHashHistory } from "history";
+import { AppThunk } from "~app/store";
 
 export const ResetStoreAction = "ResetStore";
 

@@ -1,14 +1,14 @@
-import React, { useRef } from "react";
-import { Modal, Button, Input, TimePicker, DatePicker, Textarea, Notification } from "react-rainbow-components";
-import { RootState } from "~app/rootReducer";
-import { useSelector, useDispatch } from "react-redux";
-import { createRoom, setRoomCreateModalOpen } from "./createRoomSlice";
-import styled from "styled-components";
-import { Formik, Field, Form, FormikProps } from "formik";
-import * as Yup from "yup";
-import moment from "moment";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Field, Form, Formik, FormikProps } from "formik";
+import moment from "moment";
+import React, { useRef } from "react";
+import { Button, DatePicker, Input, Modal, Notification, Textarea, TimePicker } from "react-rainbow-components";
+import { useDispatch, useSelector } from "react-redux";
+import styled from "styled-components";
+import * as Yup from "yup";
+import { RootState } from "~app/rootReducer";
+import { createRoom, setRoomCreateModalOpen } from "./createRoomSlice";
 
 const StyledNotification = styled(Notification)`
   width: 100%;

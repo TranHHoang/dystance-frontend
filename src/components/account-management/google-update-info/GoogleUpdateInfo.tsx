@@ -1,8 +1,10 @@
+import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Field, Formik, FormikProps } from "formik";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import * as Yup from "yup";
 import { RootState } from "~app/rootReducer";
-import { startGoogleUpdateInfo } from "./googleUpdateInfoSlice";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
 import {
   BackgroundContainer,
   ButtonContainer,
@@ -15,9 +17,7 @@ import {
   StyledNotification,
   Title
 } from "../styles";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Formik, Field, FormikProps } from "formik";
-import * as Yup from "yup";
+import { startGoogleUpdateInfo } from "./googleUpdateInfoSlice";
 
 export interface GoogleUpdateInfoFormValues {
   userName: string;

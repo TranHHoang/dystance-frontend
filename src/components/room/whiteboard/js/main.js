@@ -25,7 +25,7 @@ function main(roomId) {
   });
 
   socket.on("DrawToWhiteboard", function (content) {
-    whiteboard.handleEventsAndData(content, true);
+    whiteboard.handleEventsAndData(JSON.parse(content), true);
   });
 
   socket.on("RefreshUserBadges", function () {

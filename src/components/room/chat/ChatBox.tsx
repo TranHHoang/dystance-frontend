@@ -1,12 +1,12 @@
-import { faHandPaper, faImage, faPaperclip, faSmileBeam } from "@fortawesome/free-solid-svg-icons";
+import { faImage, faPaperclip, faSmileBeam } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
+import "emoji-mart/css/emoji-mart.css";
 import React, { useRef, useState } from "react";
 import { Modal } from "react-rainbow-components";
+import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import { broadcastMessage } from "./chatSlice";
-import { useDispatch } from "react-redux";
 
 const StyledChatBox = styled.div`
   display: flex;
