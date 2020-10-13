@@ -54,17 +54,36 @@ module.exports = smp.wrap({
             loader: 'file-loader',
             options: {
               name: '[name].[ext]',
-              outputPath: 'res/'
+              outputPath: 'assets'
             }
           }
         ]
       },
-      { test: /\.node$/, loader: 'node-loader' }
+      // { test: /\.node$/, loader: 'node-loader' }
+      {
+        test: /\.node$/,
+        parser: { amd: false },
+        use: {
+          loader: "@marshallofsound/webpack-asset-relocator-loader",
+          options: {
+            outputAssetBase: "native_modules",
+          },
+        },
+      },
     ]
   },
-  externals: [{
-    'jitsi-meet-electron-utils': 'require(\'jitsi-meet-electron-utils\')'
-  }],
+  externals: [
+    function (context, request, callback) {
+      if (
+        [
+          "jitsi-meet-electron-utils",
+          "robotjs"
+        ].includes(request)) {
+        return callback(null, "commonjs " + request);
+      }
+      callback();
+    },
+  ],
   plugins: [
     new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
     new webpack.ProvidePlugin({

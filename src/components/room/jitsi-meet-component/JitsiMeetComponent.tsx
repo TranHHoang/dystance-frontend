@@ -8,7 +8,7 @@ import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { User, UserInfo } from "~utils/types";
-import { removeListeners, socket } from "../room-component/roomSlice";
+import { socket } from "../room-component/roomSlice";
 import { setUserInfoList } from "../user-list/userListSlice";
 import { setShowUpperToolbar } from "./jitsiMeetSlice";
 
@@ -18,7 +18,7 @@ const loader = styled.div`
 const JitsiMeetComponent = (props: any) => {
   const profile = JSON.parse(localStorage.getItem("profile")) as User;
   const dispatch = useDispatch();
-  const { roomId, creatorId, roomName } = props;
+  const { roomId, roomName } = props;
 
   const handleAPI = (JitsiMeetAPI: any) => {
     JitsiMeetAPI.executeCommand("displayName", `${profile.realName} (${profile.userName})`);

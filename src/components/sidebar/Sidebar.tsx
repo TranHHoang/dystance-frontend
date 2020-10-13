@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
 import { faCalendarAlt, faCog, faComment, faHome, faPencilAlt, faPowerOff } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import * as React from "react";
+import React from "react";
 import { useGoogleLogout } from "react-google-login";
 import { AvatarMenu, MenuItem, Sidebar, SidebarItem } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,8 +10,9 @@ import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
 import config from "../account-management/login/googleConfigs.json";
 import { signOut } from "../account-management/signout/signOut";
-import logo from "./logo.png";
 import { setSidebarValue } from "./sidebarSlice";
+// @ts-ignore
+import logo from "./logo.png";
 
 const StyledSidebar = styled(Sidebar)`
   background: ${(props) => props.theme.rainbow.palette.background.main};
@@ -66,7 +68,7 @@ const Logo = styled.img`
 
 const SideNavigationBar = () => {
   const sidebarState = useSelector((state: RootState) => state.sidebarState);
-  const showProfileState = useSelector((state: RootState) => state.showProfileState);
+  const showProfileUser = useSelector((state: RootState) => state.showProfileState.user);
   const dispatch = useDispatch();
 
   const googleLogout = useGoogleLogout({
@@ -90,9 +92,9 @@ const SideNavigationBar = () => {
       </SidebarItemContainer>
 
       <StyledAvatarMenu
-        assistiveText={showProfileState.user.userName}
-        title={showProfileState.user.realName}
-        src={`${hostName}/${showProfileState.user.avatar}`}
+        assistiveText={showProfileUser?.userName}
+        title={showProfileUser?.realName}
+        src={showProfileUser?.avatar ? `${hostName}/${showProfileUser.avatar}` : ""}
         menuAlignment="bottom-left"
         avatarSize="large"
         menuSize="small"

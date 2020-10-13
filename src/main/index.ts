@@ -1,7 +1,8 @@
-import { app, BrowserWindow, session, systemPreferences } from "electron";
-import installExtension, { REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
+import { app, BrowserWindow } from "electron";
 import path from "path";
-import { setupScreenSharingMain, setupAlwaysOnTopMain, initPopupsConfigurationMain } from "jitsi-meet-electron-utils";
+import { setupScreenSharingMain, initPopupsConfigurationMain } from "jitsi-meet-electron-utils";
+import express from "express";
+
 declare const APP_WEBPACK_ENTRY: string;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -17,6 +18,10 @@ app.commandLine.appendSwitch("disable-webrtc-hw-decoding");
 
 // Needed until robot.js is fixed: https://github.com/octalmage/robotjs/issues/580
 app.allowRendererProcessReuse = false;
+function isDebug() {
+  return process.env.npm_lifecycle_event === "start";
+}
+
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -37,12 +42,24 @@ const createWindow = () => {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadURL(APP_WEBPACK_ENTRY);
+  if (isDebug()) {
+    mainWindow.loadURL(APP_WEBPACK_ENTRY);
+  } else {
+    const exApp = express();
+    exApp.set("port", process.env.PORT || 3000);
+    exApp.use(express.static(path.resolve(__dirname, "..", "renderer")));
+    exApp.use("/app/assets", express.static(path.resolve(__dirname, "..", "renderer/assets")));
+    // console.log(path.resolve(__dirname, "..", "renderer", "res"));
+    const server = exApp.listen(exApp.get("port"), () => {
+      mainWindow.loadURL(`http://localhost:${(server.address() as any).port}/app`);
+    });
+    // mainWindow.setIcon(path.resolve(__dirname, "..", "renderer/res/logo.png"));
+  }
+  mainWindow.setIcon(path.join(__dirname, "../../src/components/sidebar/logo.png"));
   initPopupsConfigurationMain(mainWindow);
   setupScreenSharingMain(mainWindow, "DYSTANCE");
   // mainWindow.setMenu(null);
   // console.log(__dirname);
-  mainWindow.setIcon(path.join(__dirname, "../../src/components/sidebar/logo.png"));
 };
 // installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS])
 //   .then((name) => console.log(`Added Extension:  ${name}`))

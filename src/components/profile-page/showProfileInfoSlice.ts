@@ -22,7 +22,7 @@ const showProfileSlice = createSlice({
   initialState,
   reducers: {
     fetchProfileSuccess(state, action: PayloadAction<User>) {
-      state.isLoading = true;
+      state.isLoading = false;
       state.user = action.payload;
     },
     fetchProfileFailure(state, action: PayloadAction<ErrorResponse>) {
