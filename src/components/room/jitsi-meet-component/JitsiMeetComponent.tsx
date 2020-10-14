@@ -7,7 +7,7 @@ import styled from "styled-components";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
-import { User, UserInfo } from "~utils/types";
+import { RoomAction, RoomActionType, User, UserInfo } from "~utils/types";
 import { socket } from "../room-component/roomSlice";
 import { setUserInfoList } from "../user-list/userListSlice";
 import { setShowUpperToolbar } from "./jitsiMeetSlice";
@@ -32,7 +32,7 @@ const JitsiMeetComponent = (props: any) => {
       dispatch(setShowUpperToolbar(true));
     });
     JitsiMeetAPI.on("readyToClose", () => {
-      socket.invoke("LeaveRoom", roomId, getLoginData().id);
+      socket.invoke(RoomAction, roomId, RoomActionType.Leave, getLoginData().id);
       dispatch(setShowUpperToolbar(false));
       createHashHistory().push("/homepage");
       JitsiMeetAPI.dispose();

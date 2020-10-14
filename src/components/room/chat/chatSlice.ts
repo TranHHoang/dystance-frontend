@@ -4,7 +4,7 @@ import { AppThunk } from "~app/store";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
-import { UserInfo } from "~utils/types";
+import { RoomAction, RoomActionType, UserInfo } from "~utils/types";
 import { socket } from "../room-component/roomSlice";
 
 export enum ChatType {
@@ -97,7 +97,7 @@ export function broadcastMessage(
       console.log(ex);
     }
 
-    socket.invoke("NewChat", roomId);
+    socket.invoke(RoomAction, roomId, RoomActionType.Chat, getLoginData().id);
   };
 }
 
