@@ -1,14 +1,16 @@
 import { createHashHistory } from "history";
 import { setupScreenSharingRender } from "jitsi-meet-electron-utils";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import Jitsi from "react-jitsi";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import { RootState } from "~app/rootReducer";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { RoomAction, RoomActionType, User, UserInfo } from "~utils/types";
 import { socket } from "../room-component/roomSlice";
+import { setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
 import { setUserInfoList } from "../user-list/userListSlice";
 import { setShowUpperToolbar } from "./jitsiMeetSlice";
 
@@ -16,26 +18,48 @@ const loader = styled.div`
   display: none;
 `;
 const JitsiMeetComponent = (props: any) => {
+  const userCardState = useSelector((state: RootState) => state.userCardState);
   const profile = JSON.parse(localStorage.getItem("profile")) as User;
   const dispatch = useDispatch();
   const { roomId, roomName } = props;
+  const api = useRef(null);
 
-  const handleAPI = (JitsiMeetAPI: any) => {
-    JitsiMeetAPI.executeCommand("displayName", `${profile.realName} (${profile.userName})`);
-    JitsiMeetAPI.executeCommand("avatarUrl", `${hostName}/${profile.avatar}`);
-    JitsiMeetAPI.executeCommand("email", `${profile.email}`);
-    JitsiMeetAPI.executeCommand("subject", `${roomName}`);
+  useEffect(() => {
+    if (userCardState.muteOtherUser) {
+      api?.current?.isAudioMuted().then((response: any) => {
+        if (!response) {
+          api?.current?.executeCommand("toggleAudio");
+          dispatch(setMuteOtherUser(false));
+        }
+        if (response) {
+          dispatch(setMuteOtherUser(false));
+        }
+      });
+    }
+  }, [userCardState.muteOtherUser]);
+  useEffect(() => {
+    if (userCardState.kickOtherUser) {
+      api?.current?.executeCommand("hangup");
+      dispatch(setKickOtherUser(false));
+    }
+  }, [userCardState.kickOtherUser]);
 
-    setupScreenSharingRender(JitsiMeetAPI);
-    JitsiMeetAPI.addEventListener("videoConferenceJoined", () => {
-      console.log("Local User Joined");
+  const handleAPI = (jitsiMeetAPI: any) => {
+    api.current = jitsiMeetAPI;
+    jitsiMeetAPI.executeCommand("displayName", `${profile.realName} (${profile.userName})`);
+    jitsiMeetAPI.executeCommand("avatarUrl", `${hostName}/${profile.avatar}`);
+    jitsiMeetAPI.executeCommand("email", `${profile.email}`);
+    jitsiMeetAPI.executeCommand("subject", `${roomName}`);
+    setupScreenSharingRender(jitsiMeetAPI);
+
+    jitsiMeetAPI.addEventListener("videoConferenceJoined", () => {
       dispatch(setShowUpperToolbar(true));
     });
-    JitsiMeetAPI.on("readyToClose", () => {
+    jitsiMeetAPI.on("readyToClose", () => {
       socket.invoke(RoomAction, roomId, RoomActionType.Leave, getLoginData().id);
       dispatch(setShowUpperToolbar(false));
       createHashHistory().push("/homepage");
-      JitsiMeetAPI.dispose();
+      jitsiMeetAPI.dispose();
     });
   };
   return (

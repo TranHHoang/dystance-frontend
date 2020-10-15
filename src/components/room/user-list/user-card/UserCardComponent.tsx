@@ -3,17 +3,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { setPeopleProfileModalOpen } from "../../../profile-page/people-profile/peopleProfileSlice";
 import * as React from "react";
 import { Card, ButtonMenu, MenuItem } from "react-rainbow-components";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import styled from "styled-components";
-import { RootState } from "~app/rootReducer";
 import { getLoginData } from "~utils/tokenStorage";
+import { setKickModalOpen, setMuteModalOpen } from "./userCardSlice";
 
 const StyledCard = styled(Card)`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
 `;
 
 const UserCardComponent = (props: any) => {
-  const peopleProfileState = useSelector((state: RootState) => state.peopleProfileState);
   const { userId, icon, title, creatorId } = props;
   const dispatch = useDispatch();
   return (
@@ -30,8 +29,14 @@ const UserCardComponent = (props: any) => {
               />
               {getLoginData().id === creatorId ? (
                 <div>
-                  <MenuItem label="Kick User Out" />
-                  <MenuItem label="Mute" />
+                  <MenuItem
+                    label="Kick User Out"
+                    onClick={() => dispatch(setKickModalOpen({ userId, isKickModalOpen: true }))}
+                  />
+                  <MenuItem
+                    label="Mute"
+                    onClick={() => dispatch(setMuteModalOpen({ userId, isMuteModalOpen: true }))}
+                  />
                 </div>
               ) : null}
             </ButtonMenu>

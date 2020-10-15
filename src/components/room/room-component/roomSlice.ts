@@ -8,6 +8,7 @@ import { ErrorResponse, RoomAction, RoomActionType } from "~utils/types";
 import { fetchLatestMessage } from "../chat/chatSlice";
 import { setUserInfoList } from "../user-list/userListSlice";
 import { UserInfo } from "~utils/types";
+import { setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
 
 interface RoomState {
   roomId: string;
@@ -45,12 +46,10 @@ export function initSocket(roomId: string): AppThunk {
       console.log("Start socket...");
       await socket.start();
     }
-    await socket.invoke(RoomAction, roomId, RoomActionType.Join, getLoginData().id);
-    setTimeout(async () => {
-      console.log("Someone joined");
-      await socket.invoke(RoomAction, roomId, RoomActionType.Join, "1a449bd8-ccd8-4572-b907-f6003f7e902d");
-    }, 5000);
+    socket.invoke(RoomAction, roomId, RoomActionType.Join, getLoginData().id);
+
     socket.on(RoomAction, async (data: string) => {
+      console.log("Socket is running");
       const response = JSON.parse(data);
       switch (response.type) {
         case RoomActionType.Chat:
@@ -59,7 +58,7 @@ export function initSocket(roomId: string): AppThunk {
           break;
         case RoomActionType.Join:
         case RoomActionType.Leave:
-          console.log("Joined Room");
+          console.log("Joined/Left Room");
           console.log(response);
           const userInfoList: UserInfo[] = [];
           for (const id of response.payload) {
@@ -70,20 +69,14 @@ export function initSocket(roomId: string): AppThunk {
           }
           dispatch(setUserInfoList(userInfoList));
           break;
+        case RoomActionType.Mute:
+          dispatch(setMuteOtherUser(true));
+          break;
+        case RoomActionType.Kick:
+          dispatch(setKickOtherUser(true));
+          break;
       }
     });
-    // socket.on("UserListChange", async (userIdList: string) => {
-    //   console.log("Joined Room");
-    //   console.log(userIdList);
-    //   const userInfoList: UserInfo[] = [];
-    //   for (const id of JSON.parse(userIdList)) {
-    //     console.log(id);
-    //     const response = await Axios.get(`${hostName}/api/users/info?id=${id}`);
-    //     const data = response.data as UserInfo;
-    //     userInfoList.push(data);
-    //   }
-    //   dispatch(setUserInfoList(userInfoList));
-    // });
   };
 }
 

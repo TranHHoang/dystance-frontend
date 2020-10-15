@@ -27,7 +27,6 @@ const PeopleProfilePage = (props: any) => {
   const { userId } = props;
 
   useEffect(() => {
-    console.log(userId);
     dispatch(showPeopleProfile(userId));
   }, []);
   return (
