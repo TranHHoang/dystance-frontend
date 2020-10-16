@@ -63,3 +63,13 @@ export interface DeadlineInfo {
   endDate: string;
   description: string;
 }
+export interface TimetableEvent {
+  id: string;
+  roomId: string;
+  roomName: string;
+  creatorId: string;
+  image: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+}

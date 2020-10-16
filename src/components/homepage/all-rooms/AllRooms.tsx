@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useEffect } from "react";
+import { Spinner } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
@@ -32,21 +33,25 @@ export const AllRooms = () => {
 
   return (
     <BackgroundContainer>
-      <Container>
-        {showRoomState.rooms.map((room) => (
-          <div key={room.roomId}>
-            <SingleRoom
-              roomId={room.roomId}
-              creatorId={room.creatorId}
-              roomName={room.roomName}
-              startHour={room.startHour}
-              endHour={room.endHour}
-              image={room.image}
-              description={room.description}
-            />
-          </div>
-        ))}
-      </Container>
+      {showRoomState.isLoading ? (
+        <Spinner variant="brand" size="large" />
+      ) : (
+        <Container>
+          {showRoomState.rooms.map((room) => (
+            <div key={room.roomId}>
+              <SingleRoom
+                roomId={room.roomId}
+                creatorId={room.creatorId}
+                roomName={room.roomName}
+                startHour={room.startHour}
+                endHour={room.endHour}
+                image={room.image}
+                description={room.description}
+              />
+            </div>
+          ))}
+        </Container>
+      )}
     </BackgroundContainer>
   );
 };
