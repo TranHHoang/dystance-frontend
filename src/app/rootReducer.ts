@@ -20,6 +20,7 @@ import userCardReducer from "../components/room/user-list/user-card/userCardSlic
 import deadlineListReducer from "../components/room/deadline/deadlineListSlice";
 import deadlineCardReducer from "../components/room/deadline/deadline-card/deadlineCardSlice";
 import timetableReducer from "../components/timetable/timetableSlice";
+import eventDetailsReducer from "../components/timetable/event-details/eventDetailsSlice";
 
 const appReducer = combineReducers({
   roomCreation: createRoomReducer,
@@ -42,6 +43,7 @@ const appReducer = combineReducers({
   deadlineListState: deadlineListReducer,
   deadlineCardState: deadlineCardReducer,
   timetableState: timetableReducer,
+  eventDetailsState: eventDetailsReducer,
 });
 
 const rootReducer = (state: any, action: AnyAction) => {
