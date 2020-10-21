@@ -5,7 +5,7 @@ import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { RoomAction, RoomActionType, UserInfo } from "~utils/types";
-import { socket } from "../room-component/roomSlice";
+import { socket } from "../room/room-component/roomSlice";
 
 export enum ChatType {
   Text,
@@ -73,6 +73,7 @@ export function fetchLatestMessage(roomId: string): AppThunk {
 
 export function broadcastMessage(
   roomId: string,
+  userId: string,
   message: string | File,
   type = ChatType.Text,
   onProgressEvent?: (percentage: number) => void
@@ -80,13 +81,20 @@ export function broadcastMessage(
   return async () => {
     try {
       const form = new FormData();
-      form.append("roomId", roomId);
+
+      if (roomId) {
+        // Send to room
+        form.append("roomId", roomId);
+      } else if (userId) {
+        // Send to userId
+        form.append("receiverId", userId);
+      }
       form.append("userId", getLoginData().id);
       form.append("content", message);
       form.append("chatType", type.toString());
 
       console.log("broadcasting...");
-      await Axios.post(`${hostName}/api/rooms/chat/add`, form, {
+      await Axios.post(roomId ? `${hostName}/api/rooms/chat/add` : `${hostName}/api/users/chat/add`, form, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (progressEvent) => {
           onProgressEvent(Math.round((progressEvent.loaded * 100) / progressEvent.total));

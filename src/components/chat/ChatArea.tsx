@@ -61,7 +61,7 @@ const ChatArea = (props: any) => {
   const [imagePreview, setImagePreview] = useState("");
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const chatBox = useRef<HTMLDivElement>();
-  const { roomId } = props;
+  const { roomId, userId } = props;
   const dispatch = useDispatch();
 
   function isImageFile(file: File) {
@@ -101,7 +101,7 @@ const ChatArea = (props: any) => {
   function sendFile() {
     if (file.size < MAX_FILE_SIZE)
       dispatch(
-        broadcastMessage(roomId, file, isImageFile(file) ? ChatType.Image : ChatType.File, (percentage) => {
+        broadcastMessage(roomId, userId, file, isImageFile(file) ? ChatType.Image : ChatType.File, (percentage) => {
           setUploadPercentage(percentage);
         })
       );
