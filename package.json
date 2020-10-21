@@ -185,7 +185,9 @@
     "react-router-dom": "^5.2.0",
     "shebang-loader": "^0.0.1",
     "styled-components": "^4.3.2",
-    "yup": "^0.29.3"
+    "yup": "^0.29.3",
+    "@types/simple-peer": "^9.6.0",
+    "simple-peer": "^9.7.2"
   },
   "dependencies": {
     "jitsi-meet-electron-utils": "github:jitsi/jitsi-meet-electron-utils#v2.0.10",
