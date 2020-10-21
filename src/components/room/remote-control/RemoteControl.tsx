@@ -9,7 +9,10 @@ import { socket } from "../room-component/roomSlice";
 import wrtc from "wrtc";
 import robot from "robotjs";
 import styled from "styled-components";
-import { getCurrentTimeMs } from "../whiteboard/js/utils";
+import { Button, Modal, TimelineMarker } from "react-rainbow-components";
+import { UserInfo } from "~utils/types";
+import { getUserInfo } from "../chat/chatSlice";
+import { hostName } from "~utils/hostUtils";
 
 const StyledVideo = styled.video`
   max-width: 1366px;
@@ -17,10 +20,17 @@ const StyledVideo = styled.video`
   display: none;
 `;
 
+const StyledAvatar = styled.img`
+  max-width: 32px;
+  max-height: 32px;
+`;
+
 const REMOTE_CONTROL_SIGNAL = "RemoteControlSignal";
-const MIN_TIME_DELTA = 1;
 
 enum RemoteControlSignalType {
+  Offer,
+  Accept,
+  Reject,
   Ping,
   Pong,
   Signal
@@ -111,6 +121,8 @@ function keyToRobotKey(key: string) {
       return "right";
     case " ":
       return "space";
+    case "meta":
+      return "command";
     default:
       return key;
   }
@@ -121,35 +133,31 @@ let lastClickedButton: number = undefined;
 function syncWithRemote(data: MouseSignalData | KeyboardSignalData) {
   if (data.type === "mouse") {
     const mouseData = data.data;
+    const screenSize = robot.getScreenSize();
 
     switch (mouseData.type) {
       case "move":
-        const x = scale(mouseData.clientX, 0, mouseData.canvasWidth, 0, screen.width);
-        const y = scale(mouseData.clientY, 0, mouseData.canvasHeight, 0, screen.height);
+        const x = scale(mouseData.clientX, 0, mouseData.canvasWidth, 0, screenSize.width);
+        const y = scale(mouseData.clientY, 0, mouseData.canvasHeight, 0, screenSize.height);
 
-        if (lastClickedButton) {
-          // dragging now
-          robot.dragMouse(x, y);
-        } else {
-          robot.moveMouse(x, y);
-        }
+        robot.moveMouse(x, y);
         break;
       case "click":
-        if (mouseData.clickedButton) {
+        if (mouseData.clickedButton !== undefined) {
           robot.mouseToggle(
             "down",
             mouseData.clickedButton === 0 ? "left" : mouseData.clickedButton === 1 ? "middle" : "right"
           );
           lastClickedButton = mouseData.clickedButton;
         } else {
-          if (lastClickedButton) {
+          if (lastClickedButton !== undefined) {
             robot.mouseToggle("up", lastClickedButton === 0 ? "left" : lastClickedButton === 1 ? "middle" : "right");
           }
           lastClickedButton = undefined;
         }
         break;
       case "wheel":
-        robot.scrollMouse(mouseData.deltaX, mouseData.deltaY);
+        robot.scrollMouse(mouseData.deltaX, -mouseData.deltaY);
         break;
     }
   } else {
@@ -164,21 +172,16 @@ function syncWithRemote(data: MouseSignalData | KeyboardSignalData) {
   }
 }
 
-// let lastSendTime = 0;
-// function throttle(callback: () => void) {
-//   const now = getCurrentTimeMs();
-//   if (now - lastSendTime > MIN_TIME_DELTA) {
-//     lastSendTime = now;
-//     callback();
-//   }
-// }
-
 const RemoteControl = (props: any) => {
   // const { remoteId } = props;
   const videoRef = useRef<HTMLVideoElement>();
   const peer = useRef<Instance>();
   const [hasPeer, setHasPeer] = useState(false);
   const [isStarted, setIsStarted] = useState(false);
+  const [isShowModal, setShowModal] = useState(false);
+  const [isRejected, setRejected] = useState<boolean>(undefined);
+  const [initiatorInfo, setInitiatorInfo] = useState<UserInfo>();
+
   const inputRef = useRef<HTMLInputElement>();
 
   function signalPeer(data: MouseSignalData | KeyboardSignalData) {
@@ -198,7 +201,7 @@ const RemoteControl = (props: any) => {
       const data: MouseMoveData = {
         type: "move",
         clientX: e.clientX,
-        clientY: e.clientY,
+        clientY: e.clientY - 25,
         canvasWidth: videoRef.current.getBoundingClientRect().width,
         canvasHeight: videoRef.current.getBoundingClientRect().height
       };
@@ -216,6 +219,8 @@ const RemoteControl = (props: any) => {
     videoRef.current.ondrag = (e) => e.preventDefault();
 
     videoRef.current.onwheel = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       const data: MouseWheelData = {
         type: "wheel",
         deltaX: e.deltaX,
@@ -225,6 +230,7 @@ const RemoteControl = (props: any) => {
     };
 
     videoRef.current.onkeydown = (e) => {
+      e.preventDefault();
       const data: KeyboardSignalData = {
         type: "keyboard",
         alt: e.altKey,
@@ -243,6 +249,17 @@ const RemoteControl = (props: any) => {
       console.log(data);
 
       switch (objData.type) {
+        case RemoteControlSignalType.Offer:
+          const userInfo = await getUserInfo(objData.payload);
+          setInitiatorInfo(userInfo);
+          setShowModal(true);
+          break;
+        case RemoteControlSignalType.Accept:
+          socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Ping, inputRef.current.value, getLoginData().id);
+          break;
+        case RemoteControlSignalType.Reject:
+          setRejected(true);
+          break;
         case RemoteControlSignalType.Ping:
           // Get offer from remote
           peer.current = await initPeerWithDesktopCapturer(objData.payload);
@@ -267,20 +284,22 @@ const RemoteControl = (props: any) => {
 
   useEffect(() => {
     if (isStarted) {
-      socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Ping, inputRef.current.value, getLoginData().id);
+      socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Offer, inputRef.current.value, getLoginData().id);
       console.log("Start connection");
     }
   }, [isStarted]);
 
   useEffect(() => {
     if (peer.current) {
+      document.onkeydown = (e) => e.preventDefault();
+
       peer.current.on("stream", (stream) => {
         videoRef.current.srcObject = stream;
         videoRef.current.style.display = "initial";
       });
 
       peer.current.on("data", (data) => {
-        console.log("Received", data);
+        console.log("Received", JSON.parse(data));
         syncWithRemote(JSON.parse(data) as MouseSignalData | KeyboardSignalData);
       });
     }
@@ -289,7 +308,41 @@ const RemoteControl = (props: any) => {
   return (
     <div>
       <input type="text" ref={inputRef} />
-      <button onClick={() => setIsStarted(true)}>Start</button> <StyledVideo autoPlay ref={videoRef} />
+      <Modal
+        hideCloseButton={true}
+        isOpen={isShowModal}
+        footer={
+          <div id="group">
+            <Button
+              label="Decline"
+              onClick={() => {
+                socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Reject, initiatorInfo.id, null);
+              }}
+            />
+            <Button
+              label="Accept"
+              variant="brand"
+              onClick={() => {
+                socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Accept, initiatorInfo.id, null);
+              }}
+            />
+          </div>
+        }
+        onRequestClose={() => {
+          socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Reject, initiatorInfo.id, null);
+        }}
+      >
+        <TimelineMarker
+          label={<b>{initiatorInfo.userName}</b>}
+          icon={<StyledAvatar src={`${hostName}/${initiatorInfo.avatar}`} />}
+          description="is trying to sneak into your computer"
+        />
+      </Modal>
+
+      <Modal isOpen={isRejected === true}>{<div style={{ color: "#FE4849" }}>Your request is declined</div>}</Modal>
+
+      <button onClick={() => setIsStarted(true)}>Start</button>
+      <StyledVideo autoPlay ref={videoRef} tabIndex={-1} />
     </div>
   );
 };
