@@ -16,9 +16,10 @@ const StyledVideo = styled.video`
   /* max-width: 1366px;
   max-height: 768px; */
   width: 100%;
-  height: 100vh;
+  height: 93vh;
   display: none;
   position: absolute;
+  background-color: black;
 `;
 
 export const REMOTE_CONTROL_SIGNAL = "RemoteControlSignal";

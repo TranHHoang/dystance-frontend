@@ -17,6 +17,7 @@ import jitsiMeetReducer from "../components/room/jitsi-meet-component/jitsiMeetS
 import userListReducer from "../components/room/user-list/userListSlice";
 import peopleProfileReducer from "../components/profile-page/people-profile/peopleProfileSlice";
 import userCardReducer from "../components/room/user-list/user-card/userCardSlice";
+import remoteControlReducer from "../components/room/remote-control/remoteControlSlice";
 
 const appReducer = combineReducers({
   roomCreation: createRoomReducer,
@@ -35,7 +36,8 @@ const appReducer = combineReducers({
   jitisiMeetState: jitsiMeetReducer,
   userListState: userListReducer,
   peopleProfileState: peopleProfileReducer,
-  userCardState: userCardReducer
+  userCardState: userCardReducer,
+  remoteControlState: remoteControlReducer
 });
 
 const rootReducer = (state: any, action: AnyAction) => {

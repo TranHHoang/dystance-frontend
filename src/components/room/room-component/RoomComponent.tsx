@@ -1,10 +1,10 @@
-import { faBars, faChalkboard, faCommentDots, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faChalkboard, faCommentDots, faUsers, faVideoSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PeopleProfilePage from "../../profile-page/people-profile/PeopleProfilePage";
 import { setPeopleProfileModalOpen } from "../../profile-page/people-profile/peopleProfileSlice";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Button, Drawer, Modal, Tab, Tabset, TimelineMarker } from "react-rainbow-components";
+import { Button, Drawer, Modal, Tab, Tabset } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
@@ -27,6 +27,8 @@ import { hostName } from "~utils/hostUtils";
 import RemoteControl, { RemoteControlSignalType, REMOTE_CONTROL_SIGNAL } from "../remote-control/RemoteControl";
 import { UserInfo } from "~utils/types";
 import { getLoginData } from "~utils/tokenStorage";
+import { setRemoteControlAccepted } from "../remote-control/remoteControlSlice";
+import $ from "jquery";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -86,19 +88,53 @@ const StyledModal = styled(Modal)`
 `;
 
 const StyledAvatar = styled.img`
-  max-width: 32px;
-  max-height: 32px;
+  max-width: 40px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
 `;
-
+const StyleSubTitle = styled.p`
+  font-size: 18px;
+  color: ${(props) => props.theme.rainbow.palette.text.main};
+`;
+const StyleTitle = styled.h2`
+  font-size: 18px;
+  color: ${(props) => props.theme.rainbow.palette.brand.main};
+`;
+const InfoContainer = styled.div`
+  width: fit-content;
+  padding-left: 10px;
+`;
+const StyledDiv = styled.div`
+  font-size: 16px;
+`;
+const RemoteControlButtonDiv = styled.div`
+  position: absolute;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 1vh;
+`;
+const InvisibleDiv = styled.div`
+  position: absolute;
+  top: 93vh;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  background-color: black;
+`;
 const RoomComponent = (props: any) => {
   const roomState = useSelector((state: RootState) => state.roomState);
   const peopleProfileState = useSelector((state: RootState) => state.peopleProfileState);
   const jitsiMeetState = useSelector((state: RootState) => state.jitisiMeetState);
   const userCardState = useSelector((state: RootState) => state.userCardState);
+  const remoteControlState = useSelector((state: RootState) => state.remoteControlState);
   const { roomId, roomName, creatorId } = props.match.params;
   const [whiteboardOpen, setWhiteboardOpen] = useState(false);
   const [remoteInitiatorInfo, setRemoteInitiatorInfo] = useState<UserInfo>();
-  const [remoteControlAccepted, setRemoteControlAccepted] = useState(undefined);
+  // const [remoteControlAccepted, setRemoteControlAccepted] = useState(undefined);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -123,6 +159,24 @@ const RoomComponent = (props: any) => {
   }, []);
 
   useEffect(() => {
+    if (remoteControlState.remoteControlAccepted) {
+      console.log("Remote Control Accepted");
+      // $(".hidden-class").on("mouseenter", () => {
+      //   $(".remote-control-div").stop().slideDown(100);
+      // }).on("mouseleave", () => {
+      //   $(".remote-control-div").stop().slideUp(100);
+      // })
+      // divRef.current.onmouseenter = (e) => {
+      //   function () {
+      //     $("remote-control-div").stop().slideUp(100);
+      //   }, function () {
+      //     $("remote-control-div").stop().slideDown(100);
+
+      //   }
+      // }
+    }
+  }, [remoteControlState.remoteControlAccepted]);
+  useEffect(() => {
     if (userCardState.isRemoteControlWaitingModalOpen) {
       socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Offer, userCardState.userId, getLoginData().id);
     }
@@ -137,10 +191,10 @@ const RoomComponent = (props: any) => {
         dispatch(setRemoteControlOfferModalOpen({ userId: userCardState.userId, isModalOpen: true }));
         break;
       case RemoteControlSignalType.Accept:
-        setRemoteControlAccepted(true);
+        dispatch(setRemoteControlAccepted(true));
         break;
       case RemoteControlSignalType.Reject:
-        setRemoteControlAccepted(false);
+        dispatch(setRemoteControlAccepted(false));
         break;
     }
   });
@@ -163,6 +217,7 @@ const RoomComponent = (props: any) => {
           </RearButton>
         </ButtonGroup>
       ) : null}
+
       <StyledDrawer
         header={
           <span>
@@ -190,7 +245,16 @@ const RoomComponent = (props: any) => {
       >
         {getTabContent()}
       </StyledDrawer>
-      <RemoteControl remoteId={userCardState.userId} isStarted={remoteControlAccepted === true} />
+      <RemoteControl remoteId={userCardState.userId} isStarted={remoteControlState.remoteControlAccepted} />
+      {remoteControlState.remoteControlAccepted ? (
+        <InvisibleDiv className="hidden-class">
+          <RemoteControlButtonDiv className="remote-control-div">
+            <Button variant="destructive" onClick={() => dispatch(setRemoteControlAccepted(undefined))}>
+              <FontAwesomeIcon icon={faVideoSlash} className="rainbow-m-right_medium" /> Stop Connection
+            </Button>
+          </RemoteControlButtonDiv>
+        </InvisibleDiv>
+      ) : null}
       {whiteboardOpen ? <Whiteboard roomId={roomId} /> : null}
       <JitsiMeetComponent roomId={roomId} roomName={roomName} creatorId={creatorId} />
       <StyledModal
@@ -284,23 +348,31 @@ const RoomComponent = (props: any) => {
           dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
         }}
       >
-        <TimelineMarker
-          label={<b>{remoteInitiatorInfo?.userName}</b>}
-          icon={<StyledAvatar src={`${hostName}/${remoteInitiatorInfo?.avatar}`} />}
-          description="is trying to sneak into your computer"
-        />
+        <div className="rainbow-flex rainbow-m-bottom_medium">
+          <StyledAvatar src={`${hostName}/${remoteInitiatorInfo?.avatar}`} />
+          <InfoContainer>
+            <StyleTitle>
+              {remoteInitiatorInfo?.realName} ({remoteInitiatorInfo?.userName})
+            </StyleTitle>
+            <StyleSubTitle>wants to gain access to your computer for a bit. Do you accept?</StyleSubTitle>
+          </InfoContainer>
+        </div>
       </StyledModal>
 
       <StyledModal
         isOpen={userCardState.isRemoteControlWaitingModalOpen}
         onRequestClose={() => {
           dispatch(setRemoteControlWaitingModalOpen({ userId: userCardState.userId, isModalOpen: false }));
-          setRemoteControlAccepted(undefined);
+          dispatch(setRemoteControlAccepted(undefined));
         }}
       >
-        {remoteControlAccepted === undefined && <div>Waiting for acceptance...</div>}
-        {remoteControlAccepted === true && <div style={{ color: "" }}>Accepted. Preparing...</div>}
-        {remoteControlAccepted === false && <div style={{ color: "#FE4849" }}>Your request is declined</div>}
+        {remoteControlState.remoteControlAccepted === undefined && <StyledDiv>Waiting for acceptance...</StyledDiv>}
+        {remoteControlState.remoteControlAccepted === true && (
+          <StyledDiv style={{ color: "" }}>Accepted. Preparing...</StyledDiv>
+        )}
+        {remoteControlState.remoteControlAccepted === false && (
+          <StyledDiv style={{ color: "#FE4849" }}>Your request is declined</StyledDiv>
+        )}
       </StyledModal>
     </div>
   );
