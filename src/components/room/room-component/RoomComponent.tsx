@@ -1,20 +1,21 @@
 import { faBars, faChalkboard, faCommentDots, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import PeopleProfilePage from "../../profile-page/people-profile/PeopleProfilePage";
+import { setPeopleProfileModalOpen } from "../../profile-page/people-profile/peopleProfileSlice";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Button, Drawer, Tab, Tabset } from "react-rainbow-components";
+import { Button, Drawer, Modal, Tab, Tabset } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { getLoginData } from "~utils/tokenStorage";
-import { UserInfo } from "~utils/types";
 import ChatArea from "../chat/ChatArea";
 import { fetchAllMessages } from "../chat/chatSlice";
 import JitsiMeetComponent from "../jitsi-meet-component/JitsiMeetComponent";
 import UserListComponent from "../user-list/UserListComponent";
-import { setUserInfoList } from "../user-list/userListSlice";
 import Whiteboard from "../whiteboard/Whiteboard";
-import { initSocket, removeListeners, setDrawerOpen, setTabsetValue, socket } from "./roomSlice";
+import { initSocket, removeListeners, setDrawerOpen, setTabsetValue } from "./roomSlice";
+import { kickUser, muteUser, setKickModalOpen, setMuteModalOpen } from "../user-list/user-card/userCardSlice";
+import { StyledText } from "../../homepage/single-room/SingleRoom";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -69,18 +70,22 @@ const NormalButton = styled(Button)`
 const RearButton = styled(NormalButton)`
   border-bottom-right-radius: 10px;
 `;
+const StyledModal = styled(Modal)`
+  width: fit-content;
+`;
+
 const RoomComponent = (props: any) => {
   const roomState = useSelector((state: RootState) => state.roomState);
+  const peopleProfileState = useSelector((state: RootState) => state.peopleProfileState);
   const jitsiMeetState = useSelector((state: RootState) => state.jitisiMeetState);
+  const userCardState = useSelector((state: RootState) => state.userCardState);
   const { roomId, roomName, creatorId } = props.match.params;
   const [whiteboardOpen, setWhiteboardOpen] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const profile = JSON.parse(localStorage.getItem("profile")) as UserInfo;
     dispatch(initSocket(roomId));
     dispatch(fetchAllMessages(roomId));
-    dispatch(setUserInfoList([profile]));
     return () => {
       removeListeners();
     };
@@ -91,7 +96,7 @@ const RoomComponent = (props: any) => {
       case "Chat":
         return <ChatArea roomId={roomId} />;
       case "People":
-        return <UserListComponent />;
+        return <UserListComponent creatorId={creatorId} />;
     }
   }
 
@@ -131,12 +136,84 @@ const RoomComponent = (props: any) => {
           </span>
         }
         isOpen={roomState.isDrawerOpen}
-        onRequestClose={() => dispatch(setDrawerOpen(false))}
+        onRequestClose={() => {
+          //TODO: Prevent drawer from closing when clicking on a context menu item
+          dispatch(setDrawerOpen(false));
+          // if (peopleProfileState.userId && peopleProfileState.peopleProfileModalOpen === true) {
+          // }
+          // else {
+          //   console.log(peopleProfileState.peopleProfileModalOpen);
+          //   dispatch(setDrawerOpen(true))
+          // }
+        }}
       >
         {getTabContent()}
       </StyledDrawer>
       {whiteboardOpen ? <Whiteboard roomId={roomId} /> : null}
       <JitsiMeetComponent roomId={roomId} roomName={roomName} creatorId={creatorId} />
+      <StyledModal
+        isOpen={peopleProfileState.peopleProfileModalOpen}
+        onRequestClose={() => {
+          dispatch(setPeopleProfileModalOpen({ userId: null, peopleProfileModalOpen: false }));
+          console.log("Modal in room component: " + peopleProfileState.peopleProfileModalOpen);
+        }}
+      >
+        <PeopleProfilePage userId={peopleProfileState.userId} />
+      </StyledModal>
+      <StyledModal
+        title="Confirm Mute"
+        isOpen={userCardState.isMuteModalOpen}
+        hideCloseButton={true}
+        onRequestClose={() => dispatch(setMuteModalOpen({ userId: null, isMuteModalOpen: false }))}
+        footer={
+          <div className="rainbow-flex rainbow-justify_end">
+            <Button
+              className="rainbow-m-right_large"
+              label="Cancel"
+              variant="neutral"
+              onClick={() => dispatch(setMuteModalOpen({ userId: null, isMuteModalOpen: false }))}
+              disabled={userCardState.isLoading || userCardState.isMuteSuccess}
+            />
+            <Button
+              label="Mute"
+              variant="brand"
+              type="submit"
+              onClick={() => dispatch(muteUser(roomId, userCardState.userId))}
+              disabled={userCardState.isLoading || userCardState.isMuteSuccess}
+            />
+          </div>
+        }
+      >
+        <StyledText>
+          Are you sure you want to mute this person? Only the person can unmute their microphone again.
+        </StyledText>
+      </StyledModal>
+      <StyledModal
+        title="Confirm Kick"
+        isOpen={userCardState.isKickModalOpen}
+        hideCloseButton={true}
+        onRequestClose={() => dispatch(setKickModalOpen({ userId: null, isKickModalOpen: false }))}
+        footer={
+          <div className="rainbow-flex rainbow-justify_end">
+            <Button
+              className="rainbow-m-right_large"
+              label="Cancel"
+              variant="neutral"
+              onClick={() => dispatch(setKickModalOpen({ userId: null, isKickModalOpen: false }))}
+              disabled={userCardState.isLoading || userCardState.isKickSuccess}
+            />
+            <Button
+              label="Kick"
+              variant="brand"
+              type="submit"
+              onClick={() => dispatch(kickUser(roomId, userCardState.userId))}
+              disabled={userCardState.isLoading || userCardState.isKickSuccess}
+            />
+          </div>
+        }
+      >
+        <StyledText>Are you sure you want to kick this member out of the room?</StyledText>
+      </StyledModal>
     </div>
   );
 };

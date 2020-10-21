@@ -46,3 +46,12 @@ export interface UserInfo {
   avatar: string;
   id: string;
 }
+export const RoomAction = "RoomAction";
+
+export enum RoomActionType {
+  Join,
+  Leave,
+  Chat,
+  Kick,
+  Mute
+}

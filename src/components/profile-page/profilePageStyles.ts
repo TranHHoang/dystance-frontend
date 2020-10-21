@@ -90,3 +90,6 @@ export const StyledButton = styled(Button)`
     box-shadow: 0 0 0 black;
   }
 `;
+export const PeopleProfileContainer = styled(Container)`
+  margin-left: 0px;
+`;
