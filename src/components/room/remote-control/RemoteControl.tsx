@@ -9,12 +9,16 @@ import { socket } from "../room-component/roomSlice";
 import wrtc from "wrtc";
 import robot from "robotjs";
 import styled from "styled-components";
-import { createHashHistory } from "history";
+import { setRemoteControlWaitingModalOpen } from "../user-list/user-card/userCardSlice";
+import { useDispatch } from "react-redux";
 
 const StyledVideo = styled.video`
-  max-width: 1366px;
-  max-height: 768px;
+  /* max-width: 1366px;
+  max-height: 768px; */
+  width: 100%;
+  height: 100vh;
   display: none;
+  position: absolute;
 `;
 
 export const REMOTE_CONTROL_SIGNAL = "RemoteControlSignal";
@@ -67,7 +71,7 @@ interface KeyboardSignalData {
 }
 
 function createPeer(remoteId: string, initiator: boolean, stream?: MediaStream) {
-  const peer = new SimplePeer({ initiator, stream, wrtc });
+  const peer = new SimplePeer({ initiator, stream, wrtc, trickle: false });
 
   peer.on("signal", (data) => {
     // Send my signal to remote machine
@@ -79,8 +83,7 @@ function createPeer(remoteId: string, initiator: boolean, stream?: MediaStream) 
   });
 
   peer.on("close", () => {
-    // TODO: Check this
-    createHashHistory().goBack();
+    console.log("Destroyed");
   });
 
   return peer;
@@ -174,6 +177,7 @@ const RemoteControl = (props: any) => {
   const videoRef = useRef<HTMLVideoElement>();
   const peer = useRef<Instance>();
   const [hasPeer, setHasPeer] = useState(false);
+  const dispatch = useDispatch();
 
   function signalPeer(data: MouseSignalData | KeyboardSignalData) {
     peer.current?.send(JSON.stringify(data));
@@ -267,8 +271,12 @@ const RemoteControl = (props: any) => {
       console.log(remoteId);
       socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Ping, remoteId, getLoginData().id);
       console.log("Start connection");
+    } else {
+      peer.current?.destroy();
+      videoRef.current.style.display = "none";
+      setHasPeer(false);
     }
-  }, []);
+  }, [isStarted]);
 
   useEffect(() => {
     if (peer.current) {
@@ -277,11 +285,17 @@ const RemoteControl = (props: any) => {
       peer.current.on("stream", (stream) => {
         videoRef.current.srcObject = stream;
         videoRef.current.style.display = "initial";
+        dispatch(setRemoteControlWaitingModalOpen({ userId: null, isModalOpen: false }));
       });
 
       peer.current.on("data", (data) => {
         console.log("Received", JSON.parse(data));
         syncWithRemote(JSON.parse(data) as MouseSignalData | KeyboardSignalData);
+      });
+
+      peer.current.on("error", () => {
+        peer.current.destroy();
+        setHasPeer(false);
       });
     }
   }, [hasPeer]);

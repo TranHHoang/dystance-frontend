@@ -26,7 +26,6 @@ import { StyledText } from "../../homepage/single-room/SingleRoom";
 import { hostName } from "~utils/hostUtils";
 import RemoteControl, { RemoteControlSignalType, REMOTE_CONTROL_SIGNAL } from "../remote-control/RemoteControl";
 import { UserInfo } from "~utils/types";
-import { createHashHistory } from "history";
 import { getLoginData } from "~utils/tokenStorage";
 
 const StyledHeader = styled.h1`
@@ -131,6 +130,7 @@ const RoomComponent = (props: any) => {
 
   socket.on(REMOTE_CONTROL_SIGNAL, async (data) => {
     const objData = JSON.parse(data);
+    console.log(objData);
     switch (objData.type) {
       case RemoteControlSignalType.Offer:
         setRemoteInitiatorInfo(await getUserInfo(objData.payload));
@@ -138,7 +138,6 @@ const RoomComponent = (props: any) => {
         break;
       case RemoteControlSignalType.Accept:
         setRemoteControlAccepted(true);
-        dispatch(setRemoteControlWaitingModalOpen({ userId: userCardState.userId, isModalOpen: false }));
         break;
       case RemoteControlSignalType.Reject:
         setRemoteControlAccepted(false);
@@ -191,9 +190,7 @@ const RoomComponent = (props: any) => {
       >
         {getTabContent()}
       </StyledDrawer>
-      {remoteControlAccepted === true && (
-        <RemoteControl remoteId={userCardState.userId} isStarted={remoteControlAccepted === true} />
-      )}
+      <RemoteControl remoteId={userCardState.userId} isStarted={remoteControlAccepted === true} />
       {whiteboardOpen ? <Whiteboard roomId={roomId} /> : null}
       <JitsiMeetComponent roomId={roomId} roomName={roomName} creatorId={creatorId} />
       <StyledModal
@@ -301,7 +298,8 @@ const RoomComponent = (props: any) => {
           setRemoteControlAccepted(undefined);
         }}
       >
-        {remoteControlAccepted === undefined && <div>Waiting for connection</div>}
+        {remoteControlAccepted === undefined && <div>Waiting for acceptance...</div>}
+        {remoteControlAccepted === true && <div style={{ color: "" }}>Accepted. Preparing...</div>}
         {remoteControlAccepted === false && <div style={{ color: "#FE4849" }}>Your request is declined</div>}
       </StyledModal>
     </div>

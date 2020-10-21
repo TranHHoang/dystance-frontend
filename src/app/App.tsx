@@ -9,8 +9,6 @@ import ChatArea from "../components/room/chat/ChatArea";
 import ResetPasswordComponent from "../components/account-management/reset-password/ResetPasswordComponent";
 import RoomComponent from "../components/room/room-component/RoomComponent";
 import ProfilePage from "../components/profile-page/ProfilePage";
-import RemoteControl from "../components/room/remote-control/RemoteControl";
-import { getLoginData } from "~utils/tokenStorage";
 import { useDispatch } from "react-redux";
 import { initSocket } from "../components/room/room-component/roomSlice";
 
@@ -27,7 +25,6 @@ export default hot(module)(function App() {
         <Route exact path="/resetPassword" component={ResetPasswordComponent} />
         <Route exact path="/profile" component={ProfilePage} />
         <Route exact path="/room/:roomId/:creatorId/:roomName" component={RoomComponent} />
-        <Route exact path="/remoteControl/:remoteId" component={RemoteControl} />
       </Switch>
     </HashRouter>
   );
