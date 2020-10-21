@@ -9,10 +9,7 @@ import { socket } from "../room-component/roomSlice";
 import wrtc from "wrtc";
 import robot from "robotjs";
 import styled from "styled-components";
-import { Button, Modal, TimelineMarker } from "react-rainbow-components";
-import { UserInfo } from "~utils/types";
-import { getUserInfo } from "../chat/chatSlice";
-import { hostName } from "~utils/hostUtils";
+import { createHashHistory } from "history";
 
 const StyledVideo = styled.video`
   max-width: 1366px;
@@ -20,14 +17,9 @@ const StyledVideo = styled.video`
   display: none;
 `;
 
-const StyledAvatar = styled.img`
-  max-width: 32px;
-  max-height: 32px;
-`;
+export const REMOTE_CONTROL_SIGNAL = "RemoteControlSignal";
 
-const REMOTE_CONTROL_SIGNAL = "RemoteControlSignal";
-
-enum RemoteControlSignalType {
+export enum RemoteControlSignalType {
   Offer,
   Accept,
   Reject,
@@ -84,6 +76,11 @@ function createPeer(remoteId: string, initiator: boolean, stream?: MediaStream) 
 
   peer.on("connect", () => {
     console.log("Connected");
+  });
+
+  peer.on("close", () => {
+    // TODO: Check this
+    createHashHistory().goBack();
   });
 
   return peer;
@@ -173,16 +170,10 @@ function syncWithRemote(data: MouseSignalData | KeyboardSignalData) {
 }
 
 const RemoteControl = (props: any) => {
-  // const { remoteId } = props;
+  const { remoteId, isStarted } = props;
   const videoRef = useRef<HTMLVideoElement>();
   const peer = useRef<Instance>();
   const [hasPeer, setHasPeer] = useState(false);
-  const [isStarted, setIsStarted] = useState(false);
-  const [isShowModal, setShowModal] = useState(false);
-  const [isRejected, setRejected] = useState<boolean>(undefined);
-  const [initiatorInfo, setInitiatorInfo] = useState<UserInfo>();
-
-  const inputRef = useRef<HTMLInputElement>();
 
   function signalPeer(data: MouseSignalData | KeyboardSignalData) {
     peer.current?.send(JSON.stringify(data));
@@ -249,17 +240,6 @@ const RemoteControl = (props: any) => {
       console.log(data);
 
       switch (objData.type) {
-        case RemoteControlSignalType.Offer:
-          const userInfo = await getUserInfo(objData.payload);
-          setInitiatorInfo(userInfo);
-          setShowModal(true);
-          break;
-        case RemoteControlSignalType.Accept:
-          socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Ping, inputRef.current.value, getLoginData().id);
-          break;
-        case RemoteControlSignalType.Reject:
-          setRejected(true);
-          break;
         case RemoteControlSignalType.Ping:
           // Get offer from remote
           peer.current = await initPeerWithDesktopCapturer(objData.payload);
@@ -284,10 +264,11 @@ const RemoteControl = (props: any) => {
 
   useEffect(() => {
     if (isStarted) {
-      socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Offer, inputRef.current.value, getLoginData().id);
+      console.log(remoteId);
+      socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Ping, remoteId, getLoginData().id);
       console.log("Start connection");
     }
-  }, [isStarted]);
+  }, []);
 
   useEffect(() => {
     if (peer.current) {
@@ -307,41 +288,6 @@ const RemoteControl = (props: any) => {
 
   return (
     <div>
-      <input type="text" ref={inputRef} />
-      <Modal
-        hideCloseButton={true}
-        isOpen={isShowModal}
-        footer={
-          <div id="group">
-            <Button
-              label="Decline"
-              onClick={() => {
-                socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Reject, initiatorInfo.id, null);
-              }}
-            />
-            <Button
-              label="Accept"
-              variant="brand"
-              onClick={() => {
-                socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Accept, initiatorInfo.id, null);
-              }}
-            />
-          </div>
-        }
-        onRequestClose={() => {
-          socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Reject, initiatorInfo.id, null);
-        }}
-      >
-        <TimelineMarker
-          label={<b>{initiatorInfo.userName}</b>}
-          icon={<StyledAvatar src={`${hostName}/${initiatorInfo.avatar}`} />}
-          description="is trying to sneak into your computer"
-        />
-      </Modal>
-
-      <Modal isOpen={isRejected === true}>{<div style={{ color: "#FE4849" }}>Your request is declined</div>}</Modal>
-
-      <button onClick={() => setIsStarted(true)}>Start</button>
       <StyledVideo autoPlay ref={videoRef} tabIndex={-1} />
     </div>
   );

@@ -19,7 +19,7 @@ export default hot(module)(function App() {
   return (
     <HashRouter>
       <Switch>
-        <Route exact path="/" component={() => <RemoteControl remoteId={getLoginData().id} />} />
+        <Route exact path="/" component={LoginForm} />
         <Route exact path="/homepage" component={HomePage} />
         <Route exact path="/register" component={RegisterForm} />
         <Route exact path="/googleUpdateInfo" component={GoogleUpdateInfoForm} />
@@ -27,6 +27,7 @@ export default hot(module)(function App() {
         <Route exact path="/resetPassword" component={ResetPasswordComponent} />
         <Route exact path="/profile" component={ProfilePage} />
         <Route exact path="/room/:roomId/:creatorId/:roomName" component={RoomComponent} />
+        <Route exact path="/remoteControl/:remoteId" component={RemoteControl} />
       </Switch>
     </HashRouter>
   );

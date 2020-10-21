@@ -4,18 +4,30 @@ import PeopleProfilePage from "../../profile-page/people-profile/PeopleProfilePa
 import { setPeopleProfileModalOpen } from "../../profile-page/people-profile/peopleProfileSlice";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Button, Drawer, Modal, Tab, Tabset } from "react-rainbow-components";
+import { Button, Drawer, Modal, Tab, Tabset, TimelineMarker } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import ChatArea from "../chat/ChatArea";
-import { fetchAllMessages } from "../chat/chatSlice";
+import { fetchAllMessages, getUserInfo } from "../chat/chatSlice";
 import JitsiMeetComponent from "../jitsi-meet-component/JitsiMeetComponent";
 import UserListComponent from "../user-list/UserListComponent";
 import Whiteboard from "../whiteboard/Whiteboard";
-import { initSocket, removeListeners, setDrawerOpen, setTabsetValue } from "./roomSlice";
-import { kickUser, muteUser, setKickModalOpen, setMuteModalOpen } from "../user-list/user-card/userCardSlice";
+import { initSocket, removeListeners, setDrawerOpen, setTabsetValue, socket } from "./roomSlice";
+import {
+  kickUser,
+  muteUser,
+  setKickModalOpen,
+  setMuteModalOpen,
+  setRemoteControlOfferModalOpen,
+  setRemoteControlWaitingModalOpen
+} from "../user-list/user-card/userCardSlice";
 import { StyledText } from "../../homepage/single-room/SingleRoom";
+import { hostName } from "~utils/hostUtils";
+import RemoteControl, { RemoteControlSignalType, REMOTE_CONTROL_SIGNAL } from "../remote-control/RemoteControl";
+import { UserInfo } from "~utils/types";
+import { createHashHistory } from "history";
+import { getLoginData } from "~utils/tokenStorage";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -74,6 +86,11 @@ const StyledModal = styled(Modal)`
   width: fit-content;
 `;
 
+const StyledAvatar = styled.img`
+  max-width: 32px;
+  max-height: 32px;
+`;
+
 const RoomComponent = (props: any) => {
   const roomState = useSelector((state: RootState) => state.roomState);
   const peopleProfileState = useSelector((state: RootState) => state.peopleProfileState);
@@ -81,6 +98,8 @@ const RoomComponent = (props: any) => {
   const userCardState = useSelector((state: RootState) => state.userCardState);
   const { roomId, roomName, creatorId } = props.match.params;
   const [whiteboardOpen, setWhiteboardOpen] = useState(false);
+  const [remoteInitiatorInfo, setRemoteInitiatorInfo] = useState<UserInfo>();
+  const [remoteControlAccepted, setRemoteControlAccepted] = useState(undefined);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -103,6 +122,29 @@ const RoomComponent = (props: any) => {
   useEffect(() => {
     console.log("Room ID: " + roomId);
   }, []);
+
+  useEffect(() => {
+    if (userCardState.isRemoteControlWaitingModalOpen) {
+      socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Offer, userCardState.userId, getLoginData().id);
+    }
+  }, [userCardState.isRemoteControlWaitingModalOpen]);
+
+  socket.on(REMOTE_CONTROL_SIGNAL, async (data) => {
+    const objData = JSON.parse(data);
+    switch (objData.type) {
+      case RemoteControlSignalType.Offer:
+        setRemoteInitiatorInfo(await getUserInfo(objData.payload));
+        dispatch(setRemoteControlOfferModalOpen({ userId: userCardState.userId, isModalOpen: true }));
+        break;
+      case RemoteControlSignalType.Accept:
+        setRemoteControlAccepted(true);
+        dispatch(setRemoteControlWaitingModalOpen({ userId: userCardState.userId, isModalOpen: false }));
+        break;
+      case RemoteControlSignalType.Reject:
+        setRemoteControlAccepted(false);
+        break;
+    }
+  });
 
   return (
     <div>
@@ -149,6 +191,9 @@ const RoomComponent = (props: any) => {
       >
         {getTabContent()}
       </StyledDrawer>
+      {remoteControlAccepted === true && (
+        <RemoteControl remoteId={userCardState.userId} isStarted={remoteControlAccepted === true} />
+      )}
       {whiteboardOpen ? <Whiteboard roomId={roomId} /> : null}
       <JitsiMeetComponent roomId={roomId} roomName={roomName} creatorId={creatorId} />
       <StyledModal
@@ -213,6 +258,51 @@ const RoomComponent = (props: any) => {
         }
       >
         <StyledText>Are you sure you want to kick this member out of the room?</StyledText>
+      </StyledModal>
+
+      <StyledModal
+        hideCloseButton={true}
+        isOpen={userCardState.isRemoteControlOfferModalOpen}
+        footer={
+          <div className="rainbow-flex rainbow-justify_end">
+            <Button
+              label="Decline"
+              onClick={() => {
+                socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Reject, remoteInitiatorInfo.id, null);
+                dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
+              }}
+            />
+            <Button
+              label="Accept"
+              variant="brand"
+              onClick={() => {
+                socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Accept, remoteInitiatorInfo.id, null);
+                dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
+              }}
+            />
+          </div>
+        }
+        onRequestClose={() => {
+          socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Reject, remoteInitiatorInfo.id, null);
+          dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
+        }}
+      >
+        <TimelineMarker
+          label={<b>{remoteInitiatorInfo?.userName}</b>}
+          icon={<StyledAvatar src={`${hostName}/${remoteInitiatorInfo?.avatar}`} />}
+          description="is trying to sneak into your computer"
+        />
+      </StyledModal>
+
+      <StyledModal
+        isOpen={userCardState.isRemoteControlWaitingModalOpen}
+        onRequestClose={() => {
+          dispatch(setRemoteControlWaitingModalOpen({ userId: userCardState.userId, isModalOpen: false }));
+          setRemoteControlAccepted(undefined);
+        }}
+      >
+        {remoteControlAccepted === undefined && <div>Waiting for connection</div>}
+        {remoteControlAccepted === false && <div style={{ color: "#FE4849" }}>Your request is declined</div>}
       </StyledModal>
     </div>
   );
