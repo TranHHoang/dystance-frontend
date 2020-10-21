@@ -1,18 +1,20 @@
-import { faArrowLeft, faPaperclip } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faPaperclip, faPaperPlane, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import ChatArea from "../chat/ChatArea";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { ButtonIcon, TimelineMarker } from "react-rainbow-components";
+import { ButtonIcon, TimelineMarker, Input, Textarea, Button, Modal } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
 import { getUserInfo, PrivateMessage, UserInfo } from "~utils/types";
-import { ChatType, fetchAllMessages } from "../../components/chat/chatSlice";
+import { broadcastMessage, ChatType, fetchAllMessages } from "../../components/chat/chatSlice";
 import { fetchAllPreview, initSocket } from "./chatPreviewSlice";
 import { getLoginData } from "~utils/tokenStorage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { socket } from "~app/App";
+import * as Yup from "yup";
+import { Field, Form, Formik, FormikProps } from "formik";
 
 const StyledAvatar = styled.img`
   width: 32px;
@@ -22,7 +24,7 @@ const StyledAvatar = styled.img`
 `;
 
 const StyledPreview = styled.div`
-  padding: 20px;
+  padding: 10px 20px;
   :hover {
     background-color: rgba(255, 255, 255, 0.05);
     cursor: pointer;
@@ -42,13 +44,38 @@ const StyledHeader = styled.header`
   }
 `;
 
+const StyledButtonIcon = styled(ButtonIcon)`
+  position: absolute;
+  top: 88vh;
+  left: 93%;
+  padding: 30px;
+  border: 0.5px solid white;
+`;
+
+interface NewChatFormValues {
+  id: string;
+  message: string;
+}
+
+const initialValues: NewChatFormValues = {
+  id: "",
+  message: ""
+};
+
+const schema = Yup.object({
+  id: Yup.string().required("This field is required"),
+  message: Yup.string().required("This field is required")
+});
+
 const ChatPreview = () => {
   const [usersInfo, setUsersInfo] = useState<{ [key: string]: UserInfo }>({});
   const previews = useSelector((root: RootState) => root.chatPreviewState);
   const [selectedUserId, setSelectedUserId] = useState<string>();
+  const [showNewMessageModal, setShowNewMessageModal] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch(initSocket());
     dispatch(fetchAllPreview(getLoginData().id));
   }, []);
 
@@ -72,7 +99,6 @@ const ChatPreview = () => {
 
   useEffect(() => {
     if (selectedUserId) {
-      dispatch(initSocket());
       dispatch(fetchAllMessages(undefined, { id1: selectedUserId, id2: getLoginData().id }));
     }
 
@@ -80,6 +106,13 @@ const ChatPreview = () => {
       socket.off(PrivateMessage);
     };
   }, [selectedUserId]);
+
+  function onNewChatSubmit(values: NewChatFormValues) {
+    dispatch(broadcastMessage(undefined, values.id, values.message));
+    // TODO Need to check for id's validity before proceed, or else this will crash
+    setShowNewMessageModal(false);
+    setSelectedUserId(values.id);
+  }
 
   return !selectedUserId ? (
     <div>
@@ -96,7 +129,7 @@ const ChatPreview = () => {
               icon={
                 <StyledAvatar src={usersInfo[id]?.avatar ? `${hostName}/${usersInfo[id]?.avatar}` : ""} alt="avatar" />
               }
-              datetime={moment(preview.date).calendar()}
+              datetime={moment.utc(preview.date).local().calendar()}
               description={
                 <>
                   <span>{preview.senderId === getLoginData().id && "You: "}</span>
@@ -114,6 +147,45 @@ const ChatPreview = () => {
           </StyledPreview>
         );
       })}
+
+      <Modal isOpen={showNewMessageModal} title="New message" onRequestClose={() => setShowNewMessageModal(false)}>
+        <Formik initialValues={initialValues} validationSchema={schema} onSubmit={onNewChatSubmit}>
+          {({ errors, touched }: FormikProps<NewChatFormValues>) => (
+            <Form>
+              <Field
+                name="id"
+                as={Input}
+                type="text"
+                placeholder="To someone you ❤️"
+                error={errors.id && touched.id && errors.id}
+              />
+              <br />
+              <Field
+                name="message"
+                as={Textarea}
+                type="text"
+                placeholder="What do you want to talk about?"
+                errors={errors.message && touched.message && errors.message}
+              />
+              <br />
+              <div className="rainbow-flex rainbow-justify_end">
+                <Button variant="brand" type="submit">
+                  Send&nbsp;
+                  <FontAwesomeIcon icon={faPaperPlane} />
+                </Button>
+              </div>
+            </Form>
+          )}
+        </Formik>
+      </Modal>
+
+      <StyledButtonIcon
+        assistiveText="New message"
+        title="New message"
+        icon={<FontAwesomeIcon icon={faPencilAlt} />}
+        size="large"
+        onClick={(e) => setShowNewMessageModal(true)}
+      />
     </div>
   ) : (
     <div>

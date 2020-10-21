@@ -79,7 +79,6 @@ export function fetchAllMessages(roomId: string, privateChat: { id1: string; id2
 
       dispatch(initChat({ type: roomId ? "room" : "private", content: messages }));
     } catch (ex) {
-      // TODO: Check this
       console.log(ex);
     }
   };
@@ -99,7 +98,6 @@ export function fetchLatestMessage(roomId: string, privateChat: { id1: string; i
       ).data as RoomMessage | PrivateMessage;
       dispatch(addChat({ type: roomId ? "room" : "private", content: message }));
     } catch (ex) {
-      // TODO: Check this
       console.log("Exception: " + ex);
     }
   };
@@ -139,7 +137,6 @@ export function broadcastMessage(
         }
       });
     } catch (ex) {
-      // TODO: Check this later
       console.log(ex);
     }
 

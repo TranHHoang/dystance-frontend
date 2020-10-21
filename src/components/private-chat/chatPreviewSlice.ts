@@ -40,7 +40,6 @@ export function fetchAllPreview(userId: string): AppThunk {
 
       dispatch(initPreview(response.data));
     } catch (ex) {
-      // TODO: Check this
       console.log(ex);
     }
   };

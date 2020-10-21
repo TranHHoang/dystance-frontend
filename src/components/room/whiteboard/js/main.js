@@ -399,7 +399,6 @@ function initWhiteboard() {
   );
 
   function uploadImgAndAddToWhiteboard(base64data) {
-    // TODO: API
     const form = new FormData();
     form.append("imagedata", base64data);
     form.append("whiteboardId", whiteboardId);
@@ -410,7 +409,6 @@ function initWhiteboard() {
       }
     })
       .then((response) => {
-        // TODO: API
         whiteboard.addImgToCanvasByUrl(`${hostName}/${response.data.imageUrl}`); //Add image to canvas
       })
       .catch((err) => {

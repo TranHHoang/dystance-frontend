@@ -110,7 +110,7 @@ const ChatHistory = ({ isPrivateChat }: { isPrivateChat: boolean }) => {
                 {usersInfo[id]?.realName} ({usersInfo[id]?.userName})
               </b>
             }
-            datetime={moment(chat.date).calendar()}
+            datetime={moment.utc(chat.date).local().calendar()}
             icon={
               <StyledAvatar src={usersInfo[id]?.avatar ? `${hostName}/${usersInfo[id]?.avatar}` : ""} alt="avatar" />
             }

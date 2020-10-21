@@ -95,7 +95,7 @@ const ChatBox = ({
         <FontAwesomeIcon icon={faPaperclip} onClick={() => fileInput.current.click()} />
         <input type="file" accept="image/*" hidden ref={imageInput} onChange={handleFile} />
         <input type="file" hidden ref={fileInput} onChange={handleFile} />
-        <input ref={messageInput} placeholder="Message classroom" onKeyDown={handleKeyDown} />
+        <input ref={messageInput} placeholder="Enter your message" onKeyDown={handleKeyDown} />
         <FontAwesomeIcon icon={faSmileBeam} onClick={() => setToggleEmoji(!toggleEmoji)} />
       </StyledChatBox>
     </>

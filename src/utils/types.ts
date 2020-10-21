@@ -61,7 +61,6 @@ export async function getUserInfo(userId: string): Promise<UserInfo> {
     nodeCache.set(userId, response.data);
     return response.data as UserInfo;
   } catch (ex) {
-    // TODO: Handle this
     console.log(ex);
   }
 }
