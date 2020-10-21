@@ -14,7 +14,7 @@ import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from "react-virtuali
 
 const StyledTimeline = styled.div`
   overflow: hidden;
-  height: calc(93vh - 10px);
+  height: 100%;
   padding: 5px;
 `;
 
@@ -68,10 +68,11 @@ const StyledAvatar = styled.img`
 const ChatHistory = ({ isPrivateChat }: { isPrivateChat: boolean }) => {
   const [usersInfo, setUsersInfo] = useState<{ [key: string]: UserInfo }>({});
   const chatState = useSelector((root: RootState) => root.chatState);
+  const listRef = useRef<List>();
   const cache = useRef<CellMeasurerCache>(
     new CellMeasurerCache({
       fixedWidth: true,
-      defaultHeight: 100
+      defaultHeight: 200
     })
   );
 
@@ -107,10 +108,14 @@ const ChatHistory = ({ isPrivateChat }: { isPrivateChat: boolean }) => {
     console.log(usersInfo);
   }, [usersInfo]);
 
+  useEffect(() => {
+    listRef.current.scrollToRow(messages.length);
+  }, [chatState]);
+
   function renderRow({ index, key, parent, style }: any) {
     return (
       <CellMeasurer key={key} cache={cache.current} parent={parent} columnIndex={0} rowIndex={index}>
-        {() => {
+        {({ measure }) => {
           const chat = messages[index];
           const id = isPrivateMessage(chat) ? chat.senderId : chat.userId;
           return (
@@ -133,6 +138,7 @@ const ChatHistory = ({ isPrivateChat }: { isPrivateChat: boolean }) => {
               {chat.type === ChatType.Image && (
                 <StyledCard>
                   <img
+                    onLoad={measure}
                     src={`${hostName}/${chat.content}`}
                     className="rainbow-m_auto rainbow-align-content_center"
                     alt="landscape with rainbows, birds and colorful balloons"
@@ -161,13 +167,15 @@ const ChatHistory = ({ isPrivateChat }: { isPrivateChat: boolean }) => {
       <AutoSizer>
         {({ width, height }) => (
           <List
+            ref={listRef}
             width={width}
             height={height}
             deferredMeasurementCache={cache.current}
             rowHeight={cache.current.rowHeight}
             rowRenderer={renderRow}
             rowCount={messages.length}
-            overscanColumnCount={2}
+            overscanColumnCount={3}
+            style={{ outline: "none" }}
           />
         )}
       </AutoSizer>
