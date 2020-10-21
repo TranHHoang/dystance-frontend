@@ -32,26 +32,27 @@ const StyledPreview = styled.div`
 `;
 
 const StyledHeader = styled.header`
-  position: absolute;
   z-index: 1;
-  top: 2vh;
-  left: 1%;
-
-  button {
-    background: rgba(70, 183, 146, 0.7);
-    width: 32px;
-    height: 32px;
+  display: flex;
+  span {
+    align-self: center;
+    font-size: 16px;
+    color: white;
   }
 `;
 
 const StyledButtonIcon = styled(ButtonIcon)`
   position: absolute;
   top: 88vh;
-  left: 93%;
+  left: 50%;
   padding: 30px;
   border: 0.5px solid white;
 `;
 
+const Container = styled.div`
+  width: 100%;
+  height: calc(98vh - 40px);
+`;
 interface NewChatFormValues {
   id: string;
   message: string;
@@ -114,91 +115,102 @@ const ChatPreview = () => {
     setSelectedUserId(values.id);
   }
 
-  return !selectedUserId ? (
-    <div>
-      {previews.map((preview) => {
-        const id = preview.senderId !== getLoginData().id ? preview.senderId : preview.receiverId;
-        return (
-          <StyledPreview key={preview.id} onClick={() => setSelectedUserId(id)}>
-            <TimelineMarker
-              label={
-                <b>
-                  {usersInfo[id]?.realName} ({usersInfo[id]?.userName})
-                </b>
-              }
-              icon={
-                <StyledAvatar src={usersInfo[id]?.avatar ? `${hostName}/${usersInfo[id]?.avatar}` : ""} alt="avatar" />
-              }
-              datetime={moment.utc(preview.date).local().calendar()}
-              description={
-                <>
-                  <span>{preview.senderId === getLoginData().id && "You: "}</span>
-                  {(preview.type === ChatType.File || preview.type === ChatType.Image) && (
-                    <span>
-                      <FontAwesomeIcon icon={faPaperclip} />
-                      &nbsp;
-                      {preview.fileName}
-                    </span>
-                  )}
-                  {preview.type === ChatType.Text && <span> {preview.content} </span>}
-                </>
-              }
+  return (
+    <Container>
+      {!selectedUserId ? (
+        <>
+          {previews.map((preview) => {
+            const id = preview.senderId !== getLoginData().id ? preview.senderId : preview.receiverId;
+            return (
+              <StyledPreview key={preview.id} onClick={() => setSelectedUserId(id)}>
+                <TimelineMarker
+                  label={
+                    <b>
+                      {usersInfo[id]?.realName} ({usersInfo[id]?.userName})
+                    </b>
+                  }
+                  icon={
+                    <StyledAvatar
+                      src={usersInfo[id]?.avatar ? `${hostName}/${usersInfo[id]?.avatar}` : ""}
+                      alt="avatar"
+                    />
+                  }
+                  datetime={moment.utc(preview.date).local().calendar()}
+                  description={
+                    <>
+                      <span>{preview.senderId === getLoginData().id && "You: "}</span>
+                      {(preview.type === ChatType.File || preview.type === ChatType.Image) && (
+                        <span>
+                          <FontAwesomeIcon icon={faPaperclip} />
+                          &nbsp;
+                          {preview.fileName}
+                        </span>
+                      )}
+                      {preview.type === ChatType.Text && <span> {preview.content} </span>}
+                    </>
+                  }
+                />
+              </StyledPreview>
+            );
+          })}
+
+          <Modal isOpen={showNewMessageModal} title="New message" onRequestClose={() => setShowNewMessageModal(false)}>
+            <Formik initialValues={initialValues} validationSchema={schema} onSubmit={onNewChatSubmit}>
+              {({ errors, touched }: FormikProps<NewChatFormValues>) => (
+                <Form>
+                  <Field
+                    name="id"
+                    as={Input}
+                    type="text"
+                    placeholder="To someone you ❤️"
+                    error={errors.id && touched.id && errors.id}
+                  />
+                  <br />
+                  <Field
+                    name="message"
+                    as={Textarea}
+                    type="text"
+                    placeholder="What do you want to talk about?"
+                    errors={errors.message && touched.message && errors.message}
+                  />
+                  <br />
+                  <div className="rainbow-flex rainbow-justify_end">
+                    <Button variant="brand" type="submit">
+                      Send&nbsp;
+                      <FontAwesomeIcon icon={faPaperPlane} />
+                    </Button>
+                  </div>
+                </Form>
+              )}
+            </Formik>
+          </Modal>
+
+          <StyledButtonIcon
+            assistiveText="New message"
+            title="New message"
+            icon={<FontAwesomeIcon icon={faPencilAlt} />}
+            size="large"
+            onClick={(e) => setShowNewMessageModal(true)}
+          />
+        </>
+      ) : (
+        <>
+          <StyledHeader>
+            <ButtonIcon
+              icon={<FontAwesomeIcon icon={faArrowLeft} />}
+              onClick={() => setSelectedUserId(undefined)}
+              size="medium"
             />
-          </StyledPreview>
-        );
-      })}
-
-      <Modal isOpen={showNewMessageModal} title="New message" onRequestClose={() => setShowNewMessageModal(false)}>
-        <Formik initialValues={initialValues} validationSchema={schema} onSubmit={onNewChatSubmit}>
-          {({ errors, touched }: FormikProps<NewChatFormValues>) => (
-            <Form>
-              <Field
-                name="id"
-                as={Input}
-                type="text"
-                placeholder="To someone you ❤️"
-                error={errors.id && touched.id && errors.id}
-              />
-              <br />
-              <Field
-                name="message"
-                as={Textarea}
-                type="text"
-                placeholder="What do you want to talk about?"
-                errors={errors.message && touched.message && errors.message}
-              />
-              <br />
-              <div className="rainbow-flex rainbow-justify_end">
-                <Button variant="brand" type="submit">
-                  Send&nbsp;
-                  <FontAwesomeIcon icon={faPaperPlane} />
-                </Button>
-              </div>
-            </Form>
-          )}
-        </Formik>
-      </Modal>
-
-      <StyledButtonIcon
-        assistiveText="New message"
-        title="New message"
-        icon={<FontAwesomeIcon icon={faPencilAlt} />}
-        size="large"
-        onClick={(e) => setShowNewMessageModal(true)}
-      />
-    </div>
-  ) : (
-    <div>
-      <StyledHeader>
-        <ButtonIcon
-          icon={<FontAwesomeIcon icon={faArrowLeft} size="10x" />}
-          onClick={() => setSelectedUserId(undefined)}
-        />
-      </StyledHeader>
-      <div style={{ margin: "5px" }}>
-        <ChatArea receiverId={selectedUserId} />
-      </div>
-    </div>
+            <span>
+              {usersInfo[selectedUserId].realName} ({usersInfo[selectedUserId].userName})
+            </span>
+          </StyledHeader>
+          <div style={{ margin: "5px" }}>
+            <ChatArea receiverId={selectedUserId} />
+          </div>
+        </>
+      )}
+    </Container>
   );
 };
 

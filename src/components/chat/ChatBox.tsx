@@ -15,8 +15,8 @@ const StyledChatBox = styled.div`
   align-content: space-around;
   background-color: rgb(90, 90, 90);
   padding: 2 5 2 5;
-  border-radius: 10px;
-  margin: 0 5 0 5;
+  border-radius: 5px;
+  /* margin: 5px; */
   width: 100%;
   input {
     flex: 1;
@@ -24,13 +24,13 @@ const StyledChatBox = styled.div`
     background-color: rgb(90, 90, 90);
     color: white;
     padding: 5px;
-    font-size: 18px;
+    font-size: 16px;
     margin-left: 10px;
     :focus {
       outline: none;
     }
     ::-webkit-input-placeholder {
-      font-size: 18px;
+      font-size: 16px;
     }
   }
 

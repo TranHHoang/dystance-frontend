@@ -1,10 +1,10 @@
-import { faBars, faChalkboard, faCommentDots, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faChalkboard, faCommentDots, faComments, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PeopleProfilePage from "../../profile-page/people-profile/PeopleProfilePage";
 import { setPeopleProfileModalOpen } from "../../profile-page/people-profile/peopleProfileSlice";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Button, Drawer, Modal, Tab, Tabset } from "react-rainbow-components";
+import { Button, ButtonIcon, Drawer, Modal, Tab, Tabset } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
@@ -16,6 +16,7 @@ import Whiteboard from "../whiteboard/Whiteboard";
 import { initSocket, removeListeners, setDrawerOpen, setTabsetValue } from "./roomSlice";
 import { kickUser, muteUser, setKickModalOpen, setMuteModalOpen } from "../user-list/user-card/userCardSlice";
 import { StyledText } from "../../homepage/single-room/SingleRoom";
+import ChatPreview from "../../private-chat/ChatPreview";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -37,6 +38,13 @@ const StyledHeader = styled.h1`
 const StyledDrawer = styled(Drawer)`
   width: 40%;
 `;
+
+const PrivateChatDrawer = styled(StyledDrawer)`
+  > div {
+    padding: 0;
+  }
+`;
+
 const StyledTab = styled(Tab)`
   flex-grow: 1;
   overflow: hidden;
@@ -46,7 +54,11 @@ const StyledTab = styled(Tab)`
 `;
 const ButtonGroup = styled.div`
   position: absolute;
-  z-index: 1000;
+  z-index: 1;
+  top: calc(50vh - 100px);
+  display: flex;
+  flex-direction: column;
+  opacity: 40%;
 `;
 const NormalButton = styled(Button)`
   border-radius: 0;
@@ -57,11 +69,9 @@ const NormalButton = styled(Button)`
     width: 24px;
     height: 24px;
   }
-  width: 5vw;
   height: 50px;
   color: white;
   transition: 0.2s;
-  opacity: 50%;
   min-width: 64px;
   :hover {
     opacity: 100%;
@@ -73,6 +83,9 @@ const RearButton = styled(NormalButton)`
 const StyledModal = styled(Modal)`
   width: fit-content;
 `;
+const TopButton = styled(NormalButton)`
+  border-top-right-radius: 10px;
+`;
 
 const RoomComponent = (props: any) => {
   const roomState = useSelector((state: RootState) => state.roomState);
@@ -81,6 +94,7 @@ const RoomComponent = (props: any) => {
   const userCardState = useSelector((state: RootState) => state.userCardState);
   const { roomId, roomName, creatorId } = props.match.params;
   const [whiteboardOpen, setWhiteboardOpen] = useState(false);
+  const [privateChatOpen, setPrivateChatOpen] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -108,20 +122,36 @@ const RoomComponent = (props: any) => {
     <div>
       {jitsiMeetState.showUpperToolbar ? (
         <ButtonGroup id="button-group">
-          <NormalButton
-            variant="neutral"
+          <TopButton
             onClick={() => {
               dispatch(setTabsetValue("Chat"));
               dispatch(setDrawerOpen(true));
             }}
           >
             <FontAwesomeIcon icon={faBars} size="2x" />
+          </TopButton>
+          <NormalButton
+            variant="neutral"
+            onClick={() => {
+              setPrivateChatOpen(true);
+            }}
+          >
+            <FontAwesomeIcon icon={faComments} size="2x" />
           </NormalButton>
           <RearButton variant="neutral" onClick={() => setWhiteboardOpen(!whiteboardOpen)}>
             <FontAwesomeIcon icon={faChalkboard} size="2x" />
           </RearButton>
         </ButtonGroup>
       ) : null}
+
+      <PrivateChatDrawer
+        isOpen={privateChatOpen}
+        onRequestClose={() => setPrivateChatOpen(false)}
+        hideCloseButton={true}
+      >
+        <ChatPreview />
+      </PrivateChatDrawer>
+
       <StyledDrawer
         header={
           <span>

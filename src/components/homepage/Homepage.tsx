@@ -1,3 +1,4 @@
+import ChatPreview from "../private-chat/ChatPreview";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
@@ -27,7 +28,6 @@ const Title = styled.h1`
 const HomePageContainer = styled.div`
   display: flex;
   flex-direction: column;
-  margin-left: 130px;
 `;
 const Container = styled.div`
   display: flex;
@@ -63,12 +63,14 @@ export const HomePage = () => {
         return <HomePageDisplay />;
       case "Profile":
         return <ProfilePage />;
+      case "Chat":
+        return <ChatPreview />;
     }
   }
   return (
     <Container>
       <SideNavigationBar />
-      {getCurrentSidebarValue()}
+      <div style={{ marginLeft: "110px", width: "100%" }}>{getCurrentSidebarValue()}</div>
     </Container>
   );
 };

@@ -5,13 +5,11 @@ import Jitsi from "react-jitsi";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
-import { RoomAction, RoomActionType, User, UserInfo } from "~utils/types";
-import { socket } from "../room-component/roomSlice";
+import { RoomAction, RoomActionType, User } from "~utils/types";
+import { socket } from "~app/App";
 import { setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
-import { setUserInfoList } from "../user-list/userListSlice";
 import { setShowUpperToolbar } from "./jitsiMeetSlice";
 
 const loader = styled.div`

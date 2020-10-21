@@ -20,7 +20,7 @@ const StyledChatArea = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  height: 98vh;
+  height: 100%;
 `;
 
 const StyledModal = styled(Modal)`
