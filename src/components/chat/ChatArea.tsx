@@ -12,11 +12,12 @@ import { broadcastMessage, ChatType } from "./chatSlice";
 const ChatHistoryArea = styled.div`
   overflow: auto;
   transform: translate3d(0, 0, 0); /* Faster scrolling */
-  min-width: 450px;
+  /* min-width: 450px; */
 `;
 const StyledChatArea = styled.div`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
   overflow-x: hidden;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
