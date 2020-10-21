@@ -1,7 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { socket } from "~app/App";
 import { AppThunk } from "~app/store";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
+import { NotificationAction, NotificationActionType } from "~utils/types";
 
 interface ChatPreview {
   userId: string;
@@ -55,5 +57,20 @@ export function fetchLatestPreview(userId: string): AppThunk {
       // TODO: Check this
       console.log(ex);
     }
+  };
+}
+
+export function initSocket(userId: string): AppThunk {
+  return (dispatch) => {
+    socket.invoke(NotificationAction, userId, NotificationActionType.Join);
+
+    socket.on(NotificationAction, (data) => {
+      const response = JSON.parse(data);
+
+      if (response.type === NotificationActionType.Chat) {
+        // new private message arrived
+        dispatch(fetchLatestPreview(userId));
+      }
+    });
   };
 }

@@ -8,8 +8,8 @@ import { Button, Drawer, Modal, Tab, Tabset } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import ChatArea from "../chat/ChatArea";
-import { fetchAllMessages } from "../chat/chatSlice";
+import ChatArea from "../../chat/ChatArea";
+import { fetchAllMessages } from "../../chat/chatSlice";
 import JitsiMeetComponent from "../jitsi-meet-component/JitsiMeetComponent";
 import UserListComponent from "../user-list/UserListComponent";
 import Whiteboard from "../whiteboard/Whiteboard";
@@ -85,7 +85,7 @@ const RoomComponent = (props: any) => {
 
   useEffect(() => {
     dispatch(initSocket(roomId));
-    dispatch(fetchAllMessages(roomId));
+    dispatch(fetchAllMessages(roomId, undefined));
     return () => {
       removeListeners();
     };

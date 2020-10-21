@@ -53,7 +53,15 @@ const StyledModal = styled(Modal)`
   box-shadow: none;
 `;
 
-const ChatBox = ({ setFile, roomId }: { setFile: (file: File) => void; roomId: string }) => {
+const ChatBox = ({
+  setFile,
+  roomId,
+  receiverId
+}: {
+  setFile: (file: File) => void;
+  roomId: string;
+  receiverId: string;
+}) => {
   const [toggleEmoji, setToggleEmoji] = useState(false);
   const dispatch = useDispatch();
   const imageInput = useRef<HTMLInputElement>();
@@ -67,7 +75,7 @@ const ChatBox = ({ setFile, roomId }: { setFile: (file: File) => void; roomId: s
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
       if (messageInput.current.value.trim()) {
-        dispatch(broadcastMessage(roomId, messageInput.current.value));
+        dispatch(broadcastMessage(roomId, receiverId, messageInput.current.value));
         messageInput.current.value = "";
       }
     }

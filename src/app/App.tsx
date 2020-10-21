@@ -1,16 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { hot } from "react-hot-loader";
 import LoginForm from "../components/account-management/login/LoginForm";
 import GoogleUpdateInfoForm from "../components/account-management/google-update-info/GoogleUpdateInfo";
 import { HomePage } from "../components/homepage/Homepage";
 import { Route, Switch, HashRouter } from "react-router-dom";
 import RegisterForm from "../components/account-management/register/RegisterForm";
-import ChatArea from "../components/room/chat/ChatArea";
+import ChatArea from "../components/chat/ChatArea";
 import ResetPasswordComponent from "../components/account-management/reset-password/ResetPasswordComponent";
 import RoomComponent from "../components/room/room-component/RoomComponent";
 import ProfilePage from "../components/profile-page/ProfilePage";
+import { HubConnectionBuilder } from "@microsoft/signalr";
+import { hostName } from "~utils/hostUtils";
+
+export const socket = new HubConnectionBuilder().withUrl(`${hostName}/socket`).build();
 
 export default hot(module)(function App() {
+  useEffect(() => {
+    if (socket && socket.state === "Disconnected") {
+      console.log("Start socket...");
+      socket.start(); // TODO: Add join chat socket
+    }
+  }, []);
+
   return (
     <HashRouter>
       <Switch>

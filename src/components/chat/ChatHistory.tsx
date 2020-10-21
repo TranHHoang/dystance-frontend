@@ -8,8 +8,8 @@ import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
-import { ChatType, getUserInfo } from "./chatSlice";
-import { UserInfo } from "~utils/types";
+import { ChatType } from "./chatSlice";
+import { getUserInfo, UserInfo } from "~utils/types";
 
 const StyledTimeline = styled(ActivityTimeline)`
   padding: 0 20 0 20;
@@ -62,7 +62,7 @@ const StyledAvatar = styled.img`
   object-fit: cover;
 `;
 
-const ChatHistory = () => {
+const ChatHistory = ({ isPrivateChat }: { isPrivateChat: boolean }) => {
   const [usersInfo, setUsersInfo] = useState<{ [key: string]: UserInfo }>({});
   const chatState = useSelector((root: RootState) => root.chatState);
 
@@ -78,10 +78,12 @@ const ChatHistory = () => {
     });
   }
 
+  const messages = isPrivateChat ? chatState.privateChat : chatState.roomChat;
+
   useEffect(() => {
     const fetchUsersInfo = async () => {
       const userDict: { [key: string]: UserInfo } = {};
-      const usersInfoPromise = chatState.map(async (chat) => {
+      const usersInfoPromise = messages.map(async (chat) => {
         const info = await getUserInfo(chat.userId);
         userDict[chat.userId] = info; // { 1: { avatar: "", }}
       });
@@ -89,7 +91,7 @@ const ChatHistory = () => {
       setUsersInfo(userDict);
     };
     fetchUsersInfo();
-  }, [chatState]);
+  }, [isPrivateChat, chatState, messages]);
 
   useEffect(() => {
     console.log(usersInfo);
@@ -97,7 +99,7 @@ const ChatHistory = () => {
 
   return (
     <StyledTimeline>
-      {chatState.map((chat) => (
+      {messages.map((chat) => (
         <StyledMessage
           key={chat.id}
           label={

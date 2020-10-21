@@ -4,7 +4,7 @@ import googleUpdateInfoReducer from "../components/account-management/google-upd
 import registerReducer from "../components/account-management/register/registerSlice";
 import createRoomReducer from "../components/room-management/create-room/createRoomSlice";
 import showRoomReducer from "../components/homepage/showRoomsSlice";
-import chatReducer from "../components/room/chat/chatSlice";
+import chatReducer from "../components/chat/chatSlice";
 import singleRoomReducer from "../components/homepage/single-room/singleRoomSlice";
 import resetPasswordReducer from "../components/account-management/reset-password/resetPasswordSlice";
 import inviteReducer from "../components/room/invite/inviteSlice";
@@ -17,6 +17,7 @@ import jitsiMeetReducer from "../components/room/jitsi-meet-component/jitsiMeetS
 import userListReducer from "../components/room/user-list/userListSlice";
 import peopleProfileReducer from "../components/profile-page/people-profile/peopleProfileSlice";
 import userCardReducer from "../components/room/user-list/user-card/userCardSlice";
+import chatPreviewReducer from "../components/private-chat/chatPreviewSlice";
 
 const appReducer = combineReducers({
   roomCreation: createRoomReducer,
@@ -35,7 +36,8 @@ const appReducer = combineReducers({
   jitisiMeetState: jitsiMeetReducer,
   userListState: userListReducer,
   peopleProfileState: peopleProfileReducer,
-  userCardState: userCardReducer
+  userCardState: userCardReducer,
+  chatPreviewState: chatPreviewReducer
 });
 
 const rootReducer = (state: any, action: AnyAction) => {
