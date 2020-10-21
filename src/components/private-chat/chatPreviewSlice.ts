@@ -1,14 +1,20 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { fetchLatestMessage } from "../../components/chat/chatSlice";
 import { socket } from "~app/App";
 import { AppThunk } from "~app/store";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
-import { NotificationAction, NotificationActionType } from "~utils/types";
+import { getLoginData } from "~utils/tokenStorage";
+import { PrivateMessage } from "~utils/types";
 
 interface ChatPreview {
-  userId: string;
-  lastChat: string;
-  lastDate: Date;
+  id: string;
+  content: string;
+  date: string;
+  senderId: string;
+  receiverId: string;
+  type: number;
+  fileName: string;
 }
 
 const chatPreviewSlice = createSlice({
@@ -18,25 +24,18 @@ const chatPreviewSlice = createSlice({
     initPreview(state, action: PayloadAction<ChatPreview[]>) {
       state = action.payload;
       return state;
-    },
-    addPreview(state, action: PayloadAction<ChatPreview>) {
-      // Remove existing preview
-      if (state.find((preview) => preview.userId === action.payload.userId)) {
-        const index = state.findIndex((preview) => preview.userId === action.payload.userId);
-        state.splice(index, 1);
-      }
-      state.push(action.payload);
     }
   }
 });
 
 export default chatPreviewSlice.reducer;
 
-export const { initPreview, addPreview } = chatPreviewSlice.actions;
+export const { initPreview } = chatPreviewSlice.actions;
 
 export function fetchAllPreview(userId: string): AppThunk {
   return async (dispatch) => {
     try {
+      console.log("Fetch all previews");
       const response = await Axios.get(`${hostName}/api/users/chat/preview?id=${userId}`);
 
       dispatch(initPreview(response.data));
@@ -47,30 +46,13 @@ export function fetchAllPreview(userId: string): AppThunk {
   };
 }
 
-export function fetchLatestPreview(userId: string): AppThunk {
-  return async (dispatch) => {
-    try {
-      const response = await Axios.get(`${hostName}/api/users/chat/lastPreview?id=${userId}`);
-
-      dispatch(addPreview(response.data));
-    } catch (ex) {
-      // TODO: Check this
-      console.log(ex);
-    }
-  };
-}
-
-export function initSocket(userId: string): AppThunk {
+export function initSocket(): AppThunk {
   return (dispatch) => {
-    socket.invoke(NotificationAction, userId, NotificationActionType.Join);
-
-    socket.on(NotificationAction, (data) => {
-      const response = JSON.parse(data);
-
-      if (response.type === NotificationActionType.Chat) {
-        // new private message arrived
-        dispatch(fetchLatestPreview(userId));
-      }
+    socket.on(PrivateMessage, (data) => {
+      console.log("received", data);
+      const senderId = JSON.parse(data).senderId;
+      dispatch(fetchLatestMessage(undefined, { id1: getLoginData().id, id2: senderId }));
+      dispatch(fetchAllPreview(getLoginData().id));
     });
   };
 }

@@ -11,6 +11,9 @@ import RoomComponent from "../components/room/room-component/RoomComponent";
 import ProfilePage from "../components/profile-page/ProfilePage";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import { hostName } from "~utils/hostUtils";
+import ChatPreview from "../components/private-chat/ChatPreview";
+import { PrivateMessage } from "~utils/types";
+import { getLoginData } from "~utils/tokenStorage";
 
 export const socket = new HubConnectionBuilder().withUrl(`${hostName}/socket`).build();
 
@@ -18,14 +21,16 @@ export default hot(module)(function App() {
   useEffect(() => {
     if (socket && socket.state === "Disconnected") {
       console.log("Start socket...");
-      socket.start(); // TODO: Add join chat socket
+      socket.start().then(() => {
+        socket.invoke("ConnectionState", 0, getLoginData().id);
+      });
     }
   }, []);
 
   return (
     <HashRouter>
       <Switch>
-        <Route exact path="/" component={LoginForm} />
+        <Route exact path="/" component={ChatPreview} />
         <Route exact path="/homepage" component={HomePage} />
         <Route exact path="/register" component={RegisterForm} />
         <Route exact path="/googleUpdateInfo" component={GoogleUpdateInfoForm} />

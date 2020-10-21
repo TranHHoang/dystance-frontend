@@ -67,6 +67,7 @@ export async function getUserInfo(userId: string): Promise<UserInfo> {
 }
 
 export const RoomAction = "RoomAction";
+export const PrivateMessage = "PrivateMessage";
 
 export enum RoomActionType {
   Join,

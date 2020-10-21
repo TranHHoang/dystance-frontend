@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
-import { ChatType } from "./chatSlice";
+import { ChatType, isPrivateMessage, PrivateMessage, RoomMessage } from "./chatSlice";
 import { getUserInfo, UserInfo } from "~utils/types";
 
 const StyledTimeline = styled(ActivityTimeline)`
@@ -78,14 +78,15 @@ const ChatHistory = ({ isPrivateChat }: { isPrivateChat: boolean }) => {
     });
   }
 
-  const messages = isPrivateChat ? chatState.privateChat : chatState.roomChat;
+  const messages: Array<RoomMessage | PrivateMessage> = isPrivateChat ? chatState.privateChat : chatState.roomChat;
 
   useEffect(() => {
     const fetchUsersInfo = async () => {
       const userDict: { [key: string]: UserInfo } = {};
       const usersInfoPromise = messages.map(async (chat) => {
-        const info = await getUserInfo(chat.userId);
-        userDict[chat.userId] = info; // { 1: { avatar: "", }}
+        const id = isPrivateMessage(chat) ? chat.senderId : chat.userId;
+        const info = await getUserInfo(id);
+        userDict[id] = info; // { 1: { avatar: "", }}
       });
       await Promise.all(usersInfoPromise);
       setUsersInfo(userDict);
@@ -99,41 +100,46 @@ const ChatHistory = ({ isPrivateChat }: { isPrivateChat: boolean }) => {
 
   return (
     <StyledTimeline>
-      {messages.map((chat) => (
-        <StyledMessage
-          key={chat.id}
-          label={
-            <b>
-              {usersInfo[chat.userId]?.realName} ({usersInfo[chat.userId]?.userName})
-            </b>
-          }
-          datetime={moment(chat.date).calendar()}
-          icon={<StyledAvatar src={`${hostName}/${usersInfo[chat.userId]?.avatar}`} alt="avatar" />}
-        >
-          {chat.type === ChatType.Text && (
-            <StyledText dangerouslySetInnerHTML={{ __html: linkify(chat.content) }} onClick={openExternal} />
-          )}
-          {chat.type === ChatType.Image && (
-            <StyledCard>
-              <img
-                src={`${hostName}/${chat.content}`}
-                className="rainbow-m_auto rainbow-align-content_center"
-                alt="landscape with rainbows, birds and colorful balloons"
-              />
-            </StyledCard>
-          )}
-          {chat.type === ChatType.File && (
-            <FileCard>
-              <FileContainer>
-                <FontAwesomeIcon icon={faFileAlt} size="3x" />
-                <StyledFileLink href={`${hostName}/${chat.content}`} download={chat.fileName}>
-                  {chat.fileName}
-                </StyledFileLink>
-              </FileContainer>
-            </FileCard>
-          )}
-        </StyledMessage>
-      ))}
+      {messages.map((chat) => {
+        const id = isPrivateMessage(chat) ? chat.senderId : chat.userId;
+        return (
+          <StyledMessage
+            key={chat.id}
+            label={
+              <b>
+                {usersInfo[id]?.realName} ({usersInfo[id]?.userName})
+              </b>
+            }
+            datetime={moment(chat.date).calendar()}
+            icon={
+              <StyledAvatar src={usersInfo[id]?.avatar ? `${hostName}/${usersInfo[id]?.avatar}` : ""} alt="avatar" />
+            }
+          >
+            {chat.type === ChatType.Text && (
+              <StyledText dangerouslySetInnerHTML={{ __html: linkify(chat.content) }} onClick={openExternal} />
+            )}
+            {chat.type === ChatType.Image && (
+              <StyledCard>
+                <img
+                  src={`${hostName}/${chat.content}`}
+                  className="rainbow-m_auto rainbow-align-content_center"
+                  alt="landscape with rainbows, birds and colorful balloons"
+                />
+              </StyledCard>
+            )}
+            {chat.type === ChatType.File && (
+              <FileCard>
+                <FileContainer>
+                  <FontAwesomeIcon icon={faFileAlt} size="3x" />
+                  <StyledFileLink href={`${hostName}/${chat.content}`} download={chat.fileName}>
+                    {chat.fileName}
+                  </StyledFileLink>
+                </FileContainer>
+              </FileCard>
+            )}
+          </StyledMessage>
+        );
+      })}
     </StyledTimeline>
   );
 };
