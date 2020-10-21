@@ -9,12 +9,17 @@ import ChatArea from "../components/room/chat/ChatArea";
 import ResetPasswordComponent from "../components/account-management/reset-password/ResetPasswordComponent";
 import RoomComponent from "../components/room/room-component/RoomComponent";
 import ProfilePage from "../components/profile-page/ProfilePage";
+import RemoteControl from "../components/room/remote-control/RemoteControl";
+import { getLoginData } from "~utils/tokenStorage";
+import { useDispatch } from "react-redux";
+import { initSocket } from "../components/room/room-component/roomSlice";
 
 export default hot(module)(function App() {
+  useDispatch()(initSocket("1"));
   return (
     <HashRouter>
       <Switch>
-        <Route exact path="/" component={LoginForm} />
+        <Route exact path="/" component={() => <RemoteControl remoteId={getLoginData().id} />} />
         <Route exact path="/homepage" component={HomePage} />
         <Route exact path="/register" component={RegisterForm} />
         <Route exact path="/googleUpdateInfo" component={GoogleUpdateInfoForm} />
