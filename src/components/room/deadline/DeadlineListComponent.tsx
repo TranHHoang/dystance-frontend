@@ -19,7 +19,7 @@ import moment from "moment";
 import { createDeadline, resetDeadlines, setDeadlineModalOpen, showDeadlines } from "./deadlineListSlice";
 import DeadlineCard from "./deadline-card/DeadlineCard";
 import { getLoginData } from "~utils/tokenStorage";
-import { setUpdateModalOpen } from "./deadline-card/deadlineCardSlice";
+import { updateDeadline } from "./deadline-card/deadlineCardSlice";
 
 const ButtonDiv = styled.div`
   display: flex;
@@ -28,6 +28,9 @@ const ButtonDiv = styled.div`
 const StyledAccordion = styled(Accordion)`
   background-color: ${(props) => props.theme.rainbow.palette.background.main};
 `;
+export enum DeadlineError {
+  OutOfDateRange = 1
+}
 export const StyledInput = styled(Input)`
   margin-bottom: 15px;
 
@@ -46,6 +49,7 @@ const StyledNotification = styled(Notification)`
 `;
 
 export interface CreateDeadlineFormValues {
+  deadlineId: string;
   title: string;
   deadlineTime: string;
   deadlineDate: Date;
@@ -67,16 +71,18 @@ export const DeadlineFormComponent = (props: any) => {
   const { innerRef, roomId, deadline } = props;
   const deadlineListState = useSelector((state: RootState) => state.deadlineListState);
   const deadlineCardState = useSelector((state: RootState) => state.deadlineCardState);
-
   const initialValues: CreateDeadlineFormValues = {
+    deadlineId: deadline?.deadlineId || "",
     title: deadline?.title || "",
     deadlineTime: moment(deadline?.endDate || new Date()).format("HH:mm"),
     deadlineDate: moment(deadline?.endDate || new Date()).toDate(),
     description: deadline?.description || "",
+
     roomId: roomId
   };
   function onSubmit(values: CreateDeadlineFormValues) {
     if (deadlineCardState.isUpdateModalOpen) {
+      dispatch(updateDeadline(values));
     } else if (deadlineListState.isDeadlineModalOpen) {
       dispatch(createDeadline(values));
     }
@@ -108,8 +114,9 @@ export const DeadlineFormComponent = (props: any) => {
               value={values.deadlineDate || ""}
               onChange={(e) => setFieldValue("deadlineDate", e)}
               error={
-                deadlineListState.error && deadlineListState.error.type === 1
-                  ? deadlineListState.error.message
+                (deadlineListState.error && deadlineListState.error.type === DeadlineError.OutOfDateRange) ||
+                (deadlineCardState.error && deadlineCardState.error.type === DeadlineError.OutOfDateRange)
+                  ? deadlineListState.error?.message || deadlineCardState.error?.message
                   : errors.deadlineDate && touched.deadlineDate
                   ? errors.deadlineDate
                   : null
@@ -133,12 +140,12 @@ export const DeadlineFormComponent = (props: any) => {
 };
 const DeadlineListComponent = (props: any) => {
   const deadlineListState = useSelector((state: RootState) => state.deadlineListState);
-  const deadlineCardState = useSelector((state: RootState) => state.deadlineCardState);
   const dispatch = useDispatch();
   const formRef = useRef(null);
   const { roomId, creatorId } = props;
 
   useEffect(() => {
+    dispatch(resetDeadlines());
     dispatch(showDeadlines(roomId));
     return () => {
       dispatch(resetDeadlines());
@@ -170,8 +177,8 @@ const DeadlineListComponent = (props: any) => {
         </ButtonDiv>
       ) : null}
       <Modal
-        isOpen={deadlineListState.isDeadlineModalOpen || deadlineCardState.isUpdateModalOpen}
-        title={deadlineCardState.isUpdateModalOpen ? "Update Deadline" : "Create Deadline"}
+        isOpen={deadlineListState.isDeadlineModalOpen}
+        title="Create Deadline"
         hideCloseButton={true}
         footer={
           <div className="rainbow-flex rainbow-justify_end">

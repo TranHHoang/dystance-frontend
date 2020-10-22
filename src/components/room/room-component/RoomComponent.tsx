@@ -4,7 +4,7 @@ import PeopleProfilePage from "../../profile-page/people-profile/PeopleProfilePa
 import { setPeopleProfileModalOpen } from "../../profile-page/people-profile/peopleProfileSlice";
 import React from "react";
 import { useEffect, useRef, useState } from "react";
-import { Button, Drawer, Modal, Tab, Tabset } from "react-rainbow-components";
+import { Button, Drawer, Modal, Tab, Tabset, Notification } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
@@ -17,7 +17,7 @@ import { initSocket, removeListeners, setDrawerOpen, setTabsetValue } from "./ro
 import { kickUser, muteUser, setKickModalOpen, setMuteModalOpen } from "../user-list/user-card/userCardSlice";
 import { StyledText } from "../../homepage/single-room/SingleRoom";
 import DeadlineListComponent, { DeadlineFormComponent } from "../deadline/DeadlineListComponent";
-import { setDeleteModalOpen, setUpdateModalOpen } from "../deadline/deadline-card/deadlineCardSlice";
+import { deleteDeadline, setDeleteModalOpen, setUpdateModalOpen } from "../deadline/deadline-card/deadlineCardSlice";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -75,7 +75,9 @@ const RearButton = styled(NormalButton)`
 const StyledModal = styled(Modal)`
   width: fit-content;
 `;
-
+const StyledNotification = styled(Notification)`
+  width: 100%;
+`;
 const RoomComponent = (props: any) => {
   const roomState = useSelector((state: RootState) => state.roomState);
   const peopleProfileState = useSelector((state: RootState) => state.peopleProfileState);
@@ -94,6 +96,7 @@ const RoomComponent = (props: any) => {
       removeListeners();
     };
   }, []);
+
   //Switches components when the drawer tab value is changed
   function getTabContent() {
     switch (roomState.tabsetValue) {
@@ -146,12 +149,6 @@ const RoomComponent = (props: any) => {
         onRequestClose={() => {
           //TODO: Prevent drawer from closing when clicking on a context menu item
           dispatch(setDrawerOpen(false));
-          // if (peopleProfileState.userId && peopleProfileState.peopleProfileModalOpen === true) {
-          // }
-          // else {
-          //   console.log(peopleProfileState.peopleProfileModalOpen);
-          //   dispatch(setDrawerOpen(true))
-          // }
         }}
       >
         {getTabContent()}
@@ -238,7 +235,7 @@ const RoomComponent = (props: any) => {
               disabled={deadlineCardState.isLoading || deadlineCardState.isDeadlineUpdateSuccess}
             />
             <Button
-              label="Save"
+              label="Update"
               variant="brand"
               type="submit"
               onClick={() => formRef.current.handleSubmit()}
@@ -247,19 +244,22 @@ const RoomComponent = (props: any) => {
           </div>
         }
       >
-        {/* {deadlineListState.error && deadlineListState.error.type !== 1 ?
-          <StyledNotification title="An Error Occured" hideCloseButton={true}
-            description={deadlineListState.error.message}
-            icon="error" />
-          : null}
-        {deadlineListState.isDeadlineCreationSuccess && (
+        {deadlineCardState.error && deadlineCardState.error.type !== 1 ? (
+          <StyledNotification
+            title="An Error Occured"
+            hideCloseButton={true}
+            description={deadlineCardState.error.message}
+            icon="error"
+          />
+        ) : null}
+        {deadlineCardState.isDeadlineUpdateSuccess && (
           <StyledNotification
             title="Deadline Created Successfully"
             hideCloseButton={true}
             description="Your deadline will appear shortly"
             icon="success"
           />
-        )} */}
+        )}
         <DeadlineFormComponent
           innerRef={formRef}
           roomId={roomId}
@@ -282,15 +282,26 @@ const RoomComponent = (props: any) => {
               disabled={deadlineCardState.isLoading || deadlineCardState.isDeadlineDeleteSuccess}
             />
             <Button
-              label="Kick"
+              label="Delete"
               variant="brand"
               type="submit"
-              // onClick={() =>}
+              onClick={() => dispatch(deleteDeadline(deadlineCardState.deadline?.deadlineId, roomId))}
               disabled={deadlineCardState.isLoading || deadlineCardState.isDeadlineDeleteSuccess}
             />
           </div>
         }
       >
+        {deadlineCardState.error ? (
+          <StyledNotification
+            title="An Error Occured"
+            hideCloseButton={true}
+            description={deadlineCardState.error.message}
+            icon="error"
+          />
+        ) : null}
+        {deadlineCardState.isDeadlineDeleteSuccess && (
+          <StyledNotification title="Deadline deleted Successfully" hideCloseButton={true} icon="success" />
+        )}
         <StyledText>Are you sure you want to delete this deadline?</StyledText>
       </StyledModal>
     </div>

@@ -62,7 +62,7 @@ const DeadlineCard = (props: any) => {
           <StyleTitle>Deadline Time</StyleTitle>
           <StyleSubTitle>{moment(endDate).format("HH:mm DD-MM-YYYY")}</StyleSubTitle>
           <StyleTitle>Remaining Time</StyleTitle>
-          <StyleSubTitle>{moment("2020-10-21T18:00:00").from(moment())}</StyleSubTitle>
+          <StyleSubTitle>{moment(endDate).from(moment())}</StyleSubTitle>
         </InfoContainer>
       </div>
       <div className="rainbow-flex rainbow-m-bottom_medium">
@@ -84,7 +84,13 @@ const DeadlineCard = (props: any) => {
                 dispatch(setUpdateModalOpen(true));
               }}
             />
-            <MenuItem label="Delete Deadline" onClick={() => dispatch(setDeleteModalOpen(true))} />
+            <MenuItem
+              label="Delete Deadline"
+              onClick={() => {
+                dispatch(setDeadlineInfo(deadline));
+                dispatch(setDeleteModalOpen(true));
+              }}
+            />
           </ButtonMenu>
         ) : null}
       </div>
