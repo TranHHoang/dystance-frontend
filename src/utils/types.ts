@@ -55,3 +55,11 @@ export enum RoomActionType {
   Kick,
   Mute
 }
+export interface DeadlineInfo {
+  deadlineId: string;
+  creatorId: string;
+  roomId: string;
+  title: string;
+  endDate: string;
+  description: string;
+}

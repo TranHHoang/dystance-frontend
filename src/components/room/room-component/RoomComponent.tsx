@@ -1,10 +1,10 @@
-import { faBars, faChalkboard, faCommentDots, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faChalkboard, faCommentDots, faUsers, faCalendarTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PeopleProfilePage from "../../profile-page/people-profile/PeopleProfilePage";
 import { setPeopleProfileModalOpen } from "../../profile-page/people-profile/peopleProfileSlice";
-import * as React from "react";
-import { useEffect, useState } from "react";
-import { Button, Drawer, Modal, Tab, Tabset } from "react-rainbow-components";
+import React from "react";
+import { useEffect, useRef, useState } from "react";
+import { Button, Drawer, Modal, Tab, Tabset, Notification } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
@@ -16,6 +16,8 @@ import Whiteboard from "../whiteboard/Whiteboard";
 import { initSocket, removeListeners, setDrawerOpen, setTabsetValue } from "./roomSlice";
 import { kickUser, muteUser, setKickModalOpen, setMuteModalOpen } from "../user-list/user-card/userCardSlice";
 import { StyledText } from "../../homepage/single-room/SingleRoom";
+import DeadlineListComponent, { DeadlineFormComponent } from "../deadline/DeadlineListComponent";
+import { deleteDeadline, setDeleteModalOpen, setUpdateModalOpen } from "../deadline/deadline-card/deadlineCardSlice";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -73,14 +75,18 @@ const RearButton = styled(NormalButton)`
 const StyledModal = styled(Modal)`
   width: fit-content;
 `;
-
+const StyledNotification = styled(Notification)`
+  width: 100%;
+`;
 const RoomComponent = (props: any) => {
   const roomState = useSelector((state: RootState) => state.roomState);
   const peopleProfileState = useSelector((state: RootState) => state.peopleProfileState);
   const jitsiMeetState = useSelector((state: RootState) => state.jitisiMeetState);
   const userCardState = useSelector((state: RootState) => state.userCardState);
+  const deadlineCardState = useSelector((state: RootState) => state.deadlineCardState);
   const { roomId, roomName, creatorId } = props.match.params;
   const [whiteboardOpen, setWhiteboardOpen] = useState(false);
+  const formRef = useRef(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -91,12 +97,15 @@ const RoomComponent = (props: any) => {
     };
   }, []);
 
+  //Switches components when the drawer tab value is changed
   function getTabContent() {
     switch (roomState.tabsetValue) {
       case "Chat":
         return <ChatArea roomId={roomId} />;
       case "People":
         return <UserListComponent creatorId={creatorId} />;
+      case "Deadline":
+        return <DeadlineListComponent roomId={roomId} creatorId={creatorId} />;
     }
   }
 
@@ -132,6 +141,7 @@ const RoomComponent = (props: any) => {
             >
               <StyledTab label={<FontAwesomeIcon icon={faCommentDots} size="2x" />} name="Chat" />
               <StyledTab label={<FontAwesomeIcon icon={faUsers} size="2x" />} name="People" />
+              <StyledTab label={<FontAwesomeIcon icon={faCalendarTimes} size="2x" />} name="Deadline" />
             </Tabset>
           </span>
         }
@@ -139,12 +149,6 @@ const RoomComponent = (props: any) => {
         onRequestClose={() => {
           //TODO: Prevent drawer from closing when clicking on a context menu item
           dispatch(setDrawerOpen(false));
-          // if (peopleProfileState.userId && peopleProfileState.peopleProfileModalOpen === true) {
-          // }
-          // else {
-          //   console.log(peopleProfileState.peopleProfileModalOpen);
-          //   dispatch(setDrawerOpen(true))
-          // }
         }}
       >
         {getTabContent()}
@@ -213,6 +217,92 @@ const RoomComponent = (props: any) => {
         }
       >
         <StyledText>Are you sure you want to kick this member out of the room?</StyledText>
+      </StyledModal>
+      <Modal
+        isOpen={deadlineCardState.isUpdateModalOpen}
+        title="Update Deadline"
+        hideCloseButton={true}
+        footer={
+          <div className="rainbow-flex rainbow-justify_end">
+            <Button
+              className="rainbow-m-right_large"
+              label="Cancel"
+              variant="neutral"
+              onClick={() => {
+                formRef?.current.resetForm();
+                dispatch(setUpdateModalOpen(false));
+              }}
+              disabled={deadlineCardState.isLoading || deadlineCardState.isDeadlineUpdateSuccess}
+            />
+            <Button
+              label="Update"
+              variant="brand"
+              type="submit"
+              onClick={() => formRef.current.handleSubmit()}
+              disabled={deadlineCardState.isLoading || deadlineCardState.isDeadlineUpdateSuccess}
+            />
+          </div>
+        }
+      >
+        {deadlineCardState.error && deadlineCardState.error.type !== 1 ? (
+          <StyledNotification
+            title="An Error Occured"
+            hideCloseButton={true}
+            description={deadlineCardState.error.message}
+            icon="error"
+          />
+        ) : null}
+        {deadlineCardState.isDeadlineUpdateSuccess && (
+          <StyledNotification
+            title="Deadline Created Successfully"
+            hideCloseButton={true}
+            description="Your deadline will appear shortly"
+            icon="success"
+          />
+        )}
+        <DeadlineFormComponent
+          innerRef={formRef}
+          roomId={roomId}
+          creatorId={creatorId}
+          deadline={deadlineCardState.deadline}
+        />
+      </Modal>
+      <StyledModal
+        title="Confirm Delete"
+        isOpen={deadlineCardState.isDeleteModalOpen}
+        hideCloseButton={true}
+        onRequestClose={() => dispatch(setDeleteModalOpen(false))}
+        footer={
+          <div className="rainbow-flex rainbow-justify_end">
+            <Button
+              className="rainbow-m-right_large"
+              label="Cancel"
+              variant="neutral"
+              onClick={() => dispatch(setDeleteModalOpen(false))}
+              disabled={deadlineCardState.isLoading || deadlineCardState.isDeadlineDeleteSuccess}
+            />
+            <Button
+              label="Delete"
+              variant="brand"
+              type="submit"
+              onClick={() => dispatch(deleteDeadline(deadlineCardState.deadline?.deadlineId, roomId))}
+              disabled={deadlineCardState.isLoading || deadlineCardState.isDeadlineDeleteSuccess}
+            />
+          </div>
+        }
+      >
+        {deadlineCardState.error ? (
+          <StyledNotification
+            title="An Error Occured"
+            hideCloseButton={true}
+            description={deadlineCardState.error.message}
+            icon="error"
+          />
+        ) : null}
+        {deadlineCardState.isDeadlineDeleteSuccess && (
+          <StyledNotification title="Deadline deleted Successfully" hideCloseButton={true} icon="success" />
+        )}
+        <StyledText>Are you sure you want to delete this deadline?</StyledText>
       </StyledModal>
     </div>
   );
