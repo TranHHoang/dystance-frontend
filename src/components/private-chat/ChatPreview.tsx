@@ -24,7 +24,7 @@ const StyledAvatar = styled.img`
 `;
 
 const StyledPreview = styled.div`
-  padding: 10px 20px;
+  padding: 20px 20px;
   :hover {
     background-color: rgba(255, 255, 255, 0.05);
     cursor: pointer;
@@ -32,8 +32,10 @@ const StyledPreview = styled.div`
 `;
 
 const StyledHeader = styled.header`
+  background-color: ${(props) => props.theme.rainbow.palette.background.main};
   z-index: 1;
   display: flex;
+  padding: 5 0 5 0;
   span {
     align-self: center;
     font-size: 16px;
@@ -43,15 +45,20 @@ const StyledHeader = styled.header`
 
 const StyledButtonIcon = styled(ButtonIcon)`
   position: absolute;
-  top: 88vh;
-  left: 50%;
+  bottom: 40px;
+  right: 40px;
   padding: 30px;
-  border: 0.5px solid white;
 `;
 
 const Container = styled.div`
   width: 100%;
   height: calc(98vh - 40px);
+`;
+const Title = styled.h1`
+  font-size: 2.5em;
+  font-weight: 500;
+  color: white;
+  padding-right: 20px;
 `;
 interface NewChatFormValues {
   id: string;
@@ -68,11 +75,12 @@ const schema = Yup.object({
   message: Yup.string().required("This field is required")
 });
 
-const ChatPreview = () => {
+const ChatPreview = (props: any) => {
   const [usersInfo, setUsersInfo] = useState<{ [key: string]: UserInfo }>({});
   const previews = useSelector((root: RootState) => root.chatPreviewState);
   const [selectedUserId, setSelectedUserId] = useState<string>();
   const [showNewMessageModal, setShowNewMessageModal] = useState(false);
+  const { inRoom } = props;
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -116,41 +124,49 @@ const ChatPreview = () => {
   }
 
   return (
-    <Container>
+    <Container style={{ height: inRoom ? "calc(98vh - 40px - 72.19px)" : "calc(98vh - 40px)" }}>
       {!selectedUserId ? (
         <>
           {previews.map((preview) => {
             const id = preview.senderId !== getLoginData().id ? preview.senderId : preview.receiverId;
             return (
-              <StyledPreview key={preview.id} onClick={() => setSelectedUserId(id)}>
-                <TimelineMarker
-                  label={
-                    <b>
-                      {usersInfo[id]?.realName} ({usersInfo[id]?.userName})
-                    </b>
-                  }
-                  icon={
-                    <StyledAvatar
-                      src={usersInfo[id]?.avatar ? `${hostName}/${usersInfo[id]?.avatar}` : ""}
-                      alt="avatar"
-                    />
-                  }
-                  datetime={moment.utc(preview.date).local().calendar()}
-                  description={
-                    <>
-                      <span>{preview.senderId === getLoginData().id && "You: "}</span>
-                      {(preview.type === ChatType.File || preview.type === ChatType.Image) && (
-                        <span>
-                          <FontAwesomeIcon icon={faPaperclip} />
-                          &nbsp;
-                          {preview.fileName}
-                        </span>
-                      )}
-                      {preview.type === ChatType.Text && <span> {preview.content} </span>}
-                    </>
-                  }
-                />
-              </StyledPreview>
+              <>
+                {!inRoom ? (
+                  <div style={{ padding: "20px 0 20px 20px" }}>
+                    <Title>Private Messages</Title>
+                  </div>
+                ) : null}
+
+                <StyledPreview key={preview.id} onClick={() => setSelectedUserId(id)}>
+                  <TimelineMarker
+                    label={
+                      <b>
+                        {usersInfo[id]?.realName} ({usersInfo[id]?.userName})
+                      </b>
+                    }
+                    icon={
+                      <StyledAvatar
+                        src={usersInfo[id]?.avatar ? `${hostName}/${usersInfo[id]?.avatar}` : ""}
+                        alt="avatar"
+                      />
+                    }
+                    datetime={moment.utc(preview.date).local().calendar()}
+                    description={
+                      <>
+                        <span>{preview.senderId === getLoginData().id && "You: "}</span>
+                        {(preview.type === ChatType.File || preview.type === ChatType.Image) && (
+                          <span>
+                            <FontAwesomeIcon icon={faPaperclip} />
+                            &nbsp;
+                            {preview.fileName}
+                          </span>
+                        )}
+                        {preview.type === ChatType.Text && <span> {preview.content} </span>}
+                      </>
+                    }
+                  />
+                </StyledPreview>
+              </>
             );
           })}
 
@@ -188,6 +204,7 @@ const ChatPreview = () => {
           <StyledButtonIcon
             assistiveText="New message"
             title="New message"
+            variant="brand"
             icon={<FontAwesomeIcon icon={faPencilAlt} />}
             size="large"
             onClick={(e) => setShowNewMessageModal(true)}
@@ -202,12 +219,12 @@ const ChatPreview = () => {
               size="medium"
             />
             <span>
-              {usersInfo[selectedUserId].realName} ({usersInfo[selectedUserId].userName})
+              <b>
+                {usersInfo[selectedUserId].realName} ({usersInfo[selectedUserId].userName})
+              </b>
             </span>
           </StyledHeader>
-          <div style={{ margin: "5px" }}>
-            <ChatArea receiverId={selectedUserId} />
-          </div>
+          <ChatArea receiverId={selectedUserId} />
         </>
       )}
     </Container>

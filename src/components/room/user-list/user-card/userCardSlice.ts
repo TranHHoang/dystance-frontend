@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
-import { socket } from "../../room-component/roomSlice";
+import { socket } from "~app/App";
 import { AppThunk } from "~app/store";
 import { RoomAction, RoomActionType } from "~utils/types";
 

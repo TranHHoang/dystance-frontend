@@ -65,7 +65,7 @@ const StyledDrawer = styled(Drawer)`
 
 const PrivateChatDrawer = styled(StyledDrawer)`
   > div {
-    padding: 0;
+    padding-top: 0;
   }
 `;
 
@@ -243,8 +243,9 @@ const RoomComponent = (props: any) => {
         isOpen={privateChatOpen}
         onRequestClose={() => setPrivateChatOpen(false)}
         hideCloseButton={true}
+        header="Private Messages"
       >
-        <ChatPreview />
+        <ChatPreview inRoom={true} />
       </PrivateChatDrawer>
 
       <StyledDrawer

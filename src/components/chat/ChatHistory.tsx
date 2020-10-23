@@ -18,13 +18,6 @@ const StyledTimeline = styled.div`
   padding: 5px;
 `;
 
-const StyledMessage = styled(TimelineMarker)`
-  p {
-    font-size: 16px;
-    word-break: break-all;
-  }
-`;
-
 const StyledCard = styled(Card)`
   max-width: 512px;
 `;
@@ -119,7 +112,7 @@ const ChatHistory = ({ isPrivateChat }: { isPrivateChat: boolean }) => {
           const chat = messages[index];
           const id = isPrivateMessage(chat) ? chat.senderId : chat.userId;
           return (
-            <StyledMessage
+            <TimelineMarker
               key={chat.id}
               label={
                 <b>
@@ -131,31 +124,34 @@ const ChatHistory = ({ isPrivateChat }: { isPrivateChat: boolean }) => {
                 <StyledAvatar src={usersInfo[id]?.avatar ? `${hostName}/${usersInfo[id]?.avatar}` : ""} alt="avatar" />
               }
               style={style}
-            >
-              {chat.type === ChatType.Text && (
-                <StyledText dangerouslySetInnerHTML={{ __html: linkify(chat.content) }} onClick={openExternal} />
-              )}
-              {chat.type === ChatType.Image && (
-                <StyledCard>
-                  <img
-                    onLoad={measure}
-                    src={`${hostName}/${chat.content}`}
-                    className="rainbow-m_auto rainbow-align-content_center"
-                    alt="landscape with rainbows, birds and colorful balloons"
-                  />
-                </StyledCard>
-              )}
-              {chat.type === ChatType.File && (
-                <FileCard>
-                  <FileContainer>
-                    <FontAwesomeIcon icon={faFileAlt} size="3x" />
-                    <StyledFileLink href={`${hostName}/${chat.content}`} download={chat.fileName}>
-                      {chat.fileName}
-                    </StyledFileLink>
-                  </FileContainer>
-                </FileCard>
-              )}
-            </StyledMessage>
+              description={
+                <>
+                  {chat.type === ChatType.Text && (
+                    <StyledText dangerouslySetInnerHTML={{ __html: linkify(chat.content) }} onClick={openExternal} />
+                  )}
+                  {chat.type === ChatType.Image && (
+                    <StyledCard>
+                      <img
+                        onLoad={measure}
+                        src={`${hostName}/${chat.content}`}
+                        className="rainbow-m_auto rainbow-align-content_center"
+                        alt="landscape with rainbows, birds and colorful balloons"
+                      />
+                    </StyledCard>
+                  )}
+                  {chat.type === ChatType.File && (
+                    <FileCard>
+                      <FileContainer>
+                        <FontAwesomeIcon icon={faFileAlt} size="3x" />
+                        <StyledFileLink href={`${hostName}/${chat.content}`} download={chat.fileName}>
+                          {chat.fileName}
+                        </StyledFileLink>
+                      </FileContainer>
+                    </FileCard>
+                  )}
+                </>
+              }
+            ></TimelineMarker>
           );
         }}
       </CellMeasurer>
