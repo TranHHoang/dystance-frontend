@@ -1,19 +1,31 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { hot } from "react-hot-loader";
 import LoginForm from "../components/account-management/login/LoginForm";
 import GoogleUpdateInfoForm from "../components/account-management/google-update-info/GoogleUpdateInfo";
 import { HomePage } from "../components/homepage/Homepage";
 import { Route, Switch, HashRouter } from "react-router-dom";
 import RegisterForm from "../components/account-management/register/RegisterForm";
-import ChatArea from "../components/room/chat/ChatArea";
+import ChatArea from "../components/chat/ChatArea";
 import ResetPasswordComponent from "../components/account-management/reset-password/ResetPasswordComponent";
 import RoomComponent from "../components/room/room-component/RoomComponent";
 import ProfilePage from "../components/profile-page/ProfilePage";
-import { useDispatch } from "react-redux";
-import { initSocket } from "../components/room/room-component/roomSlice";
+import { HubConnectionBuilder } from "@microsoft/signalr";
+import { hostName } from "~utils/hostUtils";
+import { getLoginData } from "~utils/tokenStorage";
+
+export const socket = new HubConnectionBuilder().withUrl(`${hostName}/socket`).build();
 
 export default hot(module)(function App() {
-  useDispatch()(initSocket("1"));
+  useEffect(() => {
+    if (socket && socket.state === "Disconnected") {
+      console.log("Start socket...");
+      socket.start().then(() => {
+        console.log("Started");
+        socket.invoke("ConnectionState", 0, getLoginData().id);
+      });
+    }
+  }, []);
+
   return (
     <HashRouter>
       <Switch>

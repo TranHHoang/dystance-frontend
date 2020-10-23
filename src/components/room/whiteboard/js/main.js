@@ -9,7 +9,7 @@ import ReadOnlyService from "./services/ReadOnlyService";
 import ConfigService from "./services/ConfigService";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
-import { socket } from "../../room-component/roomSlice";
+import { socket } from "~app/App";
 import { getLoginData } from "~utils/tokenStorage";
 
 let whiteboardId;
@@ -399,7 +399,6 @@ function initWhiteboard() {
   );
 
   function uploadImgAndAddToWhiteboard(base64data) {
-    // TODO: API
     const form = new FormData();
     form.append("imagedata", base64data);
     form.append("whiteboardId", whiteboardId);
@@ -410,7 +409,6 @@ function initWhiteboard() {
       }
     })
       .then((response) => {
-        // TODO: API
         whiteboard.addImgToCanvasByUrl(`${hostName}/${response.data.imageUrl}`); //Add image to canvas
       })
       .catch((err) => {

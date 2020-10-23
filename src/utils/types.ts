@@ -1,3 +1,7 @@
+import NodeCache from "node-cache";
+import Axios from "./fakeAPI";
+import { hostName } from "./hostUtils";
+
 export interface UserLoginData {
   id: string;
   userName: string;
@@ -46,7 +50,23 @@ export interface UserInfo {
   avatar: string;
   id: string;
 }
+
+const nodeCache = new NodeCache();
+export async function getUserInfo(userId: string): Promise<UserInfo> {
+  try {
+    if (nodeCache.get(userId)) {
+      return nodeCache.get(userId) as UserInfo;
+    }
+    const response = await Axios.get(`${hostName}/api/users/info?id=${userId}`);
+    nodeCache.set(userId, response.data);
+    return response.data as UserInfo;
+  } catch (ex) {
+    console.log(ex);
+  }
+}
+
 export const RoomAction = "RoomAction";
+export const PrivateMessage = "PrivateMessage";
 
 export enum RoomActionType {
   Join,

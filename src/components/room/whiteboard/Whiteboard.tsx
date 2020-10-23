@@ -100,7 +100,7 @@ const Whiteboard = (props: any) => {
             <svg
               xmlns="http://www.w3.org/2000/svg"
               // eslint-disable-next-line react/no-unknown-property
-              enable-background="new 0 0 24 24"
+              enableBackground="new 0 0 24 24"
               viewBox="0 0 24 24"
               fill="black"
               width="24px"

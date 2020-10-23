@@ -15,8 +15,8 @@ const StyledChatBox = styled.div`
   align-content: space-around;
   background-color: rgb(90, 90, 90);
   padding: 2 5 2 5;
-  border-radius: 10px;
-  margin: 0 5 0 5;
+  border-radius: 5px;
+  /* margin: 5px; */
   width: 100%;
   input {
     flex: 1;
@@ -24,13 +24,13 @@ const StyledChatBox = styled.div`
     background-color: rgb(90, 90, 90);
     color: white;
     padding: 5px;
-    font-size: 18px;
+    font-size: 16px;
     margin-left: 10px;
     :focus {
       outline: none;
     }
     ::-webkit-input-placeholder {
-      font-size: 18px;
+      font-size: 16px;
     }
   }
 
@@ -53,7 +53,15 @@ const StyledModal = styled(Modal)`
   box-shadow: none;
 `;
 
-const ChatBox = ({ setFile, roomId }: { setFile: (file: File) => void; roomId: string }) => {
+const ChatBox = ({
+  setFile,
+  roomId,
+  receiverId
+}: {
+  setFile: (file: File) => void;
+  roomId: string;
+  receiverId: string;
+}) => {
   const [toggleEmoji, setToggleEmoji] = useState(false);
   const dispatch = useDispatch();
   const imageInput = useRef<HTMLInputElement>();
@@ -67,7 +75,7 @@ const ChatBox = ({ setFile, roomId }: { setFile: (file: File) => void; roomId: s
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
       if (messageInput.current.value.trim()) {
-        dispatch(broadcastMessage(roomId, messageInput.current.value));
+        dispatch(broadcastMessage(roomId, receiverId, messageInput.current.value));
         messageInput.current.value = "";
       }
     }
@@ -87,7 +95,7 @@ const ChatBox = ({ setFile, roomId }: { setFile: (file: File) => void; roomId: s
         <FontAwesomeIcon icon={faPaperclip} onClick={() => fileInput.current.click()} />
         <input type="file" accept="image/*" hidden ref={imageInput} onChange={handleFile} />
         <input type="file" hidden ref={fileInput} onChange={handleFile} />
-        <input ref={messageInput} placeholder="Message classroom" onKeyDown={handleKeyDown} />
+        <input ref={messageInput} placeholder="Enter your message" onKeyDown={handleKeyDown} />
         <FontAwesomeIcon icon={faSmileBeam} onClick={() => setToggleEmoji(!toggleEmoji)} />
       </StyledChatBox>
     </>

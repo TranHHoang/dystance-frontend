@@ -2,6 +2,7 @@ import {
   faBars,
   faChalkboard,
   faCommentDots,
+  faComments,
   faUsers,
   faVideoSlash,
   faCalendarTimes
@@ -10,17 +11,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PeopleProfilePage from "../../profile-page/people-profile/PeopleProfilePage";
 import { setPeopleProfileModalOpen } from "../../profile-page/people-profile/peopleProfileSlice";
 import React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button, Drawer, Modal, Tab, Tabset, Notification } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import ChatArea from "../chat/ChatArea";
-import { fetchAllMessages, getUserInfo } from "../chat/chatSlice";
+import ChatArea from "../../chat/ChatArea";
+import { fetchAllMessages } from "../../chat/chatSlice";
+import { getUserInfo } from "~utils/types";
 import JitsiMeetComponent from "../jitsi-meet-component/JitsiMeetComponent";
 import UserListComponent from "../user-list/UserListComponent";
 import Whiteboard from "../whiteboard/Whiteboard";
-import { initSocket, removeListeners, setDrawerOpen, setTabsetValue, socket } from "./roomSlice";
+import { initSocket, removeListeners, setDrawerOpen, setTabsetValue } from "./roomSlice";
+import { socket } from "~app/App";
 import {
   kickUser,
   muteUser,
@@ -35,9 +38,9 @@ import RemoteControl, { RemoteControlSignalType, REMOTE_CONTROL_SIGNAL } from ".
 import { UserInfo } from "~utils/types";
 import { getLoginData } from "~utils/tokenStorage";
 import { setRemoteControlAccepted } from "../remote-control/remoteControlSlice";
-import $ from "jquery";
 import DeadlineListComponent, { DeadlineFormComponent } from "../deadline/DeadlineListComponent";
 import { deleteDeadline, setDeleteModalOpen, setUpdateModalOpen } from "../deadline/deadline-card/deadlineCardSlice";
+import ChatPreview from "../../private-chat/ChatPreview";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -59,6 +62,13 @@ const StyledHeader = styled.h1`
 const StyledDrawer = styled(Drawer)`
   width: 40%;
 `;
+
+const PrivateChatDrawer = styled(StyledDrawer)`
+  > div {
+    padding: 0;
+  }
+`;
+
 const StyledTab = styled(Tab)`
   flex-grow: 1;
   overflow: hidden;
@@ -68,7 +78,11 @@ const StyledTab = styled(Tab)`
 `;
 const ButtonGroup = styled.div`
   position: absolute;
-  z-index: 1000;
+  z-index: 1;
+  top: calc(50vh - 100px);
+  display: flex;
+  flex-direction: column;
+  opacity: 40%;
 `;
 const NormalButton = styled(Button)`
   border-radius: 0;
@@ -79,11 +93,9 @@ const NormalButton = styled(Button)`
     width: 24px;
     height: 24px;
   }
-  width: 5vw;
   height: 50px;
   color: white;
   transition: 0.2s;
-  opacity: 50%;
   min-width: 64px;
   :hover {
     opacity: 100%;
@@ -97,6 +109,9 @@ const StyledModal = styled(Modal)`
 `;
 const StyledNotification = styled(Notification)`
   width: 100%;
+`;
+const TopButton = styled(NormalButton)`
+  border-top-right-radius: 10px;
 `;
 
 const StyledAvatar = styled.img`
@@ -148,11 +163,12 @@ const RoomComponent = (props: any) => {
   const { roomId, roomName, creatorId } = props.match.params;
   const [whiteboardOpen, setWhiteboardOpen] = useState(false);
   const [remoteInitiatorInfo, setRemoteInitiatorInfo] = useState<UserInfo>();
+  const [privateChatOpen, setPrivateChatOpen] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(initSocket(roomId));
-    dispatch(fetchAllMessages(roomId));
+    dispatch(fetchAllMessages(roomId, undefined));
     return () => {
       removeListeners();
     };
@@ -174,24 +190,6 @@ const RoomComponent = (props: any) => {
     console.log("Room ID: " + roomId);
   }, []);
 
-  useEffect(() => {
-    if (remoteControlState.remoteControlAccepted) {
-      console.log("Remote Control Accepted");
-      // $(".hidden-class").on("mouseenter", () => {
-      //   $(".remote-control-div").stop().slideDown(100);
-      // }).on("mouseleave", () => {
-      //   $(".remote-control-div").stop().slideUp(100);
-      // })
-      // divRef.current.onmouseenter = (e) => {
-      //   function () {
-      //     $("remote-control-div").stop().slideUp(100);
-      //   }, function () {
-      //     $("remote-control-div").stop().slideDown(100);
-
-      //   }
-      // }
-    }
-  }, [remoteControlState.remoteControlAccepted]);
   useEffect(() => {
     if (userCardState.isRemoteControlWaitingModalOpen) {
       socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Offer, userCardState.userId, getLoginData().id);
@@ -219,20 +217,35 @@ const RoomComponent = (props: any) => {
     <div>
       {jitsiMeetState.showUpperToolbar ? (
         <ButtonGroup id="button-group">
-          <NormalButton
-            variant="neutral"
+          <TopButton
             onClick={() => {
               dispatch(setTabsetValue("Chat"));
               dispatch(setDrawerOpen(true));
             }}
           >
             <FontAwesomeIcon icon={faBars} size="2x" />
+          </TopButton>
+          <NormalButton
+            variant="neutral"
+            onClick={() => {
+              setPrivateChatOpen(true);
+            }}
+          >
+            <FontAwesomeIcon icon={faComments} size="2x" />
           </NormalButton>
           <RearButton variant="neutral" onClick={() => setWhiteboardOpen(!whiteboardOpen)}>
             <FontAwesomeIcon icon={faChalkboard} size="2x" />
           </RearButton>
         </ButtonGroup>
       ) : null}
+
+      <PrivateChatDrawer
+        isOpen={privateChatOpen}
+        onRequestClose={() => setPrivateChatOpen(false)}
+        hideCloseButton={true}
+      >
+        <ChatPreview />
+      </PrivateChatDrawer>
 
       <StyledDrawer
         header={

@@ -1,14 +1,14 @@
-import { HubConnectionBuilder } from "@microsoft/signalr";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppThunk } from "~app/store";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { ErrorResponse, RoomAction, RoomActionType } from "~utils/types";
-import { fetchLatestMessage } from "../chat/chatSlice";
+import { fetchLatestMessage } from "../../chat/chatSlice";
 import { setUserInfoList } from "../user-list/userListSlice";
 import { UserInfo } from "~utils/types";
 import { setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
+import { socket } from "~app/App";
 
 interface RoomState {
   roomId: string;
@@ -38,16 +38,8 @@ const roomSlice = createSlice({
 export default roomSlice.reducer;
 export const { setDrawerOpen, setTabsetValue } = roomSlice.actions;
 
-export const socket = new HubConnectionBuilder().withUrl(`${hostName}/socket`).build();
-
 export function initSocket(roomId: string): AppThunk {
-  return async (dispatch) => {
-    if (socket && socket.state === "Disconnected") {
-      console.log("Start socket...");
-      await socket.start();
-      console.log("Socket started");
-      socket.invoke("ConnectionState", 0, getLoginData().id);
-    }
+  return (dispatch) => {
     socket.invoke(RoomAction, roomId, RoomActionType.Join, getLoginData().id);
 
     socket.on(RoomAction, async (data: string) => {
@@ -56,7 +48,7 @@ export function initSocket(roomId: string): AppThunk {
       switch (response.type) {
         case RoomActionType.Chat:
           console.log("New Message");
-          dispatch(fetchLatestMessage(roomId));
+          dispatch(fetchLatestMessage(roomId, undefined));
           break;
         case RoomActionType.Join:
         case RoomActionType.Leave:
