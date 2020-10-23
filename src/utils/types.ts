@@ -63,3 +63,17 @@ export interface DeadlineInfo {
   endDate: string;
   description: string;
 }
+export enum TimetableEventType {
+  Schedule,
+  Deadline
+}
+export interface TimetableEvent {
+  id: string;
+  eventType: TimetableEventType;
+  roomId: string;
+  title: string;
+  creatorId: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+}

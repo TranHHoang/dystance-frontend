@@ -15,7 +15,7 @@ import UserListComponent from "../user-list/UserListComponent";
 import Whiteboard from "../whiteboard/Whiteboard";
 import { initSocket, removeListeners, setDrawerOpen, setTabsetValue } from "./roomSlice";
 import { kickUser, muteUser, setKickModalOpen, setMuteModalOpen } from "../user-list/user-card/userCardSlice";
-import { StyledText } from "../../homepage/single-room/SingleRoom";
+import { StyledText } from "../../homepage/single-room/styles";
 import DeadlineListComponent, { DeadlineFormComponent } from "../deadline/DeadlineListComponent";
 import { deleteDeadline, setDeleteModalOpen, setUpdateModalOpen } from "../deadline/deadline-card/deadlineCardSlice";
 

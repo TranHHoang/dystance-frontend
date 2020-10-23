@@ -1,3 +1,4 @@
+import Timetable from "../timetable/Timetable";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
@@ -34,7 +35,7 @@ const Container = styled.div`
   height: auto;
 `;
 
-export const HomePageDisplay = () => {
+const HomePageDisplay = () => {
   return (
     <HomePageContainer>
       <CreateRoomDiv>
@@ -63,6 +64,8 @@ export const HomePage = () => {
         return <HomePageDisplay />;
       case "Profile":
         return <ProfilePage />;
+      case "Timetable":
+        return <Timetable />;
     }
   }
   return (

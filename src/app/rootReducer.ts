@@ -19,6 +19,8 @@ import peopleProfileReducer from "../components/profile-page/people-profile/peop
 import userCardReducer from "../components/room/user-list/user-card/userCardSlice";
 import deadlineListReducer from "../components/room/deadline/deadlineListSlice";
 import deadlineCardReducer from "../components/room/deadline/deadline-card/deadlineCardSlice";
+import timetableReducer from "../components/timetable/timetableSlice";
+import eventDetailsReducer from "../components/timetable/event-details/eventDetailsSlice";
 
 const appReducer = combineReducers({
   roomCreation: createRoomReducer,
@@ -39,7 +41,9 @@ const appReducer = combineReducers({
   peopleProfileState: peopleProfileReducer,
   userCardState: userCardReducer,
   deadlineListState: deadlineListReducer,
-  deadlineCardState: deadlineCardReducer
+  deadlineCardState: deadlineCardReducer,
+  timetableState: timetableReducer,
+  eventDetailsState: eventDetailsReducer,
 });
 
 const rootReducer = (state: any, action: AnyAction) => {

@@ -2,14 +2,11 @@ import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
 import * as React from "react";
-import { Button, ButtonMenu, MenuItem, Modal } from "react-rainbow-components";
+import { Button, MenuItem, Modal } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { getLoginData } from "~utils/tokenStorage";
 import { Room } from "~utils/types";
-import { StyledNotification } from "../../account-management/styles";
 import InviteForm from "../../room/invite/InviteForm";
 import { setInviteModalOpen } from "../../room/invite/inviteSlice";
 import { deleteRoom, setConfirmDeleteModalOpen } from "./singleRoomSlice";
@@ -17,34 +14,20 @@ import {
   Description,
   FlexRowContainer,
   ImageContainer,
+  JoinRoomButtonContainer,
   Separator,
   StyledButton,
+  StyledButtonMenu,
   StyledCard,
   StyledImage,
+  StyledLink,
+  StyledText,
   TextContainer,
   Time,
-  Title
+  Title,
+  Error
 } from "./styles";
 
-export const JoinRoomButtonContainer = styled.div`
-  display: flex;
-  justify-content: flex-end;
-`;
-export const StyledButtonMenu = styled(ButtonMenu)`
-  align-self: center;
-`;
-export const StyledLink = styled(Link)`
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-`;
-export const StyledText = styled.p`
-  font-size: 20px;
-  margin-left: 12px;
-`;
-const Error = styled(StyledNotification)`
-  margin: 0;
-`;
 export const SingleRoom = (props: any) => {
   const { roomId, creatorId, roomName, startHour, endHour, image, description }: Room = props;
   const dispatch = useDispatch();
