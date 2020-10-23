@@ -45,6 +45,8 @@ export function initSocket(roomId: string): AppThunk {
     if (socket && socket.state === "Disconnected") {
       console.log("Start socket...");
       await socket.start();
+      console.log("Socket started");
+      socket.invoke("ConnectionState", 0, getLoginData().id);
     }
     socket.invoke(RoomAction, roomId, RoomActionType.Join, getLoginData().id);
 

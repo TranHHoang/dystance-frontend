@@ -6,7 +6,7 @@ import { Card, ButtonMenu, MenuItem } from "react-rainbow-components";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import { getLoginData } from "~utils/tokenStorage";
-import { setKickModalOpen, setMuteModalOpen } from "./userCardSlice";
+import { setKickModalOpen, setMuteModalOpen, setRemoteControlWaitingModalOpen } from "./userCardSlice";
 
 const StyledCard = styled(Card)`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
@@ -36,6 +36,10 @@ const UserCardComponent = (props: any) => {
                   <MenuItem
                     label="Mute"
                     onClick={() => dispatch(setMuteModalOpen({ userId, isMuteModalOpen: true }))}
+                  />
+                  <MenuItem
+                    label="Remote control"
+                    onClick={() => dispatch(setRemoteControlWaitingModalOpen({ userId, isModalOpen: true }))}
                   />
                 </div>
               ) : null}

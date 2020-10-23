@@ -103,7 +103,6 @@ class ConfigService {
       showSmallestScreenIndicator,
       imageDownloadFormat,
       drawBackgroundGrid,
-      backgroundGridImage,
       performance
     } = common;
 
@@ -111,12 +110,7 @@ class ConfigService {
     this.#showSmallestScreenIndicator = showSmallestScreenIndicator;
     this.#imageDownloadFormat = imageDownloadFormat;
     this.#drawBackgroundGrid = drawBackgroundGrid;
-    // this.#backgroundGridImage = backgroundGridImage;
     this.#refreshInfoInterval = 1000 / performance.refreshInfoFreq;
-
-    // const { whiteboardSpecific } = configFromServer;
-
-    // const { correspondingReadOnlyWid, isReadOnly } = whiteboardSpecific;
 
     this.#correspondingReadOnlyWid = "";
     this.#isReadOnly = false;

@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { CancelToken } from "axios";
 import NodeCache from "node-cache";
 import { AppThunk } from "~app/store";
 import Axios from "~utils/fakeAPI";
@@ -101,12 +102,12 @@ export function broadcastMessage(
   };
 }
 
-export async function getUserInfo(userId: string): Promise<UserInfo> {
+export async function getUserInfo(userId: string, cancelToken?: CancelToken): Promise<UserInfo> {
   try {
     if (nodeCache.get(userId)) {
       return nodeCache.get(userId) as UserInfo;
     }
-    const response = await Axios.get(`${hostName}/api/users/info?id=${userId}`);
+    const response = await Axios.get(`${hostName}/api/users/info?id=${userId}`, { cancelToken: cancelToken });
     nodeCache.set(userId, response.data);
     return response.data as UserInfo;
   } catch (ex) {

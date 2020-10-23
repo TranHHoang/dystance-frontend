@@ -47,6 +47,7 @@ const createWindow = () => {
   // and load the index.html of the app.
   if (isDebug()) {
     console.log(__dirname);
+    mainWindow.webContents.openDevTools();
     mainWindow.loadURL(APP_WEBPACK_ENTRY);
   } else {
     const exApp = express();

@@ -9,6 +9,7 @@ import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { RoomAction, RoomActionType, User, UserInfo } from "~utils/types";
+import { setRemoteControlAccepted } from "../remote-control/remoteControlSlice";
 import { socket } from "../room-component/roomSlice";
 import { setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
 import { setUserInfoList } from "../user-list/userListSlice";
@@ -58,6 +59,7 @@ const JitsiMeetComponent = (props: any) => {
     jitsiMeetAPI.on("readyToClose", () => {
       socket.invoke(RoomAction, roomId, RoomActionType.Leave, getLoginData().id);
       dispatch(setShowUpperToolbar(false));
+      dispatch(setRemoteControlAccepted(undefined));
       createHashHistory().push("/homepage");
       jitsiMeetAPI.dispose();
     });

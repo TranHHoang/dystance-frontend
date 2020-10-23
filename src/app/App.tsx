@@ -9,8 +9,11 @@ import ChatArea from "../components/room/chat/ChatArea";
 import ResetPasswordComponent from "../components/account-management/reset-password/ResetPasswordComponent";
 import RoomComponent from "../components/room/room-component/RoomComponent";
 import ProfilePage from "../components/profile-page/ProfilePage";
+import { useDispatch } from "react-redux";
+import { initSocket } from "../components/room/room-component/roomSlice";
 
 export default hot(module)(function App() {
+  useDispatch()(initSocket("1"));
   return (
     <HashRouter>
       <Switch>

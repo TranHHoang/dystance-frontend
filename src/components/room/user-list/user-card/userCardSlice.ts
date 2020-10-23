@@ -12,6 +12,8 @@ interface UserCardState {
   userId: string;
   isKickModalOpen: boolean;
   isMuteModalOpen: boolean;
+  isRemoteControlOfferModalOpen: boolean;
+  isRemoteControlWaitingModalOpen: boolean;
   isLoading: boolean;
   isKickSuccess: boolean;
   isMuteSuccess: boolean;
@@ -23,6 +25,8 @@ const initialState: UserCardState = {
   userId: null,
   isKickModalOpen: false,
   isMuteModalOpen: false,
+  isRemoteControlOfferModalOpen: false,
+  isRemoteControlWaitingModalOpen: false,
   isLoading: false,
   isKickSuccess: false,
   isMuteSuccess: false,
@@ -44,6 +48,14 @@ const userCardSlice = createSlice({
       state.isMuteModalOpen = action.payload.isMuteModalOpen;
       state.isMuteSuccess = false;
       state.error = undefined;
+    },
+    setRemoteControlOfferModalOpen(state, action: PayloadAction<{ userId: string; isModalOpen: boolean }>) {
+      state.userId = action.payload.userId;
+      state.isRemoteControlOfferModalOpen = action.payload.isModalOpen;
+    },
+    setRemoteControlWaitingModalOpen(state, action: PayloadAction<{ userId: string; isModalOpen: boolean }>) {
+      state.userId = action.payload.userId;
+      state.isRemoteControlWaitingModalOpen = action.payload.isModalOpen;
     },
     kickUserStart(state) {
       state.isLoading = true;
@@ -79,6 +91,8 @@ export const {
   setMuteOtherUser,
   setKickModalOpen,
   setMuteModalOpen,
+  setRemoteControlOfferModalOpen,
+  setRemoteControlWaitingModalOpen,
   kickUserStart,
   muteUserStart,
   muteSuccess,

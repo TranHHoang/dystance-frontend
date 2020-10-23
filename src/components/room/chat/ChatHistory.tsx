@@ -10,6 +10,7 @@ import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
 import { ChatType, getUserInfo } from "./chatSlice";
 import { UserInfo } from "~utils/types";
+import Axios from "axios";
 
 const StyledTimeline = styled(ActivityTimeline)`
   padding: 0 20 0 20;
@@ -79,16 +80,22 @@ const ChatHistory = () => {
   }
 
   useEffect(() => {
+    const source = Axios.CancelToken.source();
+
     const fetchUsersInfo = async () => {
       const userDict: { [key: string]: UserInfo } = {};
       const usersInfoPromise = chatState.map(async (chat) => {
-        const info = await getUserInfo(chat.userId);
+        const info = await getUserInfo(chat.userId, source.token);
         userDict[chat.userId] = info; // { 1: { avatar: "", }}
       });
       await Promise.all(usersInfoPromise);
       setUsersInfo(userDict);
     };
     fetchUsersInfo();
+
+    return () => {
+      source.cancel();
+    };
   }, [chatState]);
 
   useEffect(() => {
