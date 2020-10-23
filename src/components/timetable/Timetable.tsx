@@ -57,6 +57,7 @@ const Timetable = () => {
           const endOfWeek = new Date(week);
           endOfWeek.setDate(endOfWeek.getDate() + 6);
           setCurrentWeek(week);
+          dispatch(showTimetableEvents(week, endOfWeek));
         }}
         onEventClick={(event: any) => {
           dispatch(setDrawerOpen(true));
