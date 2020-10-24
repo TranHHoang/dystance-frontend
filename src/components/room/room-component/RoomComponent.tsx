@@ -242,7 +242,6 @@ const RoomComponent = (props: any) => {
       <PrivateChatDrawer
         isOpen={privateChatOpen}
         onRequestClose={() => setPrivateChatOpen(false)}
-        hideCloseButton={true}
         header="Private Messages"
       >
         <ChatPreview inRoom={true} />

@@ -12,6 +12,7 @@ import { setRemoteControlAccepted } from "../remote-control/remoteControlSlice";
 import { socket } from "~app/App";
 import { setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
 import { setShowUpperToolbar } from "./jitsiMeetSlice";
+import { resetRoomState } from "../room-component/roomSlice";
 
 const loader = styled.div`
   display: none;
@@ -58,6 +59,7 @@ const JitsiMeetComponent = (props: any) => {
       socket.invoke(RoomAction, roomId, RoomActionType.Leave, getLoginData().id);
       dispatch(setShowUpperToolbar(false));
       dispatch(setRemoteControlAccepted(undefined));
+      dispatch(resetRoomState());
       createHashHistory().push("/homepage");
       jitsiMeetAPI.dispose();
     });

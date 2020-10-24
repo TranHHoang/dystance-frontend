@@ -32,11 +32,14 @@ const roomSlice = createSlice({
     },
     setTabsetValue(state, action: PayloadAction<string>) {
       state.tabsetValue = action.payload;
+    },
+    resetRoomState() {
+      return initialState;
     }
   }
 });
 export default roomSlice.reducer;
-export const { setDrawerOpen, setTabsetValue } = roomSlice.actions;
+export const { setDrawerOpen, setTabsetValue, resetRoomState } = roomSlice.actions;
 
 export function initSocket(roomId: string): AppThunk {
   return (dispatch) => {
