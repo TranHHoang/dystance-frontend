@@ -32,7 +32,7 @@ import {
   setRemoteControlOfferModalOpen,
   setRemoteControlWaitingModalOpen
 } from "../user-list/user-card/userCardSlice";
-import { StyledText } from "../../homepage/single-room/SingleRoom";
+import { StyledText } from "../../homepage/single-room/styles";
 import { hostName } from "~utils/hostUtils";
 import RemoteControl, { RemoteControlSignalType, REMOTE_CONTROL_SIGNAL } from "../remote-control/RemoteControl";
 import { UserInfo } from "~utils/types";
@@ -282,6 +282,7 @@ const RoomComponent = (props: any) => {
       ) : null}
       {whiteboardOpen ? <Whiteboard roomId={roomId} /> : null}
       <JitsiMeetComponent roomId={roomId} roomName={roomName} creatorId={creatorId} />
+
       <StyledModal
         isOpen={peopleProfileState.peopleProfileModalOpen}
         onRequestClose={() => {
@@ -291,6 +292,7 @@ const RoomComponent = (props: any) => {
       >
         <PeopleProfilePage userId={peopleProfileState.userId} />
       </StyledModal>
+
       <StyledModal
         title="Confirm Mute"
         isOpen={userCardState.isMuteModalOpen}

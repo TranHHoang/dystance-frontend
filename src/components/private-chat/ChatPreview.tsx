@@ -80,12 +80,15 @@ const ChatPreview = (props: any) => {
   const previews = useSelector((root: RootState) => root.chatPreviewState);
   const [selectedUserId, setSelectedUserId] = useState<string>();
   const [showNewMessageModal, setShowNewMessageModal] = useState(false);
-  const { inRoom } = props;
+  const { inRoom, inSidebar } = props;
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(initSocket());
     dispatch(fetchAllPreview(getLoginData().id));
+    return () => {
+      socket.off(PrivateMessage);
+    };
   }, []);
 
   useEffect(() => {
@@ -110,10 +113,6 @@ const ChatPreview = (props: any) => {
     if (selectedUserId) {
       dispatch(fetchAllMessages(undefined, { id1: selectedUserId, id2: getLoginData().id }));
     }
-
-    return () => {
-      socket.off(PrivateMessage);
-    };
   }, [selectedUserId]);
 
   function onNewChatSubmit(values: NewChatFormValues) {
@@ -127,46 +126,43 @@ const ChatPreview = (props: any) => {
     <Container style={{ height: inRoom ? "calc(98vh - 40px - 72.19px)" : "calc(98vh - 40px)" }}>
       {!selectedUserId ? (
         <>
+          {!inRoom ? (
+            <div style={{ padding: "20px 0 20px 20px" }}>
+              <Title>Private Messages</Title>
+            </div>
+          ) : null}
           {previews.map((preview) => {
             const id = preview.senderId !== getLoginData().id ? preview.senderId : preview.receiverId;
             return (
-              <>
-                {!inRoom ? (
-                  <div style={{ padding: "20px 0 20px 20px" }}>
-                    <Title>Private Messages</Title>
-                  </div>
-                ) : null}
-
-                <StyledPreview key={preview.id} onClick={() => setSelectedUserId(id)}>
-                  <TimelineMarker
-                    label={
-                      <b>
-                        {usersInfo[id]?.realName} ({usersInfo[id]?.userName})
-                      </b>
-                    }
-                    icon={
-                      <StyledAvatar
-                        src={usersInfo[id]?.avatar ? `${hostName}/${usersInfo[id]?.avatar}` : ""}
-                        alt="avatar"
-                      />
-                    }
-                    datetime={moment.utc(preview.date).local().calendar()}
-                    description={
-                      <>
-                        <span>{preview.senderId === getLoginData().id && "You: "}</span>
-                        {(preview.type === ChatType.File || preview.type === ChatType.Image) && (
-                          <span>
-                            <FontAwesomeIcon icon={faPaperclip} />
-                            &nbsp;
-                            {preview.fileName}
-                          </span>
-                        )}
-                        {preview.type === ChatType.Text && <span> {preview.content} </span>}
-                      </>
-                    }
-                  />
-                </StyledPreview>
-              </>
+              <StyledPreview key={preview.id} onClick={() => setSelectedUserId(id)}>
+                <TimelineMarker
+                  label={
+                    <b>
+                      {usersInfo[id]?.realName} ({usersInfo[id]?.userName})
+                    </b>
+                  }
+                  icon={
+                    <StyledAvatar
+                      src={usersInfo[id]?.avatar ? `${hostName}/${usersInfo[id]?.avatar}` : ""}
+                      alt="avatar"
+                    />
+                  }
+                  datetime={moment.utc(preview.date).local().calendar()}
+                  description={
+                    <>
+                      <span>{preview.senderId === getLoginData().id && "You: "}</span>
+                      {(preview.type === ChatType.File || preview.type === ChatType.Image) && (
+                        <span>
+                          <FontAwesomeIcon icon={faPaperclip} />
+                          &nbsp;
+                          {preview.fileName}
+                        </span>
+                      )}
+                      {preview.type === ChatType.Text && <span> {preview.content} </span>}
+                    </>
+                  }
+                />
+              </StyledPreview>
             );
           })}
 
@@ -224,7 +220,9 @@ const ChatPreview = (props: any) => {
               </b>
             </span>
           </StyledHeader>
-          <ChatArea receiverId={selectedUserId} />
+          <div style={{ margin: "5px" }}>
+            <ChatArea receiverId={selectedUserId} />
+          </div>
         </>
       )}
     </Container>
