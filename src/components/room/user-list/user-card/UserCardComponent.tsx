@@ -41,6 +41,7 @@ const UserCardComponent = (props: any) => {
                     label="Remote control"
                     onClick={() => dispatch(setRemoteControlWaitingModalOpen({ userId, isModalOpen: true }))}
                   />
+                  <MenuItem label="Allow Whiteboard Usage" />
                 </div>
               ) : null}
             </ButtonMenu>
