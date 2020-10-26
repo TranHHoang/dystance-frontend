@@ -33,7 +33,7 @@ const timetableSlice = createSlice({
 });
 
 export default timetableSlice.reducer;
-export const { fetchTimetableSuccess, fetchTimetableFailed } = timetableSlice.actions;
+export const { fetchTimetableSuccess, fetchTimetableFailed, resetTimetable } = timetableSlice.actions;
 
 export function showTimetableEvents(week: Date, endOfWeek: Date): AppThunk {
   return async (dispatch) => {
