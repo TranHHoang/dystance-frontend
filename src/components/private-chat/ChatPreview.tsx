@@ -260,7 +260,7 @@ const ChatPreview = (props: any) => {
             />
             <span>
               <b>
-                {usersInfo[selectedUserId].realName} ({usersInfo[selectedUserId].userName})
+                {usersInfo[selectedUserId]?.realName} ({usersInfo[selectedUserId]?.userName})
               </b>
             </span>
           </StyledHeader>

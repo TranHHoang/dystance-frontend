@@ -23,6 +23,7 @@ export const StyledImage = styled.img`
   height: 105px;
   border-radius: 50%;
   z-index: 2;
+  object-fit: cover;
 `;
 export const Title = styled.h1`
   font-size: 2.5em;
