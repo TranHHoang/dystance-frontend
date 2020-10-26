@@ -1,6 +1,9 @@
 import NodeCache from "node-cache";
 import Axios from "./fakeAPI";
 import { hostName } from "./hostUtils";
+import { LookupValue } from "react-rainbow-components/components/types";
+
+export const AllUsersInfo = "allUsersInfo"; // For autocomplete function
 
 export interface UserLoginData {
   id: string;

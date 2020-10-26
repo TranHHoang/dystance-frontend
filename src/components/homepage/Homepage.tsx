@@ -10,6 +10,7 @@ import CreateRoomForm from "../room-management/create-room/CreateRoomForm";
 import SideNavigationBar from "../sidebar/Sidebar";
 import { setSidebarValue } from "../sidebar/sidebarSlice";
 import { AllRooms } from "./all-rooms/AllRooms";
+import { fetchAllUsers } from "./showRoomsSlice";
 
 const CreateRoomDiv = styled.div`
   display: flex;
@@ -56,6 +57,7 @@ export const HomePage = () => {
   useEffect(() => {
     dispatch(setSidebarValue("Homepage"));
     dispatch(showProfile());
+    dispatch(fetchAllUsers());
   }, []);
 
   function getCurrentSidebarValue() {

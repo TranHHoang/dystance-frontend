@@ -1,13 +1,13 @@
-import { faArrowLeft, faPaperclip, faPaperPlane, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faPaperclip, faPaperPlane, faPencilAlt, faSearch } from "@fortawesome/free-solid-svg-icons";
 import ChatArea from "../chat/ChatArea";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { ButtonIcon, TimelineMarker, Input, Textarea, Button, Modal } from "react-rainbow-components";
+import { ButtonIcon, TimelineMarker, Input, Textarea, Button, Modal, Lookup } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
-import { getUserInfo, PrivateMessage, UserInfo } from "~utils/types";
+import { AllUsersInfo, getUserInfo, PrivateMessage, User, UserInfo } from "~utils/types";
 import { broadcastMessage, ChatType, fetchAllMessages } from "../../components/chat/chatSlice";
 import { fetchAllPreview, initSocket } from "./chatPreviewSlice";
 import { getLoginData } from "~utils/tokenStorage";
@@ -15,6 +15,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { socket } from "~app/App";
 import * as Yup from "yup";
 import { Field, Form, Formik, FormikProps } from "formik";
+import { LookupValue } from "react-rainbow-components/components/types";
+
+declare module "react-rainbow-components/components/types" {
+  interface LookupValue {
+    id: string;
+  }
+}
 
 const StyledAvatar = styled.img`
   width: 32px;
@@ -76,11 +83,13 @@ const schema = Yup.object({
 });
 
 const ChatPreview = (props: any) => {
+  const { inRoom, inSidebar } = props;
   const [usersInfo, setUsersInfo] = useState<{ [key: string]: UserInfo }>({});
   const previews = useSelector((root: RootState) => root.chatPreviewState);
   const [selectedUserId, setSelectedUserId] = useState<string>();
   const [showNewMessageModal, setShowNewMessageModal] = useState(false);
-  const { inRoom, inSidebar } = props;
+  const [autoCompleteOptions, setAutoCompleteOptions] = useState([]);
+  const [selectedUser, setSelectedUser] = useState<LookupValue>();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -116,10 +125,36 @@ const ChatPreview = (props: any) => {
   }, [selectedUserId]);
 
   function onNewChatSubmit(values: NewChatFormValues) {
-    dispatch(broadcastMessage(undefined, values.id, values.message));
-    // TODO Need to check for id's validity before proceed, or else this will crash
-    setShowNewMessageModal(false);
-    setSelectedUserId(values.id);
+    if (selectedUser) {
+      dispatch(broadcastMessage(undefined, values.id, values.message));
+      setShowNewMessageModal(false);
+      setSelectedUserId(values.id);
+    }
+  }
+
+  const allUsersInfo = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
+  const options: LookupValue[] = allUsersInfo.map((userInfo) => ({
+    id: userInfo.id,
+    label: `${userInfo.realName} (${userInfo.userName})`,
+    description: `${userInfo.email}`,
+    // eslint-disable-next-line jsx-a11y/alt-text
+    icon: (
+      // eslint-disable-next-line jsx-a11y/alt-text
+      <img
+        style={{ height: "32px", width: "32px", borderRadius: "50%", objectFit: "cover" }}
+        src={`${hostName}/${userInfo.avatar}`}
+      />
+    )
+  }));
+
+  function filter(query: string, options: LookupValue[]) {
+    if (query) {
+      return options.filter((item) => {
+        const regex = new RegExp(query, "i");
+        return regex.test(item.label) && item.id !== getLoginData().id;
+      });
+    }
+    return [];
   }
 
   return (
@@ -168,15 +203,24 @@ const ChatPreview = (props: any) => {
 
           <Modal isOpen={showNewMessageModal} title="New message" onRequestClose={() => setShowNewMessageModal(false)}>
             <Formik initialValues={initialValues} validationSchema={schema} onSubmit={onNewChatSubmit}>
-              {({ errors, touched }: FormikProps<NewChatFormValues>) => (
+              {({ errors, touched, setFieldValue }: FormikProps<NewChatFormValues>) => (
                 <Form>
-                  <Field
+                  <Lookup
                     name="id"
-                    as={Input}
-                    type="text"
                     placeholder="To someone you ❤️"
+                    debounce
+                    value={selectedUser}
+                    icon={<FontAwesomeIcon icon={faSearch} />}
+                    options={autoCompleteOptions}
+                    onSearch={(value) => setAutoCompleteOptions(filter(value, options))}
+                    onChange={(option) => {
+                      setFieldValue("id", option?.id ?? "");
+                      setSelectedUser(option);
+                    }}
+                    size="small"
                     error={errors.id && touched.id && errors.id}
                   />
+
                   <br />
                   <Field
                     name="message"
