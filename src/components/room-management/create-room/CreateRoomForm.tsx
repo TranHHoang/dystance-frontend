@@ -21,7 +21,7 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import * as Yup from "yup";
 import { RootState } from "~app/rootReducer";
-import { createRoom, setRepeatToggle, setRoomCreateModalOpen } from "./createRoomSlice";
+import { createRoom, resetCreateRoomState, setRepeatToggle, setRoomCreateModalOpen } from "./createRoomSlice";
 
 const StyledNotification = styled(Notification)`
   width: 100%;
@@ -248,7 +248,10 @@ const CreateRoomForm = () => {
               className="rainbow-m-right_large"
               label="Cancel"
               variant="neutral"
-              onClick={() => dispatch(setRoomCreateModalOpen(false))}
+              onClick={() => {
+                dispatch(setRoomCreateModalOpen(false));
+                dispatch(resetCreateRoomState());
+              }}
               disabled={createRoomState.isLoading || createRoomState.isCreationSuccess}
             />
             <Button

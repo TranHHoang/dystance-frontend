@@ -49,6 +49,9 @@ const createRoomSlice = createSlice({
     },
     setRepeatToggle(state, action: PayloadAction<boolean>) {
       state.repeatToggle = action.payload;
+    },
+    resetCreateRoomState() {
+      return initialState;
     }
   }
 });
@@ -59,7 +62,8 @@ export const {
   roomCreateStart,
   createRoomSuccess,
   createRoomFailed,
-  setRoomCreateModalOpen
+  setRoomCreateModalOpen,
+  resetCreateRoomState
 } = createRoomSlice.actions;
 
 export function createRoom(
