@@ -1,5 +1,5 @@
 import { StyledNotification } from "../../../components/account-management/styles";
-import { Button, ButtonMenu, Card, Textarea } from "react-rainbow-components";
+import { Button, ButtonMenu, Card, Textarea, Notification } from "react-rainbow-components";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
@@ -83,4 +83,7 @@ export const StyledText = styled.p`
 `;
 export const Error = styled(StyledNotification)`
   margin: 0;
+`;
+export const StyledNotifications = styled(Notification)`
+  width: 100%;
 `;

@@ -15,7 +15,6 @@ import {
   Textarea,
   TimePicker,
   WeekDayPicker,
-  Notification,
   Option,
   FileSelector
 } from "react-rainbow-components";
@@ -23,9 +22,6 @@ import { WeekDayPickerProps } from "react-rainbow-components/components/WeekDayP
 import { setUpdateRepeatToggle, updateRoom } from "./singleRoomSlice";
 import { hostName } from "~utils/hostUtils";
 
-const StyledNotification = styled(Notification)`
-  width: 100%;
-`;
 const StyledToggleButton = styled(CheckboxToggle)`
   padding: 15px 0 15px 0;
 `;
@@ -91,7 +87,7 @@ const SingleRoomUpdateForm = (props: any) => {
     roomId: roomInfo.roomId,
     classroomName: roomInfo.roomName,
     startTime: moment(`${moment().format("YYYY-MM-DD")}T${roomInfo.startHour}`).format("HH:mm"),
-    endTime: moment(`${moment().format("YYYY-MM-DD")}T${roomInfo.startHour}`).format("HH:mm"),
+    endTime: moment(`${moment().format("YYYY-MM-DD")}T${roomInfo.endHour}`).format("HH:mm"),
     startDate: moment(roomInfo.startDate).toDate(),
     endDate: moment(roomInfo.endDate).toDate(),
     description: roomInfo.description,
@@ -147,13 +143,13 @@ const SingleRoomUpdateForm = (props: any) => {
             <Form>
               <Field
                 as={StyledFileSelector}
-                name="newAvatar"
-                label="Change Avatar"
+                name="roomImage"
+                label="Change Room Image"
                 placeholder="Drag and drop or select a file"
                 accept="image/png, image/jpeg"
                 onChange={(event: File[]) => {
                   handleChange(event);
-                  setFieldValue("newAvatar", event[0]);
+                  setFieldValue("roomImage", event[0]);
                 }}
                 error={rejectFile ? rejectReason : null}
                 value={values.roomImage || ""}
@@ -174,6 +170,7 @@ const SingleRoomUpdateForm = (props: any) => {
                   setFieldValue("startDate", e);
                   if (moment(e).isAfter(moment(values.endDate), "day")) {
                     setFieldValue("endDate", e);
+                    values.endDate = e;
                   }
                 }}
                 error={errors.startDate && touched.startDate ? errors.startDate : null}

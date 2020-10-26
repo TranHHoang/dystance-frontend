@@ -28,7 +28,8 @@ import {
   TextContainer,
   Time,
   Title,
-  Error
+  Error,
+  StyledNotifications
 } from "./styles";
 
 export const SingleRoom = (props: any) => {
@@ -79,14 +80,7 @@ export const SingleRoom = (props: any) => {
         <Separator />
         <FlexRowContainer>
           <ImageContainer>
-            <StyledImage
-              src={
-                image
-                  ? `${hostName}/${image}`
-                  : "https://image.freepik.com/free-vector/empty-classroom-interior-school-college-class_107791-631.jpg"
-              }
-              alt=""
-            />
+            <StyledImage src={`${hostName}/${image}`} alt="" />
           </ImageContainer>
           <Time>
             {formatTime(startHour)} - {formatTime(endHour)}
@@ -190,6 +184,22 @@ export const SingleRoom = (props: any) => {
           </div>
         }
       >
+        {singleRoomState.error && (
+          <StyledNotifications
+            title="An Error Occured"
+            hideCloseButton={true}
+            description={singleRoomState.error.message}
+            icon="error"
+          />
+        )}
+        {singleRoomState.isUpdateSuccess && (
+          <StyledNotifications
+            title="Classroom Updated Successfully"
+            hideCloseButton={true}
+            description="You will be redirected to the homepage shortly"
+            icon="success"
+          />
+        )}
         <SingleRoomUpdateForm room={room} innerRef={formRef} />
       </Modal>
     </div>

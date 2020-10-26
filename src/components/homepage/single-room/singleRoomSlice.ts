@@ -141,6 +141,7 @@ export function updateRoom(
           "Content-Type": "multipart/form-data"
         }
       };
+      fd.append("roomId", roomId);
       fd.append("name", classroomName);
       fd.append("creatorId", getLoginData().id);
       fd.append("description", description);
@@ -158,7 +159,7 @@ export function updateRoom(
       }
       fd.append("roomImage", roomImage);
 
-      await Axios.post(`${hostName}/api/rooms/update?id=${roomId}`, fd, config);
+      await Axios.post(`${hostName}/api/rooms/update`, fd, config);
       dispatch(updateRoomSuccess());
       dispatch(resetState());
       dispatch(resetRoom());
