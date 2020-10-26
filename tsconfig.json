@@ -5,6 +5,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "noImplicitAny": true,
+    "noImplicitThis": true,
     "sourceMap": true,
     "baseUrl": "src",
     "outDir": "dist",
@@ -15,7 +16,8 @@
       "~app/*": ["app/*"],
       "~utils/*": ["utils/*"]
     },
-    "jsx": "react"
+    "jsx": "react",
+    "lib": ["es6", "dom"]
   },
   "include": ["src/**/*", "src/components/room/jitsi-meet-component/module.d.ts"],
   "exclude": ["**/node_modules/*"]
