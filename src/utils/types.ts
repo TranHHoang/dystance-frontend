@@ -29,6 +29,8 @@ export interface Room {
   endDate: string;
   startHour: string;
   endHour: string;
+  repeatOccurrence: string;
+  repeatDays: string;
 }
 
 export interface ErrorResponse {

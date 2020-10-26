@@ -5,7 +5,7 @@ import { WeeklyCalendar } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
 import moment from "moment";
-import { showTimetableEvents } from "./timetableSlice";
+import { resetTimetable, showTimetableEvents } from "./timetableSlice";
 import { setDrawerOpen, setEvent, showCreatorInfo } from "./event-details/eventDetailsSlice";
 import EventDetailsDrawer from "./event-details/EventDetails";
 
@@ -36,9 +36,13 @@ const Timetable = () => {
     endDate: new Date(`${event.endDate}`)
   }));
   useEffect(() => {
+    dispatch(resetTimetable());
     const startOfWeek = moment().startOf("week").toDate();
     const endOfWeek = moment().endOf("week").toDate();
     dispatch(showTimetableEvents(startOfWeek, endOfWeek));
+    return () => {
+      dispatch(resetTimetable());
+    };
   }, []);
 
   useEffect(() => {

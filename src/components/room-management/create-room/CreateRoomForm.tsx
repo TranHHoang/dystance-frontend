@@ -42,7 +42,8 @@ export interface CreateRoomFormValues {
   repeatOccurrence: { name: string; label: string };
   repeatDays: string[];
 }
-const weekDayConvert = (weekDayISO: number) => {
+
+export const weekDayConvert = (weekDayISO: number) => {
   switch (weekDayISO) {
     case 1:
       return "monday";
@@ -67,11 +68,11 @@ const initialValues: CreateRoomFormValues = {
   endTime: moment().format("HH:mm"),
   endDate: new Date(),
   description: "",
-  repeatOccurrence: { name: "0", label: "Weekly" },
+  repeatOccurrence: { name: "1", label: "Weekly" },
   repeatDays: [weekDayConvert(moment().isoWeekday())]
 };
 
-const validationSchema = Yup.object({
+export const validationSchema = Yup.object({
   classroomName: Yup.string().required("Classroom name is required").max(15, "Maximum of 15 characters"),
   startDate: Yup.date()
     .default(() => new Date())
@@ -98,6 +99,7 @@ const RoomFormComponent = (props: any) => {
   const dispatch = useDispatch();
   const { innerRef } = props;
   const createRoomState = useSelector((state: RootState) => state.roomCreation);
+
   function onSubmit(values: CreateRoomFormValues) {
     if (!createRoomState.isLoading) {
       dispatch(createRoom(values, createRoomState.repeatToggle));
@@ -120,7 +122,12 @@ const RoomFormComponent = (props: any) => {
             name="startDate"
             label="Start date"
             value={values.startDate}
-            onChange={(e) => setFieldValue("startDate", e)}
+            onChange={(e) => {
+              setFieldValue("startDate", e);
+              if (moment(e).isAfter(moment(values.endDate), "day")) {
+                setFieldValue("endDate", e);
+              }
+            }}
             error={errors.startDate && touched.startDate ? errors.startDate : null}
             locale="en-GB"
             formatStyle="large"

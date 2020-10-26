@@ -79,8 +79,6 @@ export function createRoom(
     dispatch(roomCreateStart());
 
     try {
-      console.log(repeatOccurrence.name);
-      console.log(JSON.stringify(repeatDays));
       const fd = new FormData();
       const config = {
         headers: {
@@ -118,7 +116,7 @@ export function createRoom(
         // Server is offline/no connection
         dispatch(createRoomFailed({ message: "Something went wrong", type: 2 }));
       } else {
-        dispatch(createRoomFailed({ message: e.message, type: 2 }));
+        dispatch(createRoomFailed({ message: e.message, type: 3 }));
       }
     }
   };
