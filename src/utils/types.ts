@@ -73,7 +73,8 @@ export enum RoomActionType {
   Leave,
   Chat,
   Kick,
-  Mute
+  Mute,
+  ToggleWhiteboard
 }
 export interface DeadlineInfo {
   deadlineId: string;

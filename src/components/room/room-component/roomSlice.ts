@@ -7,7 +7,7 @@ import { ErrorResponse, RoomAction, RoomActionType } from "~utils/types";
 import { fetchLatestMessage } from "../../chat/chatSlice";
 import { setUserInfoList } from "../user-list/userListSlice";
 import { UserInfo } from "~utils/types";
-import { setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
+import { toggleWhiteboard, setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
 import { socket } from "~app/App";
 
 interface RoomState {
@@ -71,6 +71,9 @@ export function initSocket(roomId: string): AppThunk {
           break;
         case RoomActionType.Kick:
           dispatch(setKickOtherUser(true));
+          break;
+        case RoomActionType.ToggleWhiteboard:
+          dispatch(toggleWhiteboard());
           break;
       }
     });

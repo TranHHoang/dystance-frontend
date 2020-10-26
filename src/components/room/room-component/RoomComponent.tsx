@@ -180,7 +180,7 @@ const RoomComponent = (props: any) => {
       case "Chat":
         return <ChatArea roomId={roomId} />;
       case "People":
-        return <UserListComponent creatorId={creatorId} />;
+        return <UserListComponent roomId={roomId} creatorId={creatorId} />;
       case "Deadline":
         return <DeadlineListComponent roomId={roomId} creatorId={creatorId} />;
     }
@@ -279,7 +279,7 @@ const RoomComponent = (props: any) => {
           </RemoteControlButtonDiv>
         </InvisibleDiv>
       ) : null}
-      {whiteboardOpen ? <Whiteboard roomId={roomId} /> : null}
+      {whiteboardOpen ? <Whiteboard roomId={roomId} creatorId={creatorId} /> : null}
       <JitsiMeetComponent roomId={roomId} roomName={roomName} creatorId={creatorId} />
 
       <StyledModal

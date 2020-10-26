@@ -10,10 +10,12 @@ import { getLoginData } from "~utils/tokenStorage";
 import { RoomAction, RoomActionType, User } from "~utils/types";
 import { setRemoteControlAccepted } from "../remote-control/remoteControlSlice";
 import { socket } from "~app/App";
-import { setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
+import { resetCardState, setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
 import { setShowUpperToolbar } from "./jitsiMeetSlice";
 import { resetRoomState } from "../room-component/roomSlice";
 import { Spinner } from "react-rainbow-components";
+import { session } from "electron";
+import { setAllowWhiteboard } from "../whiteboard/js/main";
 
 const loader = styled.div`
   display: none;
@@ -68,6 +70,7 @@ const JitsiMeetComponent = (props: any) => {
       dispatch(setShowUpperToolbar(false));
       dispatch(setRemoteControlAccepted(undefined));
       dispatch(resetRoomState());
+      dispatch(resetCardState());
       createHashHistory().push("/homepage");
       jitsiMeetAPI.dispose();
     });
