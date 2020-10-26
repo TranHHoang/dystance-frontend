@@ -24,7 +24,7 @@ const StyledAvatar = styled.img`
 `;
 
 const StyledPreview = styled.div`
-  padding: 10px 20px;
+  padding: 20px 20px;
   :hover {
     background-color: rgba(255, 255, 255, 0.05);
     cursor: pointer;
@@ -32,8 +32,10 @@ const StyledPreview = styled.div`
 `;
 
 const StyledHeader = styled.header`
+  background-color: ${(props) => props.theme.rainbow.palette.background.main};
   z-index: 1;
   display: flex;
+  padding: 5 0 5 0;
   span {
     align-self: center;
     font-size: 16px;
@@ -43,15 +45,20 @@ const StyledHeader = styled.header`
 
 const StyledButtonIcon = styled(ButtonIcon)`
   position: absolute;
-  top: 88vh;
-  left: 50%;
+  bottom: 40px;
+  right: 40px;
   padding: 30px;
-  border: 0.5px solid white;
 `;
 
 const Container = styled.div`
   width: 100%;
   height: calc(98vh - 40px);
+`;
+const Title = styled.h1`
+  font-size: 2.5em;
+  font-weight: 500;
+  color: white;
+  padding-right: 20px;
 `;
 interface NewChatFormValues {
   id: string;
@@ -68,16 +75,20 @@ const schema = Yup.object({
   message: Yup.string().required("This field is required")
 });
 
-const ChatPreview = () => {
+const ChatPreview = (props: any) => {
   const [usersInfo, setUsersInfo] = useState<{ [key: string]: UserInfo }>({});
   const previews = useSelector((root: RootState) => root.chatPreviewState);
   const [selectedUserId, setSelectedUserId] = useState<string>();
   const [showNewMessageModal, setShowNewMessageModal] = useState(false);
+  const { inRoom, inSidebar } = props;
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(initSocket());
     dispatch(fetchAllPreview(getLoginData().id));
+    return () => {
+      socket.off(PrivateMessage);
+    };
   }, []);
 
   useEffect(() => {
@@ -102,10 +113,6 @@ const ChatPreview = () => {
     if (selectedUserId) {
       dispatch(fetchAllMessages(undefined, { id1: selectedUserId, id2: getLoginData().id }));
     }
-
-    return () => {
-      socket.off(PrivateMessage);
-    };
   }, [selectedUserId]);
 
   function onNewChatSubmit(values: NewChatFormValues) {
@@ -116,9 +123,14 @@ const ChatPreview = () => {
   }
 
   return (
-    <Container>
+    <Container style={{ height: inRoom ? "calc(98vh - 40px - 72.19px)" : "calc(98vh - 40px)" }}>
       {!selectedUserId ? (
         <>
+          {!inRoom ? (
+            <div style={{ padding: "20px 0 20px 20px" }}>
+              <Title>Private Messages</Title>
+            </div>
+          ) : null}
           {previews.map((preview) => {
             const id = preview.senderId !== getLoginData().id ? preview.senderId : preview.receiverId;
             return (
@@ -188,6 +200,7 @@ const ChatPreview = () => {
           <StyledButtonIcon
             assistiveText="New message"
             title="New message"
+            variant="brand"
             icon={<FontAwesomeIcon icon={faPencilAlt} />}
             size="large"
             onClick={(e) => setShowNewMessageModal(true)}
@@ -202,10 +215,12 @@ const ChatPreview = () => {
               size="medium"
             />
             <span>
-              {usersInfo[selectedUserId].realName} ({usersInfo[selectedUserId].userName})
+              <b>
+                {usersInfo[selectedUserId].realName} ({usersInfo[selectedUserId].userName})
+              </b>
             </span>
           </StyledHeader>
-          <div style={{ margin: "5px" }}>
+          <div style={{ margin: "0 5 0 5" }}>
             <ChatArea receiverId={selectedUserId} />
           </div>
         </>

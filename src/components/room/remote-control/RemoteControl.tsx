@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import SimplePeer from "simple-peer";
 import { Instance } from "simple-peer";
 import { getLoginData } from "~utils/tokenStorage";
-import { socket } from "../room-component/roomSlice";
+import { socket } from "~app/App";
 // @ts-ignore
 import wrtc from "wrtc";
 import robot from "robotjs";
@@ -13,8 +13,6 @@ import { setRemoteControlWaitingModalOpen } from "../user-list/user-card/userCar
 import { useDispatch } from "react-redux";
 
 const StyledVideo = styled.video`
-  /* max-width: 1366px;
-  max-height: 768px; */
   width: 100%;
   height: 93vh;
   display: none;

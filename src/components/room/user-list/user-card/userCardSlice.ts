@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
-import { socket } from "../../room-component/roomSlice";
+import { socket } from "~app/App";
 import { AppThunk } from "~app/store";
 import { RoomAction, RoomActionType } from "~utils/types";
 
@@ -17,9 +17,12 @@ interface UserCardState {
   isLoading: boolean;
   isKickSuccess: boolean;
   isMuteSuccess: boolean;
+  isAllowWhiteboardSuccess: boolean;
   muteOtherUser: boolean;
   kickOtherUser: boolean;
+  allowWhiteboard: boolean;
   error?: ErrorResponse;
+  userWhiteboard: { [key: string]: boolean };
 }
 const initialState: UserCardState = {
   userId: null,
@@ -30,8 +33,11 @@ const initialState: UserCardState = {
   isLoading: false,
   isKickSuccess: false,
   isMuteSuccess: false,
+  isAllowWhiteboardSuccess: false,
   muteOtherUser: false,
-  kickOtherUser: false
+  kickOtherUser: false,
+  allowWhiteboard: false,
+  userWhiteboard: {}
 };
 const userCardSlice = createSlice({
   name: "userCardSlice",
@@ -57,6 +63,9 @@ const userCardSlice = createSlice({
       state.userId = action.payload.userId;
       state.isRemoteControlWaitingModalOpen = action.payload.isModalOpen;
     },
+    allowWhiteboardStart(state) {
+      state.isLoading = true;
+    },
     kickUserStart(state) {
       state.isLoading = true;
     },
@@ -73,15 +82,24 @@ const userCardSlice = createSlice({
       state.isKickSuccess = true;
       state.isKickModalOpen = false;
     },
-    actionFailure(state, action: PayloadAction<ErrorResponse>) {
+    allowWhiteboardSuccess(state) {
       state.isLoading = false;
-      state.error = action.payload;
+      state.isAllowWhiteboardSuccess = true;
     },
     setMuteOtherUser(state, action: PayloadAction<boolean>) {
       state.muteOtherUser = action.payload;
     },
     setKickOtherUser(state, action: PayloadAction<boolean>) {
       state.kickOtherUser = action.payload;
+    },
+    toggleWhiteboard(state) {
+      state.allowWhiteboard = !state.allowWhiteboard;
+    },
+    toggleUserWhiteboard(state, action: PayloadAction<string>) {
+      state.userWhiteboard[action.payload] = !state.userWhiteboard[action.payload];
+    },
+    resetCardState() {
+      return initialState;
     }
   }
 });
@@ -97,26 +115,18 @@ export const {
   muteUserStart,
   muteSuccess,
   kickSuccess,
-  actionFailure
+  allowWhiteboardStart,
+  toggleWhiteboard,
+  allowWhiteboardSuccess,
+  resetCardState,
+  toggleUserWhiteboard
 } = userCardSlice.actions;
 
 export function muteUser(roomId: string, userId: string): AppThunk {
   return async (dispatch) => {
-    try {
-      dispatch(muteUserStart());
-      await socket.invoke(RoomAction, roomId, RoomActionType.Mute, userId);
-      dispatch(muteSuccess());
-    } catch (e) {
-      const ex = e as AxiosError;
-
-      if (ex.response?.data) {
-        dispatch(actionFailure(e.response.data as ErrorResponse));
-      } else if (ex.request) {
-        dispatch(actionFailure({ message: "Something Went Wrong" }));
-      } else {
-        dispatch(actionFailure({ message: ex.message }));
-      }
-    }
+    dispatch(muteUserStart());
+    await socket.invoke(RoomAction, roomId, RoomActionType.Mute, userId);
+    dispatch(muteSuccess());
   };
 }
 
@@ -125,5 +135,11 @@ export function kickUser(roomId: string, userId: string): AppThunk {
     dispatch(kickUserStart());
     await socket.invoke(RoomAction, roomId, RoomActionType.Kick, userId);
     dispatch(kickSuccess());
+  };
+}
+export function toggleWhiteboardUsage(roomId: string, userId: string): AppThunk {
+  return async (dispatch) => {
+    await socket.invoke(RoomAction, roomId, RoomActionType.ToggleWhiteboard, userId);
+    dispatch(toggleUserWhiteboard(userId));
   };
 }

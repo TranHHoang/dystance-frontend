@@ -32,7 +32,7 @@ import {
   setRemoteControlOfferModalOpen,
   setRemoteControlWaitingModalOpen
 } from "../user-list/user-card/userCardSlice";
-import { StyledText } from "../../homepage/single-room/SingleRoom";
+import { StyledText } from "../../homepage/single-room/styles";
 import { hostName } from "~utils/hostUtils";
 import RemoteControl, { RemoteControlSignalType, REMOTE_CONTROL_SIGNAL } from "../remote-control/RemoteControl";
 import { UserInfo } from "~utils/types";
@@ -65,7 +65,7 @@ const StyledDrawer = styled(Drawer)`
 
 const PrivateChatDrawer = styled(StyledDrawer)`
   > div {
-    padding: 0;
+    padding-top: 0;
   }
 `;
 
@@ -180,7 +180,7 @@ const RoomComponent = (props: any) => {
       case "Chat":
         return <ChatArea roomId={roomId} />;
       case "People":
-        return <UserListComponent creatorId={creatorId} />;
+        return <UserListComponent roomId={roomId} creatorId={creatorId} />;
       case "Deadline":
         return <DeadlineListComponent roomId={roomId} creatorId={creatorId} />;
     }
@@ -242,9 +242,9 @@ const RoomComponent = (props: any) => {
       <PrivateChatDrawer
         isOpen={privateChatOpen}
         onRequestClose={() => setPrivateChatOpen(false)}
-        hideCloseButton={true}
+        header="Private Messages"
       >
-        <ChatPreview />
+        <ChatPreview inRoom={true} />
       </PrivateChatDrawer>
 
       <StyledDrawer
@@ -279,8 +279,9 @@ const RoomComponent = (props: any) => {
           </RemoteControlButtonDiv>
         </InvisibleDiv>
       ) : null}
-      {whiteboardOpen ? <Whiteboard roomId={roomId} /> : null}
+      {whiteboardOpen ? <Whiteboard roomId={roomId} creatorId={creatorId} /> : null}
       <JitsiMeetComponent roomId={roomId} roomName={roomName} creatorId={creatorId} />
+
       <StyledModal
         isOpen={peopleProfileState.peopleProfileModalOpen}
         onRequestClose={() => {
@@ -290,6 +291,7 @@ const RoomComponent = (props: any) => {
       >
         <PeopleProfilePage userId={peopleProfileState.userId} />
       </StyledModal>
+
       <StyledModal
         title="Confirm Mute"
         isOpen={userCardState.isMuteModalOpen}

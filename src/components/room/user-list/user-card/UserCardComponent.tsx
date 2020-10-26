@@ -3,18 +3,31 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { setPeopleProfileModalOpen } from "../../../profile-page/people-profile/peopleProfileSlice";
 import * as React from "react";
 import { Card, ButtonMenu, MenuItem } from "react-rainbow-components";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { getLoginData } from "~utils/tokenStorage";
-import { setKickModalOpen, setMuteModalOpen, setRemoteControlWaitingModalOpen } from "./userCardSlice";
+import {
+  resetCardState,
+  setKickModalOpen,
+  setMuteModalOpen,
+  setRemoteControlWaitingModalOpen,
+  toggleWhiteboard,
+  toggleWhiteboardUsage
+} from "./userCardSlice";
+import { RootState } from "~app/rootReducer";
+import { useEffect } from "react";
 
 const StyledCard = styled(Card)`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
 `;
 
 const UserCardComponent = (props: any) => {
-  const { userId, icon, title, creatorId } = props;
+  const { userId, icon, title, creatorId, roomId } = props;
+  const userCardState = useSelector((state: RootState) => state.userCardState);
   const dispatch = useDispatch();
+  // useEffect(() => {
+  //   dispatch(resetCardState());
+  // }, [])
   return (
     <div>
       <StyledCard
@@ -40,6 +53,10 @@ const UserCardComponent = (props: any) => {
                   <MenuItem
                     label="Remote control"
                     onClick={() => dispatch(setRemoteControlWaitingModalOpen({ userId, isModalOpen: true }))}
+                  />
+                  <MenuItem
+                    label="Toggle Whiteboard Usage"
+                    onClick={() => dispatch(toggleWhiteboardUsage(roomId, userId))}
                   />
                 </div>
               ) : null}

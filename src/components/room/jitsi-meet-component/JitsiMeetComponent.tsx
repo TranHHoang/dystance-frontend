@@ -1,6 +1,6 @@
 import { createHashHistory } from "history";
 import { setupScreenSharingRender } from "jitsi-meet-electron-utils";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Jitsi from "react-jitsi";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
@@ -10,16 +10,26 @@ import { getLoginData } from "~utils/tokenStorage";
 import { RoomAction, RoomActionType, User } from "~utils/types";
 import { setRemoteControlAccepted } from "../remote-control/remoteControlSlice";
 import { socket } from "~app/App";
-import { setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
+import { resetCardState, setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
 import { setShowUpperToolbar } from "./jitsiMeetSlice";
+import { resetRoomState } from "../room-component/roomSlice";
+import { Spinner } from "react-rainbow-components";
+import { session } from "electron";
+import { setAllowWhiteboard } from "../whiteboard/js/main";
 
 const loader = styled.div`
   display: none;
+`;
+const StyledSpinner = styled(Spinner)`
+  position: absolute;
+  top: 50vh;
+  left: 50vw;
 `;
 const JitsiMeetComponent = (props: any) => {
   const userCardState = useSelector((state: RootState) => state.userCardState);
   const profile = JSON.parse(localStorage.getItem("profile")) as User;
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(true);
   const { roomId, roomName } = props;
   const api = useRef(null);
 
@@ -44,6 +54,7 @@ const JitsiMeetComponent = (props: any) => {
   }, [userCardState.kickOtherUser]);
 
   const handleAPI = (jitsiMeetAPI: any) => {
+    setIsLoading(false);
     api.current = jitsiMeetAPI;
     jitsiMeetAPI.executeCommand("displayName", `${profile.realName} (${profile.userName})`);
     jitsiMeetAPI.executeCommand("avatarUrl", `${hostName}/${profile.avatar}`);
@@ -58,58 +69,63 @@ const JitsiMeetComponent = (props: any) => {
       socket.invoke(RoomAction, roomId, RoomActionType.Leave, getLoginData().id);
       dispatch(setShowUpperToolbar(false));
       dispatch(setRemoteControlAccepted(undefined));
+      dispatch(resetRoomState());
+      dispatch(resetCardState());
       createHashHistory().push("/homepage");
       jitsiMeetAPI.dispose();
     });
   };
   return (
-    <Jitsi
-      domain="jitsidystance.southeastasia.cloudapp.azure.com"
-      loadingComponent={loader}
-      roomName={roomId}
-      displayName={`${profile.realName} (${profile.userName})`}
-      userInfo={{
-        email: `${profile.email}`
-      }}
-      containerStyle={{ width: "100%", height: "100vh" }}
-      frameStyle={{ width: "100%", height: "100%", display: "block" }}
-      interfaceConfig={{
-        filmStripOnly: false,
-        TOOLBAR_BUTTONS: [
-          "microphone",
-          "camera",
-          "desktop",
-          "fodeviceselection",
-          "hangup",
-          "sharedvideo",
-          "raisehand",
-          "videoquality",
-          "stats",
-          "shortcuts",
-          "tileview",
-          "download",
-          "help",
-          "mute-everyone"
-        ],
-        DISABLE_FOCUS_INDICATOR: true,
-        VIDEO_QUALITY_LABEL_DISABLED: true
-      }}
-      config={{
-        disableSimulcast: false,
-        requireDisplayName: false,
-        enableWelcomePage: false,
-        enableClosePage: true,
-        remoteVideoMenu: {
-          disableKick: true
-        },
-        disableRemoteMute: true,
-        desktopSharingFrameRate: {
-          min: 30,
-          max: 30
-        }
-      }}
-      onAPILoad={handleAPI}
-    />
+    <>
+      {isLoading && <StyledSpinner />}
+      <Jitsi
+        domain="jitsidystance.southeastasia.cloudapp.azure.com"
+        loadingComponent={loader}
+        roomName={roomId}
+        displayName={`${profile.realName} (${profile.userName})`}
+        userInfo={{
+          email: `${profile.email}`
+        }}
+        containerStyle={{ width: "100%", height: "100vh" }}
+        frameStyle={{ width: "100%", height: "100%", display: "block" }}
+        interfaceConfig={{
+          filmStripOnly: false,
+          TOOLBAR_BUTTONS: [
+            "microphone",
+            "camera",
+            "desktop",
+            "fodeviceselection",
+            "hangup",
+            "sharedvideo",
+            "raisehand",
+            "videoquality",
+            "stats",
+            "shortcuts",
+            "tileview",
+            "download",
+            "help",
+            "mute-everyone"
+          ],
+          DISABLE_FOCUS_INDICATOR: true,
+          VIDEO_QUALITY_LABEL_DISABLED: true
+        }}
+        config={{
+          disableSimulcast: false,
+          requireDisplayName: false,
+          enableWelcomePage: false,
+          enableClosePage: true,
+          remoteVideoMenu: {
+            disableKick: true
+          },
+          disableRemoteMute: true,
+          desktopSharingFrameRate: {
+            min: 30,
+            max: 30
+          }
+        }}
+        onAPILoad={handleAPI}
+      />
+    </>
   );
 };
 export default JitsiMeetComponent;

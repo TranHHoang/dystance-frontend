@@ -13,6 +13,7 @@ import { socket } from "~app/App";
 import { getLoginData } from "~utils/tokenStorage";
 
 let whiteboardId;
+let allowWhiteboard = false;
 const myUsername = (getLoginData() || {}).userName;
 
 function main(roomId) {
@@ -33,7 +34,9 @@ function main(roomId) {
   });
   socket.invoke("JoinWhiteboard", whiteboardId);
 }
-
+export function setAllowWhiteboard(isAllowed) {
+  allowWhiteboard = isAllowed;
+}
 function showBasicAlert(html, newOptions) {
   const options = {
     header: "INFO MESSAGE",
@@ -90,7 +93,6 @@ function showBasicAlert(html, newOptions) {
 function initWhiteboard() {
   $(document).ready(function () {
     // by default set in readOnly mode
-    // ReadOnlyService.activateReadOnlyMode();
 
     whiteboard.loadWhiteboard("#whiteboardContainer", {
       //Load the whiteboard
@@ -107,6 +109,17 @@ function initWhiteboard() {
     Axios.get(`${hostName}/api/rooms/whiteboard/load?id=${whiteboardId}`).then(function (response) {
       console.log(response.data);
       whiteboard.loadData(response.data);
+      if (allowWhiteboard) {
+        ReadOnlyService.deactivateReadOnlyMode();
+      } else {
+        ReadOnlyService.activateReadOnlyMode();
+      }
+      // if (sessionStorage.getItem("allowWhiteboard")) {
+      //   if (sessionStorage.getItem("allowWhiteboard") === "true") {
+      //   } else {
+      //   }
+      // }
+      // ReadOnlyService.activateReadOnlyMode();
     });
 
     /*----------------/
