@@ -33,25 +33,31 @@ export const AllRooms = () => {
 
   return (
     <BackgroundContainer>
-      {showRoomState.isLoading ? (
-        <Spinner variant="brand" size="large" />
-      ) : (
-        <Container>
-          {showRoomState.rooms.map((room) => (
-            <div key={room.roomId}>
-              <SingleRoom
-                roomId={room.roomId}
-                creatorId={room.creatorId}
-                roomName={room.roomName}
-                startHour={room.startHour}
-                endHour={room.endHour}
-                image={room.image}
-                description={room.description}
-              />
-            </div>
-          ))}
-        </Container>
-      )}
-    </BackgroundContainer>
+  {
+    showRoomState.isLoading ? (
+      <Spinner variant="brand" size="large" />
+    ) : (
+      <Container>
+        {showRoomState.rooms.map((room) => (
+          <div key={room.roomId}>
+            <SingleRoom
+              roomId={room.roomId}
+              creatorId={room.creatorId}
+              roomName={room.roomName}
+              startHour={room.startHour}
+              endHour={room.endHour}
+              startDate={room.startDate}
+              endDate={room.endDate}
+              image={room.image}
+              description={room.description}
+              repeatOccurrence={room.repeatOccurrence}
+              repeatDays={room.repeatDays}
+            />
+          </div>
+        ))}
+      </Container>
+    )
+  }
+    </BackgroundContainer >
   );
 };
