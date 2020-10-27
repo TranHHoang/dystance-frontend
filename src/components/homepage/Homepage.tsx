@@ -1,3 +1,5 @@
+import Timetable from "../timetable/Timetable";
+import ChatPreview from "../private-chat/ChatPreview";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
@@ -8,6 +10,7 @@ import CreateRoomForm from "../room-management/create-room/CreateRoomForm";
 import SideNavigationBar from "../sidebar/Sidebar";
 import { setSidebarValue } from "../sidebar/sidebarSlice";
 import { AllRooms } from "./all-rooms/AllRooms";
+import { fetchAllUsers } from "./showRoomsSlice";
 
 const CreateRoomDiv = styled.div`
   display: flex;
@@ -27,14 +30,13 @@ const Title = styled.h1`
 const HomePageContainer = styled.div`
   display: flex;
   flex-direction: column;
-  margin-left: 130px;
 `;
 const Container = styled.div`
   display: flex;
   height: auto;
 `;
 
-export const HomePageDisplay = () => {
+const HomePageDisplay = () => {
   return (
     <HomePageContainer>
       <CreateRoomDiv>
@@ -55,6 +57,7 @@ export const HomePage = () => {
   useEffect(() => {
     dispatch(setSidebarValue("Homepage"));
     dispatch(showProfile());
+    dispatch(fetchAllUsers());
   }, []);
 
   function getCurrentSidebarValue() {
@@ -63,12 +66,16 @@ export const HomePage = () => {
         return <HomePageDisplay />;
       case "Profile":
         return <ProfilePage />;
+      case "Timetable":
+        return <Timetable />;
+      case "Chat":
+        return <ChatPreview />;
     }
   }
   return (
     <Container>
       <SideNavigationBar />
-      {getCurrentSidebarValue()}
+      <div style={{ marginLeft: "110px", width: "100%" }}>{getCurrentSidebarValue()}</div>
     </Container>
   );
 };

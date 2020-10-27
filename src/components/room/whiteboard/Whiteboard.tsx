@@ -4,9 +4,13 @@
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
+import { RootState } from "~app/rootReducer";
+import { getLoginData } from "~utils/tokenStorage";
 import "./js/index";
-import main from "./js/main";
+import main, { setAllowWhiteboard } from "./js/main";
+import ReadOnlyService from "./js/services/ReadOnlyService";
 
 declare module "react" {
   interface HTMLAttributes<T> {
@@ -40,26 +44,38 @@ const StyledWhiteboard = styled.div`
 `;
 
 const Whiteboard = (props: any) => {
-  const { roomId } = props;
+  const userCardState = useSelector((state: RootState) => state.userCardState);
+  const { roomId, creatorId } = props;
   const [thickness, setThickness] = useState(3);
 
   useEffect(() => {
     main(roomId);
+    // ReadOnlyService.activateReadOnlyMode();
   }, [roomId]);
 
+  useEffect(() => {
+    setAllowWhiteboard(userCardState.allowWhiteboard);
+    if (userCardState.allowWhiteboard) {
+      ReadOnlyService.deactivateReadOnlyMode();
+    } else {
+      ReadOnlyService.activateReadOnlyMode();
+    }
+  }, [userCardState.allowWhiteboard]);
   return (
     <StyledWhiteboard id="whiteboard">
       <div id="whiteboardContainer"></div>
 
       <Toolbar>
-        <div className="btn-group">
-          <WhiteboardLockButton id="whiteboardLockBtn" title="View and Write" type="button">
-            <i className="fa fa-lock"></i>
-          </WhiteboardLockButton>
-          <button id="whiteboardUnlockBtn" title="View Only" type="button">
-            <i className="fa fa-lock-open"></i>
-          </button>
-        </div>
+        {creatorId === getLoginData().id ? (
+          <div className="btn-group">
+            <WhiteboardLockButton id="whiteboardLockBtn" title="View and Write" type="button">
+              <i className="fa fa-lock"></i>
+            </WhiteboardLockButton>
+            <button id="whiteboardUnlockBtn" title="View Only" type="button">
+              <i className="fa fa-lock-open"></i>
+            </button>
+          </div>
+        ) : null}
 
         <div className="btn-group whiteboard-edit-group">
           <button id="whiteboardTrashBtn" title="Clear the whiteboard" type="button">
@@ -100,7 +116,7 @@ const Whiteboard = (props: any) => {
             <svg
               xmlns="http://www.w3.org/2000/svg"
               // eslint-disable-next-line react/no-unknown-property
-              enable-background="new 0 0 24 24"
+              enableBackground="new 0 0 24 24"
               viewBox="0 0 24 24"
               fill="black"
               width="24px"

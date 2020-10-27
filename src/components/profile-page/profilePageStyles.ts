@@ -1,10 +1,10 @@
 import { Form } from "formik";
 import { Button, Card, DatePicker, FileSelector, Input } from "react-rainbow-components";
 import styled from "styled-components";
+
 export const Container = styled.div`
   padding: 20px;
   width: 100%;
-  margin-left: 130px;
 `;
 export const CardContainer = styled.div`
   padding: 20px;
@@ -89,4 +89,7 @@ export const StyledButton = styled(Button)`
     outline: 0;
     box-shadow: 0 0 0 black;
   }
+`;
+export const PeopleProfileContainer = styled(Container)`
+  margin-left: 0px;
 `;

@@ -10,13 +10,14 @@ import ChatHistory from "./ChatHistory";
 import { broadcastMessage, ChatType } from "./chatSlice";
 
 const ChatHistoryArea = styled.div`
-  overflow: auto;
+  overflow: hidden;
   transform: translate3d(0, 0, 0); /* Faster scrolling */
   min-width: 450px;
+  height: 100%;
 `;
 const StyledChatArea = styled.div`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
-  overflow-x: hidden;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -56,12 +57,11 @@ const StyledModal = styled(Modal)`
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 const ChatArea = (props: any) => {
-  const chatState = useSelector((root: RootState) => root.chatState);
   const [file, setFile] = useState<File>();
   const [imagePreview, setImagePreview] = useState("");
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const chatBox = useRef<HTMLDivElement>();
-  const { roomId } = props;
+  const { roomId, receiverId } = props;
   const dispatch = useDispatch();
 
   function isImageFile(file: File) {
@@ -85,10 +85,6 @@ const ChatArea = (props: any) => {
     }
   }, [file]);
 
-  useEffect(() => {
-    chatBox.current.scrollTop = chatBox.current.scrollHeight + 500;
-  }, [chatState]);
-
   function onDrop(e: React.DragEvent<HTMLDivElement>) {
     e.preventDefault();
 
@@ -101,7 +97,7 @@ const ChatArea = (props: any) => {
   function sendFile() {
     if (file.size < MAX_FILE_SIZE)
       dispatch(
-        broadcastMessage(roomId, file, isImageFile(file) ? ChatType.Image : ChatType.File, (percentage) => {
+        broadcastMessage(roomId, receiverId, file, isImageFile(file) ? ChatType.Image : ChatType.File, (percentage) => {
           setUploadPercentage(percentage);
         })
       );
@@ -165,9 +161,9 @@ const ChatArea = (props: any) => {
       </StyledModal>
       <StyledChatArea>
         <ChatHistoryArea id="chatbox" ref={chatBox}>
-          <ChatHistory />
+          <ChatHistory isPrivateChat={roomId === undefined} />
         </ChatHistoryArea>
-        <ChatBox setFile={setFile} roomId={roomId} />
+        <ChatBox setFile={setFile} roomId={roomId} receiverId={receiverId} />
       </StyledChatArea>
     </div>
   );

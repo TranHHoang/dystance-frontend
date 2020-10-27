@@ -13,6 +13,7 @@ interface CreateRoomState {
   isLoading: boolean;
   isModalOpen: boolean;
   isCreationSuccess: boolean;
+  repeatToggle: boolean;
   error?: ErrorResponse;
 }
 
@@ -20,7 +21,8 @@ const initialState: CreateRoomState = {
   // Use to update react component
   isLoading: false,
   isModalOpen: false,
-  isCreationSuccess: false
+  isCreationSuccess: false,
+  repeatToggle: false
 };
 
 const createRoomSlice = createSlice({
@@ -44,21 +46,39 @@ const createRoomSlice = createSlice({
     createRoomFailed(state, action: PayloadAction<ErrorResponse>) {
       state.isLoading = false;
       state.error = action.payload;
+    },
+    setRepeatToggle(state, action: PayloadAction<boolean>) {
+      state.repeatToggle = action.payload;
+    },
+    resetCreateRoomState() {
+      return initialState;
     }
   }
 });
 
 export default createRoomSlice.reducer;
-export const { roomCreateStart, createRoomSuccess, createRoomFailed, setRoomCreateModalOpen } = createRoomSlice.actions;
+export const {
+  setRepeatToggle,
+  roomCreateStart,
+  createRoomSuccess,
+  createRoomFailed,
+  setRoomCreateModalOpen,
+  resetCreateRoomState
+} = createRoomSlice.actions;
 
-export function createRoom({
-  classroomName,
-  startDate,
-  startTime,
-  endTime,
-  endDate,
-  description
-}: CreateRoomFormValues): AppThunk {
+export function createRoom(
+  {
+    classroomName,
+    startDate,
+    startTime,
+    endTime,
+    endDate,
+    description,
+    repeatOccurrence,
+    repeatDays
+  }: CreateRoomFormValues,
+  repeatToggle: boolean
+): AppThunk {
   return async (dispatch) => {
     dispatch(roomCreateStart());
 
@@ -73,9 +93,17 @@ export function createRoom({
       fd.append("creatorId", getLoginData().id);
       fd.append("description", description);
       fd.append("startDate", moment(startDate).format("YYYY-MM-DD"));
-      fd.append("endDate", moment(endDate).format("YYYY-MM-DD"));
       fd.append("startHour", startTime);
       fd.append("endHour", endTime);
+      fd.append("repeatOccurrence", repeatOccurrence.name);
+      fd.append("repeatDays", JSON.stringify(repeatDays));
+      if (repeatToggle) {
+        console.log("Repeat Toggle is True");
+        fd.append("endDate", moment(endDate).format("YYYY-MM-DD"));
+      } else {
+        console.log("Repeat Toggle is False");
+        fd.append("endDate", moment(new Date()).format("YYYY-MM-DD"));
+      }
 
       await Axios.post(`${hostName}/api/rooms/create`, fd, config);
       dispatch(createRoomSuccess());
@@ -92,7 +120,7 @@ export function createRoom({
         // Server is offline/no connection
         dispatch(createRoomFailed({ message: "Something went wrong", type: 2 }));
       } else {
-        dispatch(createRoomFailed({ message: e.message, type: 2 }));
+        dispatch(createRoomFailed({ message: e.message, type: 3 }));
       }
     }
   };

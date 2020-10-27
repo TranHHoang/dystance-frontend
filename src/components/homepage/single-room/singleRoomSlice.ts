@@ -1,33 +1,47 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
+import moment from "moment";
 import { AppThunk } from "~app/store";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
+import { getLoginData } from "~utils/tokenStorage";
+import { ErrorResponse, Room } from "~utils/types";
 import { resetRoom, showRoom } from "../showRoomsSlice";
-
-interface ErrorResponse {
-  message: string;
-}
+import { UpdateRoomFormValues } from "./SingleRoomUpdateForm";
 
 interface SingleRoomState {
   roomId: string;
   isLoading: boolean;
+  isUpdateModalOpen: boolean;
   isConfirmDeleteModalOpen: boolean;
+  isUpdateSuccess: boolean;
   isDeleteSuccess: boolean;
+  room: Room;
   error?: ErrorResponse;
+  updateRepeatToggle: boolean;
 }
 
 const initialState: SingleRoomState = {
   roomId: null,
   isLoading: false,
+  isUpdateModalOpen: false,
   isConfirmDeleteModalOpen: false,
-  isDeleteSuccess: false
+  isUpdateSuccess: false,
+  room: null,
+  isDeleteSuccess: false,
+  updateRepeatToggle: false
 };
 
 const singleRoomSlice = createSlice({
   name: "singleRoom",
   initialState,
   reducers: {
+    setUpdateModalOpen(state, action: PayloadAction<{ roomId: string; isUpdateModalOpen: boolean }>) {
+      state.roomId = action.payload.roomId;
+      state.isUpdateModalOpen = action.payload.isUpdateModalOpen;
+      state.isUpdateSuccess = false;
+      state.error = undefined;
+    },
     setConfirmDeleteModalOpen(state, action: PayloadAction<{ roomId: string; isConfirmDeleteModalOpen: boolean }>) {
       state.roomId = action.payload.roomId;
       state.isConfirmDeleteModalOpen = action.payload.isConfirmDeleteModalOpen;
@@ -35,6 +49,9 @@ const singleRoomSlice = createSlice({
       state.error = undefined;
     },
     deleteRoomStart(state) {
+      state.isLoading = true;
+    },
+    updateRoomStart(state) {
       state.isLoading = true;
     },
     deleteRoomSuccess(state) {
@@ -45,6 +62,21 @@ const singleRoomSlice = createSlice({
     deleteRoomFailed(state, action: PayloadAction<ErrorResponse>) {
       state.isLoading = false;
       state.error = action.payload;
+    },
+    updateRoomSuccess(state) {
+      state.isLoading = false;
+      state.isUpdateSuccess = true;
+      state.isUpdateModalOpen = false;
+    },
+    updateRoomFailed(state, action: PayloadAction<ErrorResponse>) {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
+    setUpdateRepeatToggle(state, action: PayloadAction<boolean>) {
+      state.updateRepeatToggle = action.payload;
+    },
+    resetState() {
+      return initialState;
     }
   }
 });
@@ -53,8 +85,14 @@ export default singleRoomSlice.reducer;
 export const {
   setConfirmDeleteModalOpen,
   deleteRoomStart,
+  resetState,
   deleteRoomFailed,
-  deleteRoomSuccess
+  setUpdateRepeatToggle,
+  deleteRoomSuccess,
+  setUpdateModalOpen,
+  updateRoomStart,
+  updateRoomSuccess,
+  updateRoomFailed
 } = singleRoomSlice.actions;
 
 export function deleteRoom(roomId: string): AppThunk {
@@ -71,9 +109,73 @@ export function deleteRoom(roomId: string): AppThunk {
       if (ex.response?.data) {
         dispatch(deleteRoomFailed(e.response.data as ErrorResponse));
       } else if (ex.request) {
-        dispatch(deleteRoomFailed({ message: "Something Went Wrong" }));
+        dispatch(deleteRoomFailed({ message: "Something Went Wrong", type: 2 }));
       } else {
-        dispatch(deleteRoomFailed({ message: ex.message }));
+        dispatch(deleteRoomFailed({ message: ex.message, type: 3 }));
+      }
+    }
+  };
+}
+
+export function updateRoom(
+  {
+    roomId,
+    classroomName,
+    startDate,
+    startTime,
+    endTime,
+    endDate,
+    description,
+    repeatOccurrence,
+    repeatDays,
+    roomImage
+  }: UpdateRoomFormValues,
+  updateRepeatToggle: boolean
+): AppThunk {
+  return async (dispatch) => {
+    dispatch(updateRoomStart());
+    try {
+      const fd = new FormData();
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      };
+      fd.append("roomId", roomId);
+      fd.append("name", classroomName);
+      fd.append("creatorId", getLoginData().id);
+      fd.append("description", description);
+      fd.append("startDate", moment(startDate).format("YYYY-MM-DD"));
+      fd.append("startHour", startTime);
+      fd.append("endHour", endTime);
+      fd.append("repeatOccurrence", repeatOccurrence.name);
+      fd.append("repeatDays", JSON.stringify(repeatDays));
+      if (updateRepeatToggle) {
+        console.log("Repeat Toggle is True");
+        fd.append("endDate", moment(endDate).format("YYYY-MM-DD"));
+      } else {
+        console.log("Repeat Toggle is False");
+        fd.append("endDate", moment(new Date()).format("YYYY-MM-DD"));
+      }
+      fd.append("roomImage", roomImage);
+
+      await Axios.post(`${hostName}/api/rooms/update`, fd, config);
+      dispatch(updateRoomSuccess());
+      dispatch(resetState());
+      dispatch(resetRoom());
+      dispatch(showRoom());
+    } catch (ex) {
+      // Error code != 200
+      const e = ex as AxiosError;
+
+      if (e.response) {
+        // Server is online, get data from server
+        dispatch(updateRoomFailed(e.response.data as ErrorResponse));
+      } else if (e.request) {
+        // Server is offline/no connection
+        dispatch(updateRoomFailed({ message: "Something went wrong", type: 2 }));
+      } else {
+        dispatch(updateRoomFailed({ message: e.message, type: 3 }));
       }
     }
   };

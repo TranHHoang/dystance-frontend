@@ -4,7 +4,7 @@ import { AppThunk } from "~app/store";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
-import { Room } from "~utils/types";
+import { AllUsersInfo, Room } from "~utils/types";
 
 enum ShowRoomError {
   OtherError = 2
@@ -75,6 +75,17 @@ export function showRoom(): AppThunk {
           })
         );
       }
+    }
+  };
+}
+
+export function fetchAllUsers(): AppThunk {
+  return async () => {
+    try {
+      const response = await Axios.get(`${hostName}/api/users/getAll`);
+      sessionStorage.setItem(AllUsersInfo, JSON.stringify(response.data));
+    } catch (ex) {
+      console.log(ex);
     }
   };
 }

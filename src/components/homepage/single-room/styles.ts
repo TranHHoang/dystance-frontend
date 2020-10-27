@@ -1,4 +1,6 @@
-import { Button, Card, Textarea } from "react-rainbow-components";
+import { StyledNotification } from "../../../components/account-management/styles";
+import { Button, ButtonMenu, Card, Textarea, Notification } from "react-rainbow-components";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 export const StyledCard = styled(Card)`
@@ -21,6 +23,7 @@ export const StyledImage = styled.img`
   height: 105px;
   border-radius: 50%;
   z-index: 2;
+  object-fit: cover;
 `;
 export const Title = styled.h1`
   font-size: 2.5em;
@@ -51,6 +54,7 @@ export const Description = styled(Textarea)`
 export const StyledButton = styled(Button)`
   align-self: center;
   width: 50%;
+  max-width: 250px;
   margin: 10px 60px 10px 0;
 `;
 export const Separator = styled.hr`
@@ -61,4 +65,26 @@ export const Separator = styled.hr`
   top: 12%;
   z-index: 1;
   opacity: 0.2;
+`;
+export const JoinRoomButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+export const StyledButtonMenu = styled(ButtonMenu)`
+  align-self: center;
+`;
+export const StyledLink = styled(Link)`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+`;
+export const StyledText = styled.p`
+  font-size: 20px;
+  margin-left: 12px;
+`;
+export const Error = styled(StyledNotification)`
+  margin: 0;
+`;
+export const StyledNotifications = styled(Notification)`
+  width: 100%;
 `;

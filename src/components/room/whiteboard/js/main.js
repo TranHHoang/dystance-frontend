@@ -9,10 +9,11 @@ import ReadOnlyService from "./services/ReadOnlyService";
 import ConfigService from "./services/ConfigService";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
-import { socket } from "../../room-component/roomSlice";
+import { socket } from "~app/App";
 import { getLoginData } from "~utils/tokenStorage";
 
 let whiteboardId;
+let allowWhiteboard = false;
 const myUsername = (getLoginData() || {}).userName;
 
 function main(roomId) {
@@ -33,7 +34,9 @@ function main(roomId) {
   });
   socket.invoke("JoinWhiteboard", whiteboardId);
 }
-
+export function setAllowWhiteboard(isAllowed) {
+  allowWhiteboard = isAllowed;
+}
 function showBasicAlert(html, newOptions) {
   const options = {
     header: "INFO MESSAGE",
@@ -90,7 +93,6 @@ function showBasicAlert(html, newOptions) {
 function initWhiteboard() {
   $(document).ready(function () {
     // by default set in readOnly mode
-    // ReadOnlyService.activateReadOnlyMode();
 
     whiteboard.loadWhiteboard("#whiteboardContainer", {
       //Load the whiteboard
@@ -107,6 +109,17 @@ function initWhiteboard() {
     Axios.get(`${hostName}/api/rooms/whiteboard/load?id=${whiteboardId}`).then(function (response) {
       console.log(response.data);
       whiteboard.loadData(response.data);
+      if (allowWhiteboard) {
+        ReadOnlyService.deactivateReadOnlyMode();
+      } else {
+        ReadOnlyService.activateReadOnlyMode();
+      }
+      // if (sessionStorage.getItem("allowWhiteboard")) {
+      //   if (sessionStorage.getItem("allowWhiteboard") === "true") {
+      //   } else {
+      //   }
+      // }
+      // ReadOnlyService.activateReadOnlyMode();
     });
 
     /*----------------/
@@ -399,7 +412,6 @@ function initWhiteboard() {
   );
 
   function uploadImgAndAddToWhiteboard(base64data) {
-    // TODO: API
     const form = new FormData();
     form.append("imagedata", base64data);
     form.append("whiteboardId", whiteboardId);
@@ -410,7 +422,6 @@ function initWhiteboard() {
       }
     })
       .then((response) => {
-        // TODO: API
         whiteboard.addImgToCanvasByUrl(`${hostName}/${response.data.imageUrl}`); //Add image to canvas
       })
       .catch((err) => {
