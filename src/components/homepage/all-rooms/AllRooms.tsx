@@ -1,10 +1,10 @@
 import * as React from "react";
 import { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "~app/rootReducer";
-import { showRoom } from "../showRoomsSlice";
-import { SingleRoom } from "../single-room/SingleRoom";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import { RootState } from "~app/rootReducer";
+import { resetRoom, showRoom } from "../showRoomsSlice";
+import { SingleRoom } from "../single-room/SingleRoom";
 
 const BackgroundContainer = styled.div`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
@@ -25,6 +25,9 @@ export const AllRooms = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(showRoom());
+    return () => {
+      dispatch(resetRoom());
+    };
   }, []);
 
   return (

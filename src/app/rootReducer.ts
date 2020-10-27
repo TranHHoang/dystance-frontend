@@ -1,4 +1,4 @@
-import { combineReducers } from "@reduxjs/toolkit";
+import { AnyAction, combineReducers } from "@reduxjs/toolkit";
 import loginReducer from "../components/account-management/login/loginSlice";
 import googleUpdateInfoReducer from "../components/account-management/google-update-info/googleUpdateInfoSlice";
 import registerReducer from "../components/account-management/register/registerSlice";
@@ -8,8 +8,15 @@ import chatReducer from "../components/room/chat/chatSlice";
 import singleRoomReducer from "../components/homepage/single-room/singleRoomSlice";
 import resetPasswordReducer from "../components/account-management/reset-password/resetPasswordSlice";
 import inviteReducer from "../components/room/invite/inviteSlice";
+import { ResetStoreAction } from "../components/account-management/signout/signOut";
+import showProfileReducer from "../components/profile-page/showProfileInfoSlice";
+import updateProfileReducer from "../components/profile-page/updateProfileSlice";
+import sidebarReducer from "../components/sidebar/sidebarSlice";
+import roomReducer from "../components/room/room-component/roomSlice";
+import jitsiMeetReducer from "../components/room/jitsi-meet-component/jitsiMeetSlice";
+import userListReducer from "../components/room/user-list/userListSlice";
 
-const rootReducer = combineReducers({
+const appReducer = combineReducers({
   roomCreation: createRoomReducer,
   showRoomState: showRoomReducer,
   loginState: loginReducer,
@@ -19,7 +26,20 @@ const rootReducer = combineReducers({
   singleRoomState: singleRoomReducer,
   resetPasswordState: resetPasswordReducer,
   inviteState: inviteReducer,
+  showProfileState: showProfileReducer,
+  updateProfileState: updateProfileReducer,
+  sidebarState: sidebarReducer,
+  roomState: roomReducer,
+  jitisiMeetState: jitsiMeetReducer,
+  userListState: userListReducer
 });
+
+const rootReducer = (state: any, action: AnyAction) => {
+  if (action.type === ResetStoreAction) {
+    state = undefined;
+  }
+  return appReducer(state, action);
+};
 
 export type RootState = ReturnType<typeof rootReducer>;
 export default rootReducer;

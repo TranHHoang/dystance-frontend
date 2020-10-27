@@ -21,11 +21,25 @@ module.exports = {
           },
         },
       },
+      // { test: /\.node$/, loader: 'node-loader' }
+      {
+        test: /\.(m?js|node)$/,
+        parser: { amd: false },
+        use: {
+          loader: "@marshallofsound/webpack-asset-relocator-loader",
+          options: {
+            outputAssetBase: "native_modules",
+          },
+        },
+      },
     ],
   },
   resolve: {
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json'],
   },
+  // externals: [{
+  //   'jitsi-meet-electron-utils': 'require(\'jitsi-meet-electron-utils\')'
+  // }],
   devServer: {
     historyApiFallback: true,
     hot: true,

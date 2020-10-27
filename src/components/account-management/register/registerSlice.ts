@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
-import { hostName } from "~utils/hostUtils";
-import { AppThunk } from "~app/store";
 import { createHashHistory } from "history";
-import Axios from "~utils/fakeAPI";
-import { RegisterFormValues } from "./RegisterForm";
 import moment from "moment";
+import { AppThunk } from "~app/store";
+import Axios from "~utils/fakeAPI";
+import { hostName } from "~utils/hostUtils";
 import { ErrorResponse } from "~utils/types";
+import { RegisterFormValues } from "./RegisterForm";
 
 export enum RegisterError {
   EmailExists,

@@ -1,14 +1,14 @@
-import React, { useRef } from "react";
-import { Modal, Button, Input, TimePicker, DatePicker, Textarea, Notification } from "react-rainbow-components";
-import { RootState } from "~app/rootReducer";
-import { useSelector, useDispatch } from "react-redux";
-import { createRoom, setRoomCreateModalOpen } from "./createRoomSlice";
-import styled from "styled-components";
-import { Formik, Field, Form, FormikProps } from "formik";
-import * as Yup from "yup";
-import moment from "moment";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Field, Form, Formik, FormikProps } from "formik";
+import moment from "moment";
+import React, { useRef } from "react";
+import { Button, DatePicker, Input, Modal, Notification, Textarea, TimePicker } from "react-rainbow-components";
+import { useDispatch, useSelector } from "react-redux";
+import styled from "styled-components";
+import * as Yup from "yup";
+import { RootState } from "~app/rootReducer";
+import { createRoom, setRoomCreateModalOpen } from "./createRoomSlice";
 
 const StyledNotification = styled(Notification)`
   width: 100%;
@@ -33,7 +33,7 @@ const initialValues: CreateRoomFormValues = {
 };
 
 const validationSchema = Yup.object({
-  classroomName: Yup.string().required("Classroom name is required"),
+  classroomName: Yup.string().required("Classroom name is required").max(15, "Maximum of 15 characters"),
   startDate: Yup.date()
     .default(() => new Date())
     .required("Start date is required"),
@@ -50,7 +50,8 @@ const validationSchema = Yup.object({
     .test("is-date-greater", "End date must be after start date", function (value) {
       const { startDate } = this.parent;
       return moment(value).isSameOrAfter(moment(startDate), "day");
-    })
+    }),
+  description: Yup.string().max(150, "Maximum of 150 characters")
 });
 
 const RoomFormComponent = (props: any) => {
@@ -117,7 +118,13 @@ const RoomFormComponent = (props: any) => {
               formatStyle="large"
             />
           </div>
-          <Field as={Textarea} name="description" label="Description" placeholder="Add description" />
+          <Field
+            as={Textarea}
+            name="description"
+            label="Description"
+            placeholder="Add description"
+            error={errors.description && touched.description ? errors.description : null}
+          />
         </Form>
       )}
     </Formik>
@@ -131,9 +138,7 @@ const CreateRoomForm = () => {
   const formRef = useRef(null);
 
   if (createRoomState.isCreationSuccess) {
-    setTimeout(() => {
-      dispatch(setRoomCreateModalOpen(false));
-    }, 2000);
+    dispatch(setRoomCreateModalOpen(false));
   }
 
   return (

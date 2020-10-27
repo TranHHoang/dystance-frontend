@@ -1,8 +1,10 @@
+import { faEnvelope, faLock, faUser } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Field, Formik, FormikProps } from "formik";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { startRegister } from "./registerSlice";
+import * as Yup from "yup";
 import { RootState } from "~app/rootReducer";
-import { faUser, faLock, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import {
   BackgroundContainer,
   ButtonContainer,
@@ -12,13 +14,11 @@ import {
   StyledDatePicker,
   StyledForm,
   StyledInput,
+  StyledLink,
   StyledNotification,
-  Title,
-  StyledLink
+  Title
 } from "../styles";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Formik, Field, FormikProps } from "formik";
-import * as Yup from "yup";
+import { startRegister } from "./registerSlice";
 
 export interface RegisterFormValues {
   userName: string;

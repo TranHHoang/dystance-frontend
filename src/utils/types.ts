@@ -28,3 +28,21 @@ export interface ErrorResponse {
   type: number;
   message: string;
 }
+
+export interface User {
+  id: string;
+  userName: string;
+  realName: string;
+  email: string;
+  dob: string;
+  password: string;
+  newPassword: string;
+  avatar: string;
+}
+
+export interface UserInfo {
+  userName: string;
+  realName: string;
+  avatar: string;
+  id: string;
+}

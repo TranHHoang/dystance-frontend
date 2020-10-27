@@ -1,9 +1,11 @@
-import { HubConnectionBuilder } from "@microsoft/signalr";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import Axios from "~utils/fakeAPI";
+import NodeCache from "node-cache";
 import { AppThunk } from "~app/store";
+import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
+import { UserInfo } from "~utils/types";
+import { socket } from "../room-component/roomSlice";
 
 export enum ChatType {
   Text,
@@ -22,6 +24,7 @@ interface ChatMessage {
 }
 
 const initialState: ChatMessage[] = [];
+const nodeCache = new NodeCache();
 
 const chatSlice = createSlice({
   name: "chatSlice",
@@ -55,7 +58,7 @@ export function fetchAllMessages(roomId: string): AppThunk {
   };
 }
 
-function fetchLatestMessage(roomId: string): AppThunk {
+export function fetchLatestMessage(roomId: string): AppThunk {
   return async (dispatch) => {
     try {
       const response = await Axios.get(`${hostName}/api/rooms/chat/getLast?id=${roomId}`);
@@ -68,21 +71,12 @@ function fetchLatestMessage(roomId: string): AppThunk {
   };
 }
 
-const socket = new HubConnectionBuilder().withUrl(`${hostName}/socket`).build();
-
-export function initSocket(roomId: string): AppThunk {
-  return async (dispatch) => {
-    console.log("Start socket...");
-    await socket.start();
-    await socket.invoke("JoinRoom", roomId, getLoginData().id);
-
-    socket.on("Broadcast", () => {
-      dispatch(fetchLatestMessage(roomId));
-    });
-  };
-}
-
-export function broadcastMessage(roomId: string, message: string | File, type = ChatType.Text): AppThunk {
+export function broadcastMessage(
+  roomId: string,
+  message: string | File,
+  type = ChatType.Text,
+  onProgressEvent?: (percentage: number) => void
+): AppThunk {
   return async () => {
     try {
       const form = new FormData();
@@ -93,17 +87,30 @@ export function broadcastMessage(roomId: string, message: string | File, type = 
 
       console.log("broadcasting...");
       await Axios.post(`${hostName}/api/rooms/chat/add`, form, {
-        headers: { "Content-Type": "multipart/form-data" }
+        headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress: (progressEvent) => {
+          onProgressEvent(Math.round((progressEvent.loaded * 100) / progressEvent.total));
+        }
       });
     } catch (ex) {
       // TODO: Check this later
       console.log(ex);
     }
 
-    socket.invoke("Broadcast", roomId);
+    socket.invoke("NewChat", roomId);
   };
 }
 
-export function removeListeners() {
-  socket.off("Broadcast");
+export async function getUserInfo(userId: string): Promise<UserInfo> {
+  try {
+    if (nodeCache.get(userId)) {
+      return nodeCache.get(userId) as UserInfo;
+    }
+    const response = await Axios.get(`${hostName}/api/users/info?id=${userId}`);
+    nodeCache.set(userId, response.data);
+    return response.data as UserInfo;
+  } catch (ex) {
+    // TODO: Handle this
+    console.log(ex);
+  }
 }

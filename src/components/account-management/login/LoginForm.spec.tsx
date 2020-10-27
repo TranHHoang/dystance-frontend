@@ -1,8 +1,8 @@
-import React from "react";
-import { mount } from "enzyme";
-import LoginForm from "./LoginForm";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { mount } from "enzyme";
+import React from "react";
 import { Provider } from "react-redux";
+import LoginForm from "./LoginForm";
 import loginReducer, * as LoginSlice from "./loginSlice";
 
 const store = configureStore({

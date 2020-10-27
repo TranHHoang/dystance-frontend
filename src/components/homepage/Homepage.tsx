@@ -1,14 +1,22 @@
-import * as React from "react";
-import CreateRoomForm from "../room-management/create-room/CreateRoomForm";
-import { AllRooms } from "./all-rooms/AllRooms";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import { RootState } from "~app/rootReducer";
+import ProfilePage from "../profile-page/ProfilePage";
+import { showProfile } from "../profile-page/showProfileInfoSlice";
+import CreateRoomForm from "../room-management/create-room/CreateRoomForm";
+import SideNavigationBar from "../sidebar/Sidebar";
+import { setSidebarValue } from "../sidebar/sidebarSlice";
+import { AllRooms } from "./all-rooms/AllRooms";
 
-const AllRoomsDiv = styled.div`
+const CreateRoomDiv = styled.div`
   display: flex;
   align-items: center;
   padding: 10px 0 20px 20px;
 `;
-
+const AllRoomsDiv = styled.div`
+  display: flex;
+`;
 const Title = styled.h1`
   font-size: 2.5em;
   font-weight: 500;
@@ -16,14 +24,51 @@ const Title = styled.h1`
   padding-right: 20px;
 `;
 
-export const HomePage = () => {
+const HomePageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-left: 130px;
+`;
+const Container = styled.div`
+  display: flex;
+  height: auto;
+`;
+
+export const HomePageDisplay = () => {
   return (
-    <div>
-      <AllRoomsDiv>
+    <HomePageContainer>
+      <CreateRoomDiv>
         <Title>All Rooms</Title>
         <CreateRoomForm />
+      </CreateRoomDiv>
+      <AllRoomsDiv>
+        <AllRooms />
       </AllRoomsDiv>
-      <AllRooms />
-    </div>
+    </HomePageContainer>
+  );
+};
+
+export const HomePage = () => {
+  const sidebarState = useSelector((state: RootState) => state.sidebarState);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(setSidebarValue("Homepage"));
+    dispatch(showProfile());
+  }, []);
+
+  function getCurrentSidebarValue() {
+    switch (sidebarState.sidebarValue) {
+      case "Homepage":
+        return <HomePageDisplay />;
+      case "Profile":
+        return <ProfilePage />;
+    }
+  }
+  return (
+    <Container>
+      <SideNavigationBar />
+      {getCurrentSidebarValue()}
+    </Container>
   );
 };

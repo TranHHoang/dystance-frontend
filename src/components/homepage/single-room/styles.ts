@@ -1,4 +1,4 @@
-import { Card, Button, Textarea } from "react-rainbow-components";
+import { Button, Card, Textarea } from "react-rainbow-components";
 import styled from "styled-components";
 
 export const StyledCard = styled(Card)`
@@ -23,7 +23,7 @@ export const StyledImage = styled.img`
   z-index: 2;
 `;
 export const Title = styled.h1`
-  font-size: 3em;
+  font-size: 2.5em;
   text-overflow: ellipsis;
   overflow: hidden;
   font-weight: 500;

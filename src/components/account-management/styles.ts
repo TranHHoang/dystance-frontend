@@ -1,8 +1,8 @@
-import styled from "styled-components";
-import { Input, Button, Card, Notification, DatePicker } from "react-rainbow-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form } from "formik";
+import { Button, Card, DatePicker, Input, Notification } from "react-rainbow-components";
 import { Link } from "react-router-dom";
+import styled from "styled-components";
 
 export const BackgroundContainer = styled.div`
   background-image: url("https://images.wallpaperscraft.com/image/minimalism_sky_clouds_sun_mountains_lake_landscape_95458_1920x1080.jpg");
