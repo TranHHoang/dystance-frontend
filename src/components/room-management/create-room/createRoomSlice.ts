@@ -8,6 +8,7 @@ import { getLoginData } from "~utils/tokenStorage";
 import { ErrorResponse } from "~utils/types";
 import { resetRoom, showRoom } from "../../homepage/showRoomsSlice";
 import { CreateRoomFormValues } from "./CreateRoomForm";
+import _ from "lodash";
 
 interface CreateRoomState {
   isLoading: boolean;
@@ -66,21 +67,20 @@ export const {
   resetCreateRoomState
 } = createRoomSlice.actions;
 
-export function createRoom(
-  {
-    classroomName,
-    startDate,
-    startTime,
-    endTime,
-    endDate,
-    description,
-    repeatOccurrence,
-    repeatDays
-  }: CreateRoomFormValues,
-  repeatToggle: boolean
-): AppThunk {
+export function createRoom({
+  classroomName,
+  startDate,
+  endDate,
+  description,
+  repeatOccurrence,
+  roomTime
+}: CreateRoomFormValues): AppThunk {
   return async (dispatch) => {
     dispatch(roomCreateStart());
+    const roomTimes = _.map(roomTime, (value, key) => ({
+      dayOfWeek: key,
+      ...value
+    }));
 
     try {
       const fd = new FormData();
@@ -93,17 +93,9 @@ export function createRoom(
       fd.append("creatorId", getLoginData().id);
       fd.append("description", description);
       fd.append("startDate", moment(startDate).format("YYYY-MM-DD"));
-      fd.append("startHour", startTime);
-      fd.append("endHour", endTime);
       fd.append("repeatOccurrence", repeatOccurrence.name);
-      fd.append("repeatDays", JSON.stringify(repeatDays));
-      if (repeatToggle) {
-        console.log("Repeat Toggle is True");
-        fd.append("endDate", moment(endDate).format("YYYY-MM-DD"));
-      } else {
-        console.log("Repeat Toggle is False");
-        fd.append("endDate", moment(new Date()).format("YYYY-MM-DD"));
-      }
+      fd.append("roomTimes", JSON.stringify(roomTimes));
+      fd.append("endDate", moment(endDate).format("YYYY-MM-DD"));
 
       await Axios.post(`${hostName}/api/rooms/create`, fd, config);
       dispatch(createRoomSuccess());
