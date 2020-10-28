@@ -176,6 +176,7 @@ const RemoteControl = (props: any) => {
   const videoRef = useRef<HTMLVideoElement>();
   const peer = useRef<Instance>();
   const [hasPeer, setHasPeer] = useState(false);
+  const [isInitiator, setIsInitiator] = useState<boolean>();
   const dispatch = useDispatch();
 
   function signalPeer(data: MouseSignalData | KeyboardSignalData) {
@@ -183,61 +184,65 @@ const RemoteControl = (props: any) => {
   }
 
   useEffect(() => {
-    videoRef.current.onmousedown = (e) => {
-      const data: MouseClickData = {
-        type: "click",
-        clickedButton: e.button
+    if (isInitiator) {
+      videoRef.current.onmousedown = (e) => {
+        const data: MouseClickData = {
+          type: "click",
+          clickedButton: e.button
+        };
+        signalPeer({ type: "mouse", data });
       };
-      signalPeer({ type: "mouse", data });
-    };
 
-    videoRef.current.onmousemove = (e) => {
-      const data: MouseMoveData = {
-        type: "move",
-        clientX: e.clientX,
-        clientY: e.clientY - 25,
-        canvasWidth: videoRef.current.getBoundingClientRect().width,
-        canvasHeight: videoRef.current.getBoundingClientRect().height
+      videoRef.current.onmousemove = (e) => {
+        const data: MouseMoveData = {
+          type: "move",
+          clientX: e.clientX,
+          clientY: e.clientY - 25,
+          canvasWidth: videoRef.current.getBoundingClientRect().width,
+          canvasHeight: videoRef.current.getBoundingClientRect().height
+        };
+        signalPeer({ type: "mouse", data });
       };
-      signalPeer({ type: "mouse", data });
-    };
 
-    videoRef.current.onmouseup = () => {
-      const data: MouseClickData = {
-        type: "click",
-        clickedButton: undefined
+      videoRef.current.onmouseup = () => {
+        const data: MouseClickData = {
+          type: "click",
+          clickedButton: undefined
+        };
+        signalPeer({ type: "mouse", data });
       };
-      signalPeer({ type: "mouse", data });
-    };
 
-    videoRef.current.ondrag = (e) => e.preventDefault();
+      videoRef.current.ondrag = (e) => e.preventDefault();
 
-    videoRef.current.onwheel = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const data: MouseWheelData = {
-        type: "wheel",
-        deltaX: e.deltaX,
-        deltaY: e.deltaY
+      videoRef.current.onwheel = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const data: MouseWheelData = {
+          type: "wheel",
+          deltaX: e.deltaX,
+          deltaY: e.deltaY
+        };
+        signalPeer({ type: "mouse", data });
       };
-      signalPeer({ type: "mouse", data });
-    };
 
-    videoRef.current.onkeydown = (e) => {
-      e.preventDefault();
-      const data: KeyboardSignalData = {
-        type: "keyboard",
-        alt: e.altKey,
-        ctrl: e.ctrlKey,
-        key: e.key.toLowerCase(),
-        meta: e.metaKey,
-        shift: e.shiftKey
+      videoRef.current.onkeydown = (e) => {
+        e.preventDefault();
+        const data: KeyboardSignalData = {
+          type: "keyboard",
+          alt: e.altKey,
+          ctrl: e.ctrlKey,
+          key: e.key.toLowerCase(),
+          meta: e.metaKey,
+          shift: e.shiftKey
+        };
+        signalPeer(data);
       };
-      signalPeer(data);
-    };
 
-    videoRef.current.style.cursor = "none";
+      videoRef.current.style.cursor = "none";
+    }
+  }, [isInitiator]);
 
+  useEffect(() => {
     socket.on(REMOTE_CONTROL_SIGNAL, async (data) => {
       const objData = JSON.parse(data) as RemoteControlSignal;
       console.log(data);
@@ -248,10 +253,12 @@ const RemoteControl = (props: any) => {
           peer.current = await initPeerWithDesktopCapturer(objData.payload);
           // Pong back
           socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Pong, objData.payload, getLoginData().id);
+          setIsInitiator(false);
           setHasPeer(true);
           break;
         case RemoteControlSignalType.Pong:
           peer.current = createPeer(objData.payload, true);
+          setIsInitiator(true);
           setHasPeer(true);
           break;
         case RemoteControlSignalType.Signal:
@@ -274,13 +281,12 @@ const RemoteControl = (props: any) => {
       peer.current?.destroy();
       videoRef.current.style.display = "none";
       setHasPeer(false);
+      setIsInitiator(undefined);
     }
   }, [isStarted]);
 
   useEffect(() => {
-    if (peer.current) {
-      document.onkeydown = (e) => e.preventDefault();
-
+    if (peer.current && hasPeer) {
       peer.current.on("stream", (stream) => {
         videoRef.current.srcObject = stream;
         videoRef.current.style.display = "initial";
