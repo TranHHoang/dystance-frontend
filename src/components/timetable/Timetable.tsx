@@ -8,6 +8,7 @@ import moment from "moment";
 import { resetTimetable, showTimetableEvents } from "./timetableSlice";
 import { setDrawerOpen, setEvent, showCreatorInfo } from "./event-details/eventDetailsSlice";
 import EventDetailsDrawer from "./event-details/EventDetails";
+import { TimetableEventType } from "~utils/types";
 
 export const Container = styled.div`
   padding: 20px;
@@ -33,7 +34,8 @@ const Timetable = () => {
   const events = timetableState.events.map((event) => ({
     ...event,
     startDate: new Date(`${event.startDate}`),
-    endDate: new Date(`${event.endDate}`)
+    endDate: new Date(`${event.endDate}`),
+    backgroundColor: event.eventType === TimetableEventType.Deadline ? "rgba(254,72,73,1)" : null
   }));
   useEffect(() => {
     dispatch(resetTimetable());
@@ -45,17 +47,17 @@ const Timetable = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const calendarEvents = document.querySelectorAll("div[id^='calendar-event']");
-    calendarEvents.forEach((event) => {
-      const span = event.querySelector("span");
-      if (span.innerHTML.startsWith("Deadline - ")) {
-        event.style.backgroundColor = "#FE4849";
-        event.style.padding = "5px";
-        event.style.height = "auto";
-      }
-    });
-  }, [timetableState.events]);
+  // useEffect(() => {
+  //   const calendarEvents = document.querySelectorAll("div[id^='calendar-event']");
+  //   calendarEvents.forEach((event) => {
+  //     const span = event.querySelector("span");
+  //     if (span.innerHTML.startsWith("Deadline - ")) {
+  //       event.style.backgroundColor = "#FE4849";
+  //       event.style.padding = "5px";
+  //       event.style.height = "auto";
+  //     }
+  //   });
+  // }, [timetableState.events]);
 
   return (
     <>

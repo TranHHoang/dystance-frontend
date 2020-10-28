@@ -37,14 +37,13 @@ export const SingleRoom = (props: any) => {
     roomId,
     creatorId,
     roomName,
-    startHour,
-    endHour,
     startDate,
     endDate,
     image,
     description,
     repeatDays,
-    repeatOccurrence
+    repeatOccurrence,
+    roomTimes
   }: Room = props;
   const dispatch = useDispatch();
   const singleRoomState = useSelector((state: RootState) => state.singleRoomState);
@@ -53,15 +52,15 @@ export const SingleRoom = (props: any) => {
     roomId: roomId,
     creatorId: creatorId,
     roomName: roomName,
-    startHour: startHour,
-    endHour: endHour,
     startDate: startDate,
     endDate: endDate,
     image: image,
     description: description,
     repeatDays: repeatDays,
-    repeatOccurrence: repeatOccurrence
+    repeatOccurrence: repeatOccurrence,
+    roomTimes: roomTimes
   };
+
   function formatTime(time: string): string {
     const parts = time.split(":");
     const hours = parseInt(parts[0]);
@@ -82,9 +81,7 @@ export const SingleRoom = (props: any) => {
           <ImageContainer>
             <StyledImage src={`${hostName}/${image}`} alt="" />
           </ImageContainer>
-          <Time>
-            {formatTime(startHour)} - {formatTime(endHour)}
-          </Time>
+          <Time>{/* {formatTime(startHour)} - {formatTime(endHour)} */}</Time>
         </FlexRowContainer>
         <TextContainer>
           <Title>{roomName}</Title>
