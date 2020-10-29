@@ -92,21 +92,20 @@ export const SingleRoom = (props: any) => {
           rows={3}
           className="rainbow-m-vertical_x-large rainbow-p-horizontal_medium rainbow-m_auto"
         />
-
-        <JoinRoomButtonContainer>
-          <StyledLink
-            style={{ textDecoration: "none", width: "100%" }}
-            to={{ pathname: `/room/${roomId}/${creatorId}/${roomName}` }}
-          >
-            <StyledButton label="Join Now" variant="brand" />
-          </StyledLink>
-          <StyledButtonMenu
-            menuAlignment="right"
-            menuSize="x-small"
-            buttonVariant="base"
-            icon={<FontAwesomeIcon icon={faEllipsisV} />}
-          >
-            {creatorId === getLoginData().id ? (
+        {creatorId === getLoginData().id ? (
+          <JoinRoomButtonContainer>
+            <StyledLink
+              style={{ textDecoration: "none" }}
+              to={{ pathname: `/room/${roomId}/${creatorId}/${roomName}` }}
+            >
+              <StyledButton label="Join Now" variant="brand" />
+            </StyledLink>
+            <StyledButtonMenu
+              menuAlignment="right"
+              menuSize="x-small"
+              buttonVariant="base"
+              icon={<FontAwesomeIcon icon={faEllipsisV} />}
+            >
               <div>
                 <MenuItem
                   label="Invite people to room"
@@ -121,9 +120,18 @@ export const SingleRoom = (props: any) => {
                   onClick={() => dispatch(setConfirmDeleteModalOpen({ roomId, isConfirmDeleteModalOpen: true }))}
                 />
               </div>
-            ) : null}
-          </StyledButtonMenu>
-        </JoinRoomButtonContainer>
+            </StyledButtonMenu>
+          </JoinRoomButtonContainer>
+        ) : (
+          <JoinRoomButtonContainer>
+            <StyledLink
+              style={{ textDecoration: "none", justifyContent: "center" }}
+              to={{ pathname: `/room/${roomId}/${creatorId}/${roomName}` }}
+            >
+              <StyledButton style={{ margin: "10 0 10 0" }} label="Join Now" variant="brand" />
+            </StyledLink>
+          </JoinRoomButtonContainer>
+        )}
       </StyledCard>
       <InviteForm roomId={roomId} />
       <Modal
