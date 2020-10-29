@@ -23,6 +23,7 @@ import timetableReducer from "../components/timetable/timetableSlice";
 import eventDetailsReducer from "../components/timetable/event-details/eventDetailsSlice";
 import remoteControlReducer from "../components/room/remote-control/remoteControlSlice";
 import chatPreviewReducer from "../components/private-chat/chatPreviewSlice";
+import groupReducer from "../components/room/group/groupSlice";
 
 const appReducer = combineReducers({
   roomCreation: createRoomReducer,
@@ -47,7 +48,8 @@ const appReducer = combineReducers({
   timetableState: timetableReducer,
   eventDetailsState: eventDetailsReducer,
   remoteControlState: remoteControlReducer,
-  chatPreviewState: chatPreviewReducer
+  chatPreviewState: chatPreviewReducer,
+  groupState: groupReducer
 });
 
 const rootReducer = (state: any, action: AnyAction) => {

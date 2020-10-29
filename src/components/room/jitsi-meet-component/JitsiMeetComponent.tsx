@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
 import { createHashHistory } from "history";
 import { setupScreenSharingRender } from "jitsi-meet-electron-utils";
 import React, { useEffect, useRef, useState } from "react";
@@ -14,6 +15,7 @@ import { resetCardState, setKickOtherUser, setMuteOtherUser } from "../user-list
 import { setShowUpperToolbar } from "./jitsiMeetSlice";
 import { removeListeners, resetRoomState } from "../room-component/roomSlice";
 import { Spinner } from "react-rainbow-components";
+import { withRouter } from "react-router-dom";
 
 const loader = styled.div`
   display: none;
@@ -28,8 +30,10 @@ const JitsiMeetComponent = (props: any) => {
   const profile = JSON.parse(localStorage.getItem("profile")) as User;
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
-  const { roomId, roomName } = props;
+  const { roomId, roomName, history } = props;
   const api = useRef(null);
+
+  const isBreakoutGroup = /.+#d/.test(roomId);
 
   useEffect(() => {
     if (userCardState.muteOtherUser) {
@@ -109,6 +113,8 @@ const JitsiMeetComponent = (props: any) => {
           VIDEO_QUALITY_LABEL_DISABLED: true
         }}
         config={{
+          // @ts-ignore
+          prejoinPageEnabled: isBreakoutGroup,
           disableSimulcast: false,
           requireDisplayName: false,
           enableWelcomePage: false,
@@ -127,4 +133,4 @@ const JitsiMeetComponent = (props: any) => {
     </>
   );
 };
-export default JitsiMeetComponent;
+export default withRouter(JitsiMeetComponent);

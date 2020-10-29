@@ -5,7 +5,9 @@ import {
   faComments,
   faUsers,
   faVideoSlash,
-  faCalendarTimes
+  faCalendarTimes,
+  faObjectGroup,
+  faObjectUngroup
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PeopleProfilePage from "../../profile-page/people-profile/PeopleProfilePage";
@@ -42,6 +44,7 @@ import DeadlineListComponent, { DeadlineFormComponent } from "../deadline/Deadli
 import { deleteDeadline, setDeleteModalOpen, setUpdateModalOpen } from "../deadline/deadline-card/deadlineCardSlice";
 import ChatPreview from "../../private-chat/ChatPreview";
 import { ipcRenderer } from "electron";
+import GroupComponent from "../group/GroupComponent";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -169,6 +172,8 @@ const RoomComponent = (props: any) => {
   const [privateChatOpen, setPrivateChatOpen] = useState(false);
   const dispatch = useDispatch();
 
+  const isBreakoutGroup = /.+#d/.test(roomId);
+
   useEffect(() => {
     dispatch(initSocket(roomId));
     dispatch(fetchAllMessages(roomId, undefined));
@@ -188,6 +193,8 @@ const RoomComponent = (props: any) => {
         return <UserListComponent roomId={roomId} creatorId={creatorId} />;
       case "Deadline":
         return <DeadlineListComponent roomId={roomId} creatorId={creatorId} />;
+      case "Groups":
+        return <GroupComponent roomId={roomId} creatorId={creatorId} />;
     }
   }
 
@@ -297,7 +304,12 @@ const RoomComponent = (props: any) => {
                 }
                 name="People"
               />
-              <StyledTab label={<FontAwesomeIcon icon={faCalendarTimes} size="2x" />} name="Deadline" />
+              {!isBreakoutGroup && (
+                <>
+                  <StyledTab label={<FontAwesomeIcon icon={faCalendarTimes} size="2x" />} name="Deadline" />
+                  <StyledTab label={<FontAwesomeIcon icon={faObjectUngroup} size="2x" />} name="Groups" />
+                </>
+              )}
             </Tabset>
           </span>
         }
@@ -317,7 +329,7 @@ const RoomComponent = (props: any) => {
         </InvisibleDiv>
       ) : null}
       {whiteboardOpen ? <Whiteboard roomId={roomId} creatorId={creatorId} /> : null}
-      <JitsiMeetComponent roomId={roomId} roomName={roomName} creatorId={creatorId} />
+      {/* <JitsiMeetComponent roomId={roomId} roomName={roomName} creatorId={creatorId} /> */}
 
       <StyledModal
         isOpen={peopleProfileState.peopleProfileModalOpen}

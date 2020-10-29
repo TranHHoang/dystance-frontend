@@ -1,0 +1,4 @@
+@hostName = https://dystancetest.azurewebsites.net
+
+{{hostName}}/api/rooms/groups/get?roomId=65
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjFhNDQ5YmQ4LWNjZDgtNDU3Mi1iOTA3LWY2MDAzZjdlOTAyZCIsIm5iZiI6MTYwMzkwMDkzNywiZXhwIjoxNjAzOTg3MzM3LCJpYXQiOjE2MDM5MDA5Mzd9.5EHhmQZiUUS8PtnO6lVoZnRsWtO037QA_7gT9huaxHI
