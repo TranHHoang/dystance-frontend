@@ -18,7 +18,7 @@ import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import ChatArea from "../../chat/ChatArea";
 import { fetchAllMessages } from "../../chat/chatSlice";
-import { getUserInfo } from "~utils/types";
+import { getUserInfo, RoomAction, RoomActionType } from "~utils/types";
 import JitsiMeetComponent from "../jitsi-meet-component/JitsiMeetComponent";
 import UserListComponent from "../user-list/UserListComponent";
 import Whiteboard from "../whiteboard/Whiteboard";
@@ -41,6 +41,7 @@ import { setRemoteControlAccepted } from "../remote-control/remoteControlSlice";
 import DeadlineListComponent, { DeadlineFormComponent } from "../deadline/DeadlineListComponent";
 import { deleteDeadline, setDeleteModalOpen, setUpdateModalOpen } from "../deadline/deadline-card/deadlineCardSlice";
 import ChatPreview from "../../private-chat/ChatPreview";
+import { ipcRenderer } from "electron";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -152,6 +153,7 @@ const InvisibleDiv = styled.div`
   justify-content: center;
   background-color: black;
 `;
+
 const RoomComponent = (props: any) => {
   const roomState = useSelector((state: RootState) => state.roomState);
   const peopleProfileState = useSelector((state: RootState) => state.peopleProfileState);
@@ -170,9 +172,11 @@ const RoomComponent = (props: any) => {
   useEffect(() => {
     dispatch(initSocket(roomId));
     dispatch(fetchAllMessages(roomId, undefined));
-    return () => {
+    //Listen to the event sent from ipcMain and leave Room and remove socket
+    ipcRenderer.on("app-close", () => {
+      socket.invoke(RoomAction, roomId, RoomActionType.Leave, getLoginData().id);
       removeListeners();
-    };
+    });
   }, []);
 
   //Switches components when the drawer tab value is changed
@@ -195,7 +199,6 @@ const RoomComponent = (props: any) => {
 
   socket.on(REMOTE_CONTROL_SIGNAL, async (data) => {
     const objData = JSON.parse(data);
-    console.log(objData);
     switch (objData.type) {
       case RemoteControlSignalType.Offer:
         setRemoteInitiatorInfo(await getUserInfo(objData.payload));
