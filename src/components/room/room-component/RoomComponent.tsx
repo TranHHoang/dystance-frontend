@@ -197,6 +197,19 @@ const RoomComponent = (props: any) => {
     }
   }, [userCardState.isRemoteControlWaitingModalOpen]);
 
+  useEffect(() => {
+    if (roomState.isDrawerOpen) {
+      const closeAction = setInterval(() => {
+        if ($("#drawer-close-button").length) {
+          clearInterval(closeAction);
+        }
+        $("#drawer-close-button").on("click", () => {
+          dispatch(setDrawerOpen(false));
+        }),
+          500;
+      });
+    }
+  }, [roomState.isDrawerOpen]);
   socket.on(REMOTE_CONTROL_SIGNAL, async (data) => {
     const objData = JSON.parse(data);
     switch (objData.type) {
@@ -212,7 +225,6 @@ const RoomComponent = (props: any) => {
         break;
     }
   });
-
   return (
     <div>
       {jitsiMeetState.showUpperToolbar ? (
@@ -252,7 +264,6 @@ const RoomComponent = (props: any) => {
       >
         <ChatPreview inRoom={true} />
       </PrivateChatDrawer>
-
       <StyledDrawer
         header={
           <span>
@@ -291,13 +302,10 @@ const RoomComponent = (props: any) => {
           </span>
         }
         isOpen={roomState.isDrawerOpen}
-        onRequestClose={() => {
-          //TODO: Prevent drawer from closing when clicking on a context menu item
-          dispatch(setDrawerOpen(false));
-        }}
       >
         {getTabContent()}
       </StyledDrawer>
+
       <RemoteControl remoteId={userCardState.userId} isStarted={remoteControlState.remoteControlAccepted} />
       {remoteControlState.remoteControlAccepted ? (
         <InvisibleDiv className="hidden-class">
@@ -313,10 +321,7 @@ const RoomComponent = (props: any) => {
 
       <StyledModal
         isOpen={peopleProfileState.peopleProfileModalOpen}
-        onRequestClose={() => {
-          dispatch(setPeopleProfileModalOpen({ userId: null, peopleProfileModalOpen: false }));
-          console.log("Modal in room component: " + peopleProfileState.peopleProfileModalOpen);
-        }}
+        onRequestClose={() => dispatch(setPeopleProfileModalOpen({ userId: null, peopleProfileModalOpen: false }))}
       >
         <PeopleProfilePage userId={peopleProfileState.userId} />
       </StyledModal>
