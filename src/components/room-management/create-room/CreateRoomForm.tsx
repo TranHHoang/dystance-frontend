@@ -144,7 +144,6 @@ const RoomFormComponent = (props: any) => {
               onChange={(e) => {
                 setFieldValue("repeatDays", e);
                 _.difference(values.repeatDays, e).forEach((value) => {
-                  console.log(value);
                   delete values.roomTime[value];
                 });
               }}

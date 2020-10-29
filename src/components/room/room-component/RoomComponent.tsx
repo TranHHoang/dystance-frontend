@@ -12,7 +12,7 @@ import PeopleProfilePage from "../../profile-page/people-profile/PeopleProfilePa
 import { setPeopleProfileModalOpen } from "../../profile-page/people-profile/peopleProfileSlice";
 import React from "react";
 import { useEffect, useState, useRef } from "react";
-import { Button, Drawer, Modal, Tab, Tabset, Notification } from "react-rainbow-components";
+import { Button, Drawer, Modal, Tab, Tabset, Notification, BadgeOverlay } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
@@ -22,7 +22,7 @@ import { getUserInfo } from "~utils/types";
 import JitsiMeetComponent from "../jitsi-meet-component/JitsiMeetComponent";
 import UserListComponent from "../user-list/UserListComponent";
 import Whiteboard from "../whiteboard/Whiteboard";
-import { initSocket, removeListeners, setDrawerOpen, setTabsetValue } from "./roomSlice";
+import { initSocket, removeListeners, resetChatBadge, setDrawerOpen, setTabsetValue } from "./roomSlice";
 import { socket } from "~app/App";
 import {
   kickUser,
@@ -158,6 +158,7 @@ const RoomComponent = (props: any) => {
   const jitsiMeetState = useSelector((state: RootState) => state.jitisiMeetState);
   const userCardState = useSelector((state: RootState) => state.userCardState);
   const deadlineCardState = useSelector((state: RootState) => state.deadlineCardState);
+  const userListState = useSelector((state: RootState) => state.userListState);
   const formRef = useRef(null);
   const remoteControlState = useSelector((state: RootState) => state.remoteControlState);
   const { roomId, roomName, creatorId } = props.match.params;
@@ -185,10 +186,6 @@ const RoomComponent = (props: any) => {
         return <DeadlineListComponent roomId={roomId} creatorId={creatorId} />;
     }
   }
-
-  useEffect(() => {
-    console.log("Room ID: " + roomId);
-  }, []);
 
   useEffect(() => {
     if (userCardState.isRemoteControlWaitingModalOpen) {
@@ -223,7 +220,13 @@ const RoomComponent = (props: any) => {
               dispatch(setDrawerOpen(true));
             }}
           >
-            <FontAwesomeIcon icon={faBars} size="2x" />
+            {roomState.chatBadge > 0 ? (
+              <BadgeOverlay className="rainbow-m-around_medium">
+                <FontAwesomeIcon icon={faBars} size="2x" />
+              </BadgeOverlay>
+            ) : (
+              <FontAwesomeIcon icon={faBars} size="2x" />
+            )}
           </TopButton>
           <NormalButton
             variant="neutral"
@@ -253,10 +256,33 @@ const RoomComponent = (props: any) => {
             <StyledHeader>Meeting Details</StyledHeader>
             <Tabset
               activeTabName={roomState.tabsetValue}
-              onSelect={(_, selected) => dispatch(setTabsetValue(selected))}
+              onSelect={(_, selected) => {
+                dispatch(setTabsetValue(selected));
+                if (selected === "Chat") {
+                  dispatch(resetChatBadge());
+                }
+              }}
             >
-              <StyledTab label={<FontAwesomeIcon icon={faCommentDots} size="2x" />} name="Chat" />
-              <StyledTab label={<FontAwesomeIcon icon={faUsers} size="2x" />} name="People" />
+              <StyledTab
+                label={
+                  roomState.chatBadge > 0 ? (
+                    <BadgeOverlay className="rainbow-m-around_medium" value={roomState.chatBadge} variant="brand">
+                      <FontAwesomeIcon icon={faCommentDots} size="2x" />
+                    </BadgeOverlay>
+                  ) : (
+                    <FontAwesomeIcon icon={faCommentDots} size="2x" />
+                  )
+                }
+                name="Chat"
+              />
+              <StyledTab
+                label={
+                  <BadgeOverlay className="rainbow-m-around_medium" value={userListState.length} variant="brand">
+                    <FontAwesomeIcon icon={faUsers} size="2x" />
+                  </BadgeOverlay>
+                }
+                name="People"
+              />
               <StyledTab label={<FontAwesomeIcon icon={faCalendarTimes} size="2x" />} name="Deadline" />
             </Tabset>
           </span>

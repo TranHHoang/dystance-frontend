@@ -9,7 +9,6 @@ import { getLoginData } from "~utils/tokenStorage";
 import { ErrorResponse, Room } from "~utils/types";
 import { resetRoom, showRoom } from "../showRoomsSlice";
 import { UpdateRoomFormValues } from "./SingleRoomUpdateForm";
-
 interface SingleRoomState {
   roomId: string;
   isLoading: boolean;
