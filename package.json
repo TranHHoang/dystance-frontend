@@ -198,6 +198,7 @@
     "yup": "^0.29.3"
   },
   "dependencies": {
+    "node-addon-api": "*",
     "jitsi-meet-electron-utils": "github:jitsi/jitsi-meet-electron-utils#v2.0.10",
     "robotjs": "github:octalmage/robotjs"
   }
