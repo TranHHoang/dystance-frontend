@@ -98,10 +98,6 @@ const ChatHistory = ({ isPrivateChat }: { isPrivateChat: boolean }) => {
   }, [isPrivateChat, chatState, messages]);
 
   useEffect(() => {
-    console.log(usersInfo);
-  }, [usersInfo]);
-
-  useEffect(() => {
     listRef.current.scrollToRow(messages.length);
   }, [chatState]);
 

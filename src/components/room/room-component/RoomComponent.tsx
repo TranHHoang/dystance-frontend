@@ -12,17 +12,17 @@ import PeopleProfilePage from "../../profile-page/people-profile/PeopleProfilePa
 import { setPeopleProfileModalOpen } from "../../profile-page/people-profile/peopleProfileSlice";
 import React from "react";
 import { useEffect, useState, useRef } from "react";
-import { Button, Drawer, Modal, Tab, Tabset, Notification } from "react-rainbow-components";
+import { Button, Drawer, Modal, Tab, Tabset, Notification, BadgeOverlay } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import ChatArea from "../../chat/ChatArea";
 import { fetchAllMessages } from "../../chat/chatSlice";
-import { getUserInfo } from "~utils/types";
+import { getUserInfo, RoomAction, RoomActionType } from "~utils/types";
 import JitsiMeetComponent from "../jitsi-meet-component/JitsiMeetComponent";
 import UserListComponent from "../user-list/UserListComponent";
 import Whiteboard from "../whiteboard/Whiteboard";
-import { initSocket, removeListeners, setDrawerOpen, setTabsetValue } from "./roomSlice";
+import { initSocket, removeListeners, resetChatBadge, setDrawerOpen, setTabsetValue } from "./roomSlice";
 import { socket } from "~app/App";
 import {
   kickUser,
@@ -41,6 +41,7 @@ import { setRemoteControlAccepted } from "../remote-control/remoteControlSlice";
 import DeadlineListComponent, { DeadlineFormComponent } from "../deadline/DeadlineListComponent";
 import { deleteDeadline, setDeleteModalOpen, setUpdateModalOpen } from "../deadline/deadline-card/deadlineCardSlice";
 import ChatPreview from "../../private-chat/ChatPreview";
+import { ipcRenderer } from "electron";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -152,12 +153,14 @@ const InvisibleDiv = styled.div`
   justify-content: center;
   background-color: black;
 `;
+
 const RoomComponent = (props: any) => {
   const roomState = useSelector((state: RootState) => state.roomState);
   const peopleProfileState = useSelector((state: RootState) => state.peopleProfileState);
   const jitsiMeetState = useSelector((state: RootState) => state.jitisiMeetState);
   const userCardState = useSelector((state: RootState) => state.userCardState);
   const deadlineCardState = useSelector((state: RootState) => state.deadlineCardState);
+  const userListState = useSelector((state: RootState) => state.userListState);
   const formRef = useRef(null);
   const remoteControlState = useSelector((state: RootState) => state.remoteControlState);
   const { roomId, roomName, creatorId } = props.match.params;
@@ -169,9 +172,11 @@ const RoomComponent = (props: any) => {
   useEffect(() => {
     dispatch(initSocket(roomId));
     dispatch(fetchAllMessages(roomId, undefined));
-    return () => {
+    //Listen to the event sent from ipcMain and leave Room and remove socket
+    ipcRenderer.on("app-close", () => {
+      socket.invoke(RoomAction, roomId, RoomActionType.Leave, getLoginData().id);
       removeListeners();
-    };
+    });
   }, []);
 
   //Switches components when the drawer tab value is changed
@@ -187,18 +192,26 @@ const RoomComponent = (props: any) => {
   }
 
   useEffect(() => {
-    console.log("Room ID: " + roomId);
-  }, []);
-
-  useEffect(() => {
     if (userCardState.isRemoteControlWaitingModalOpen) {
       socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Offer, userCardState.userId, getLoginData().id);
     }
   }, [userCardState.isRemoteControlWaitingModalOpen]);
 
+  useEffect(() => {
+    if (roomState.isDrawerOpen) {
+      const closeAction = setInterval(() => {
+        if ($("#drawer-close-button").length) {
+          clearInterval(closeAction);
+        }
+        $("#drawer-close-button").on("click", () => {
+          dispatch(setDrawerOpen(false));
+        }),
+          500;
+      });
+    }
+  }, [roomState.isDrawerOpen]);
   socket.on(REMOTE_CONTROL_SIGNAL, async (data) => {
     const objData = JSON.parse(data);
-    console.log(objData);
     switch (objData.type) {
       case RemoteControlSignalType.Offer:
         setRemoteInitiatorInfo(await getUserInfo(objData.payload));
@@ -212,7 +225,6 @@ const RoomComponent = (props: any) => {
         break;
     }
   });
-
   return (
     <div>
       {jitsiMeetState.showUpperToolbar ? (
@@ -223,7 +235,13 @@ const RoomComponent = (props: any) => {
               dispatch(setDrawerOpen(true));
             }}
           >
-            <FontAwesomeIcon icon={faBars} size="2x" />
+            {roomState.chatBadge > 0 ? (
+              <BadgeOverlay className="rainbow-m-around_medium">
+                <FontAwesomeIcon icon={faBars} size="2x" />
+              </BadgeOverlay>
+            ) : (
+              <FontAwesomeIcon icon={faBars} size="2x" />
+            )}
           </TopButton>
           <NormalButton
             variant="neutral"
@@ -246,29 +264,48 @@ const RoomComponent = (props: any) => {
       >
         <ChatPreview inRoom={true} />
       </PrivateChatDrawer>
-
       <StyledDrawer
         header={
           <span>
             <StyledHeader>Meeting Details</StyledHeader>
             <Tabset
               activeTabName={roomState.tabsetValue}
-              onSelect={(_, selected) => dispatch(setTabsetValue(selected))}
+              onSelect={(_, selected) => {
+                dispatch(setTabsetValue(selected));
+                if (selected === "Chat") {
+                  dispatch(resetChatBadge());
+                }
+              }}
             >
-              <StyledTab label={<FontAwesomeIcon icon={faCommentDots} size="2x" />} name="Chat" />
-              <StyledTab label={<FontAwesomeIcon icon={faUsers} size="2x" />} name="People" />
+              <StyledTab
+                label={
+                  roomState.chatBadge > 0 ? (
+                    <BadgeOverlay className="rainbow-m-around_medium" value={roomState.chatBadge} variant="brand">
+                      <FontAwesomeIcon icon={faCommentDots} size="2x" />
+                    </BadgeOverlay>
+                  ) : (
+                    <FontAwesomeIcon icon={faCommentDots} size="2x" />
+                  )
+                }
+                name="Chat"
+              />
+              <StyledTab
+                label={
+                  <BadgeOverlay className="rainbow-m-around_medium" value={userListState.length} variant="brand">
+                    <FontAwesomeIcon icon={faUsers} size="2x" />
+                  </BadgeOverlay>
+                }
+                name="People"
+              />
               <StyledTab label={<FontAwesomeIcon icon={faCalendarTimes} size="2x" />} name="Deadline" />
             </Tabset>
           </span>
         }
         isOpen={roomState.isDrawerOpen}
-        onRequestClose={() => {
-          //TODO: Prevent drawer from closing when clicking on a context menu item
-          dispatch(setDrawerOpen(false));
-        }}
       >
         {getTabContent()}
       </StyledDrawer>
+
       <RemoteControl remoteId={userCardState.userId} isStarted={remoteControlState.remoteControlAccepted} />
       {remoteControlState.remoteControlAccepted ? (
         <InvisibleDiv className="hidden-class">
@@ -284,10 +321,7 @@ const RoomComponent = (props: any) => {
 
       <StyledModal
         isOpen={peopleProfileState.peopleProfileModalOpen}
-        onRequestClose={() => {
-          dispatch(setPeopleProfileModalOpen({ userId: null, peopleProfileModalOpen: false }));
-          console.log("Modal in room component: " + peopleProfileState.peopleProfileModalOpen);
-        }}
+        onRequestClose={() => dispatch(setPeopleProfileModalOpen({ userId: null, peopleProfileModalOpen: false }))}
       >
         <PeopleProfilePage userId={peopleProfileState.userId} />
       </StyledModal>

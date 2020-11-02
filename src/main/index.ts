@@ -41,12 +41,12 @@ const createWindow = () => {
     },
     show: false
   });
+  //Splash Screen when app is loading
   const splash = new BrowserWindow({ width: 500, height: 400, frame: false, resizable: false });
   splash.loadURL(path.join(__dirname, "../../src/main/splash.html"));
 
   // and load the index.html of the app.
   if (isDebug()) {
-    console.log(__dirname);
     mainWindow.webContents.openDevTools();
     mainWindow.loadURL(APP_WEBPACK_ENTRY);
   } else {
@@ -61,9 +61,16 @@ const createWindow = () => {
   mainWindow.setIcon(path.join(__dirname, "../../src/components/sidebar/logo.png"));
   initPopupsConfigurationMain(mainWindow);
   setupScreenSharingMain(mainWindow, "DYSTANCE");
+
+  //Removes the splash screen and display the app when it is done loading
   mainWindow.once("ready-to-show", () => {
     splash.destroy();
     mainWindow.show();
+  });
+
+  //Send app-close event to ipcRenderer
+  mainWindow.on("close", () => {
+    mainWindow.webContents.send("app-close");
   });
   // mainWindow.setMenu(null);
   // console.log(__dirname);

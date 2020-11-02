@@ -15,11 +15,13 @@ interface RoomState {
   isDrawerOpen: boolean;
   tabsetValue: string;
   error?: ErrorResponse;
+  chatBadge: number;
 }
 const initialState: RoomState = {
   roomId: null,
   isDrawerOpen: false,
-  tabsetValue: ""
+  tabsetValue: "",
+  chatBadge: 0
 };
 
 const roomSlice = createSlice({
@@ -33,33 +35,37 @@ const roomSlice = createSlice({
     setTabsetValue(state, action: PayloadAction<string>) {
       state.tabsetValue = action.payload;
     },
+    incrementChatBadge(state) {
+      state.chatBadge += 1;
+    },
+    resetChatBadge(state) {
+      state.chatBadge = 0;
+    },
     resetRoomState() {
       return initialState;
     }
   }
 });
 export default roomSlice.reducer;
-export const { setDrawerOpen, setTabsetValue, resetRoomState } = roomSlice.actions;
+export const { setDrawerOpen, setTabsetValue, resetRoomState, incrementChatBadge, resetChatBadge } = roomSlice.actions;
 
 export function initSocket(roomId: string): AppThunk {
   return (dispatch) => {
     socket.invoke(RoomAction, roomId, RoomActionType.Join, getLoginData().id);
 
     socket.on(RoomAction, async (data: string) => {
-      console.log("Socket is running");
       const response = JSON.parse(data);
       switch (response.type) {
         case RoomActionType.Chat:
-          console.log("New Message");
           dispatch(fetchLatestMessage(roomId, undefined));
+          if (response.payload !== getLoginData().id) {
+            dispatch(incrementChatBadge());
+          }
           break;
         case RoomActionType.Join:
         case RoomActionType.Leave:
-          console.log("Joined/Left Room");
-          console.log(response);
           const userInfoList: UserInfo[] = [];
           for (const id of response.payload) {
-            console.log(id);
             const response = await Axios.get(`${hostName}/api/users/info?id=${id}`);
             const data = response.data as UserInfo;
             userInfoList.push(data);
@@ -82,5 +88,4 @@ export function initSocket(roomId: string): AppThunk {
 
 export function removeListeners() {
   socket.off(RoomAction);
-  console.log("Component Unmount");
 }
