@@ -26,12 +26,23 @@ const StyledSpinner = styled(Spinner)`
   top: 50vh;
   left: 50vw;
 `;
+const StyledClock = styled.div`
+  position: absolute;
+  background-color: #36393f;
+  color: rgba(78, 204, 163, 1);
+  font-size: 18px;
+  padding: 8px;
+  border-bottom-right-radius: 10px;
+  opacity: 50%;
+`;
+
 const JitsiMeetComponent = (props: any) => {
   const userCardState = useSelector((state: RootState) => state.userCardState);
   const roomState = useSelector((state: RootState) => state.roomState);
   const profile = JSON.parse(localStorage.getItem("profile")) as User;
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
+  const [remainingTime, setRemainingTime] = useState("00:00");
   const { roomId, roomName, groupId, creatorId, history } = props;
   const api = useRef(null);
   const group = useRef<BreakoutGroup>();
@@ -68,6 +79,7 @@ const JitsiMeetComponent = (props: any) => {
 
       intervalRef.current = setInterval(() => {
         duration = duration - 1000;
+        setRemainingTime(moment(duration).format("mm:ss"));
         if (duration <= 0) {
           clearInterval(intervalRef.current);
           api.current?.executeCommand("hangup");
@@ -121,6 +133,7 @@ const JitsiMeetComponent = (props: any) => {
   return (
     <>
       {isLoading && <StyledSpinner />}
+      {group.current && <StyledClock>{`${roomName} - ${remainingTime}`}</StyledClock>}
       <Jitsi
         domain="jitsidystance.southeastasia.cloudapp.azure.com"
         loadingComponent={loader}
@@ -154,7 +167,7 @@ const JitsiMeetComponent = (props: any) => {
         }}
         config={{
           // @ts-ignore
-          prejoinPageEnabled: true,
+          prejoinPageEnabled: groupId === undefined,
           disableSimulcast: false,
           requireDisplayName: false,
           enableWelcomePage: false,

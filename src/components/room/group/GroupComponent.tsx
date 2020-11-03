@@ -1,12 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Picklist, Option, Accordion, AccordionSection, Button, MultiSelect, Input } from "react-rainbow-components";
+import {
+  Picklist,
+  Option,
+  Accordion,
+  AccordionSection,
+  Button,
+  MultiSelect,
+  Input,
+  Badge
+} from "react-rainbow-components";
 import _ from "lodash";
 import { AllUsersInfo, User } from "~utils/types";
 import { hostName } from "~utils/hostUtils";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
-import { createGroups, deleteGroups, fetchAllGroups, startNewSession, updateGroups } from "./groupSlice";
+import { createGroups, deleteGroups, fetchAllGroups, resetGroups, startNewSession, updateGroups } from "./groupSlice";
 import { withRouter } from "react-router-dom";
 import { switchToGroup } from "../room-component/roomSlice";
 import { get } from "~utils/axiosUtils";
@@ -100,6 +109,9 @@ const GroupComponent = (props: any) => {
         if (duration <= 0) {
           clearInterval(intervalRef.current);
           setStatus("Not started");
+          if (getLoginData().id === creatorId) {
+            dispatch(resetGroups(_.map(groupState, (group) => group.groupId)));
+          }
         }
       }, 1000);
     }
@@ -148,7 +160,7 @@ const GroupComponent = (props: any) => {
         id: keyToRoomNameDict.current[groupId],
         roomPath: `/room/${roomId}/${creatorId}/${roomName}`,
         name: groupName,
-        endTime: _.find(groupState, { groupId: groupId.toString() }).endTime
+        endTime: _.find(groupState, { groupId: keyToRoomNameDict.current[groupId] }).endTime
       })
     );
   }
@@ -169,7 +181,6 @@ const GroupComponent = (props: any) => {
             }}
             style={{ display: "inline-block", width: 115, textAlign: "center" }}
             label="Groups"
-            // disabled={getLoginData().id !== creatorId}
           >
             {_.range(9).map((index) => (
               <Option key={index} name={index} label={index.toString()} />
@@ -181,6 +192,8 @@ const GroupComponent = (props: any) => {
             label="Timeout (minutes)"
             labelAlignment="left"
             value={timeout}
+            min="1"
+            max="60"
             onChange={(e) => setTimeout(parseInt(e.target.value))}
           />
           <Button
@@ -200,10 +213,15 @@ const GroupComponent = (props: any) => {
             key={groupId}
             label={
               <div>
-                <b style={{ marginRight: 16 }}>Group #{groupId}</b>
-                <i style={{ marginRight: 16 }}>{`${usersByGroup[groupId]?.length ?? 0} people in room`}</i>
+                <Badge style={{ marginRight: 16 }} variant={status === "Not started" ? "default" : "brand"}>
+                  <span style={{}}>{status}</span>
+                </Badge>
+                <b> Group #{groupId} </b>
+                &nbsp;
+                <Badge variant="inverse" style={{ marginRight: 16 }}>
+                  {`${usersByGroup[groupId]?.length ?? 0}`} people
+                </Badge>
                 <Button
-                  label="Join"
                   variant="neutral"
                   onClick={() => joinGroup(groupId)}
                   disabled={
@@ -212,10 +230,9 @@ const GroupComponent = (props: any) => {
                       !usersByGroup[groupId]?.some((user) => user.id === getLoginData().id))
                   }
                 >
-                  Join&nbsp;
+                  Join now&nbsp;
                   <FontAwesomeIcon icon={faSignInAlt} />
                 </Button>
-                <span style={{ marginLeft: 16, fontStyle: "italic" }}>{status}</span>
               </div>
             }
           >
@@ -248,7 +265,7 @@ const GroupComponent = (props: any) => {
               // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
               // @ts-ignore
               showCheckbox
-              disabled={hidden}
+              readOnly={hidden}
             >
               {_.filter(usersInRoom, (user) => !!!user.selected || _.some(usersByGroup[groupId], { id: user.id })).map(
                 (value) => (
