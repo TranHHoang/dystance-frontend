@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Field, Form, Formik, FormikProps } from "formik";
 import { CreateRoomFormValues, validationSchema } from "../../room-management/create-room/CreateRoomForm";
 import { useDispatch } from "react-redux";
-import { Room } from "~utils/types";
+import { Room, RoomTimes } from "~utils/types";
 import moment from "moment";
 import styled from "styled-components";
 import {
@@ -61,11 +61,6 @@ export interface UpdateRoomFormValues extends CreateRoomFormValues {
   roomImage: File;
 }
 
-interface RoomTimes {
-  dayOfWeek: string;
-  startTime: string;
-  endTime: string;
-}
 const SingleRoomUpdateForm = (props: any) => {
   const [imgSrc, setImgSrc] = useState(null);
   const [rejectFile, setRejectFile] = useState(false);
@@ -193,7 +188,6 @@ const SingleRoomUpdateForm = (props: any) => {
                 onChange={(e) => {
                   setFieldValue("repeatDays", e);
                   _.difference(values.repeatDays, e).forEach((value) => {
-                    console.log(value);
                     delete values.roomTime[value];
                   });
                 }}
