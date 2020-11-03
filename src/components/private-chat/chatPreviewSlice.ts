@@ -49,7 +49,6 @@ export function fetchAllPreview(userId: string): AppThunk {
     try {
       console.log("Fetch all previews");
       const response = await Axios.get(`${hostName}/api/users/chat/preview?id=${userId}`);
-
       dispatch(initPreview(response.data));
     } catch (ex) {
       console.log(ex);
@@ -57,7 +56,7 @@ export function fetchAllPreview(userId: string): AppThunk {
   };
 }
 
-export function initSocket(): AppThunk {
+export function initPrivateChatSocket(): AppThunk {
   return (dispatch) => {
     socket.on(PrivateMessage, (data) => {
       console.log("received", data);

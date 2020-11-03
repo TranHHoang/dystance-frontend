@@ -12,16 +12,20 @@ import ProfilePage from "../components/profile-page/ProfilePage";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
+import { useDispatch } from "react-redux";
+import { initPrivateChatSocket } from "../components/private-chat/chatPreviewSlice";
 
 export const socket = new HubConnectionBuilder().withUrl(`${hostName}/socket`).build();
 
 export default hot(module)(function App() {
+  const dispatch = useDispatch();
   useEffect(() => {
     if (socket && socket.state === "Disconnected") {
       console.log("Start socket...");
       socket.start().then(() => {
         console.log("Started");
         socket.invoke("ConnectionState", 0, getLoginData().id);
+        dispatch(initPrivateChatSocket());
       });
     }
   }, []);

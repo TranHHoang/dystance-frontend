@@ -9,7 +9,7 @@ import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
 import { AllUsersInfo, getUserInfo, PrivateMessage, User, UserInfo } from "~utils/types";
 import { broadcastMessage, ChatType, fetchAllMessages } from "../../components/chat/chatSlice";
-import { fetchAllPreview, initSocket } from "./chatPreviewSlice";
+import { fetchAllPreview } from "./chatPreviewSlice";
 import { getLoginData } from "~utils/tokenStorage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { socket } from "~app/App";
@@ -93,11 +93,7 @@ const ChatPreview = (props: any) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(initSocket());
     dispatch(fetchAllPreview(getLoginData().id));
-    return () => {
-      socket.off(PrivateMessage);
-    };
   }, []);
 
   useEffect(() => {
