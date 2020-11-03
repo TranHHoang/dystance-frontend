@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
-import { createHashHistory } from "history";
 import { setupScreenSharingRender } from "jitsi-meet-electron-utils";
 import React, { useEffect, useRef, useState } from "react";
 import Jitsi from "react-jitsi";
@@ -14,8 +13,10 @@ import { socket } from "~app/App";
 import { resetCardState, setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
 import { setShowUpperToolbar } from "./jitsiMeetSlice";
 import { removeListeners, resetRoomState } from "../room-component/roomSlice";
+import { BreakoutGroup, resetRoomState, switchToGroup } from "../room-component/roomSlice";
 import { Spinner } from "react-rainbow-components";
 import { withRouter } from "react-router-dom";
+import moment from "moment";
 
 const loader = styled.div`
   display: none;
@@ -27,13 +28,14 @@ const StyledSpinner = styled(Spinner)`
 `;
 const JitsiMeetComponent = (props: any) => {
   const userCardState = useSelector((state: RootState) => state.userCardState);
+  const roomState = useSelector((state: RootState) => state.roomState);
   const profile = JSON.parse(localStorage.getItem("profile")) as User;
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
-  const { roomId, roomName, history } = props;
+  const { roomId, roomName, groupId, creatorId, history } = props;
   const api = useRef(null);
-
-  const isBreakoutGroup = /.+#d/.test(roomId);
+  const group = useRef<BreakoutGroup>();
+  const intervalRef = useRef<number>();
 
   useEffect(() => {
     if (userCardState.muteOtherUser) {
@@ -48,12 +50,50 @@ const JitsiMeetComponent = (props: any) => {
       });
     }
   }, [userCardState.muteOtherUser]);
+
   useEffect(() => {
     if (userCardState.kickOtherUser) {
       api?.current?.executeCommand("hangup");
       dispatch(setKickOtherUser(false));
     }
   }, [userCardState.kickOtherUser]);
+
+  useEffect(() => {
+    if (roomState.group) {
+      api.current?.executeCommand("hangup");
+      group.current = roomState.group;
+
+      clearInterval(intervalRef.current);
+      let duration = moment(group.current.endTime).diff(moment());
+
+      intervalRef.current = setInterval(() => {
+        duration = duration - 1000;
+        if (duration <= 0) {
+          clearInterval(intervalRef.current);
+          api.current?.executeCommand("hangup");
+        }
+      }, 1000);
+    }
+  }, [roomState.group]);
+
+  function redirect() {
+    if (group.current) {
+      if (groupId) {
+        // Redirect back to room
+        history.push("/temp");
+        history.replace(`${group.current.roomPath}`);
+        group.current = undefined;
+      } else {
+        // Redirect to group
+        history.push("/temp");
+        history.replace(`/room/${group.current.id}/${creatorId}/${group.current.name}/${groupId}`);
+        dispatch(switchToGroup(undefined));
+      }
+    } else {
+      history.replace("/homepage");
+      group.current = undefined;
+    }
+  }
 
   const handleAPI = (jitsiMeetAPI: any) => {
     setIsLoading(false);
@@ -74,7 +114,7 @@ const JitsiMeetComponent = (props: any) => {
       dispatch(resetRoomState());
       dispatch(resetCardState());
       removeListeners();
-      createHashHistory().push("/homepage");
+      redirect();
       jitsiMeetAPI.dispose();
     });
   };
@@ -114,7 +154,7 @@ const JitsiMeetComponent = (props: any) => {
         }}
         config={{
           // @ts-ignore
-          prejoinPageEnabled: isBreakoutGroup,
+          prejoinPageEnabled: true,
           disableSimulcast: false,
           requireDisplayName: false,
           enableWelcomePage: false,

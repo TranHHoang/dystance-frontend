@@ -6,7 +6,6 @@ import {
   faUsers,
   faVideoSlash,
   faCalendarTimes,
-  faObjectGroup,
   faObjectUngroup
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -166,13 +165,17 @@ const RoomComponent = (props: any) => {
   const userListState = useSelector((state: RootState) => state.userListState);
   const formRef = useRef(null);
   const remoteControlState = useSelector((state: RootState) => state.remoteControlState);
-  const { roomId, roomName, creatorId } = props.match.params;
+  const { roomId, creatorId, groupId } = props.match.params;
+  let { roomName } = props.match.params;
   const [whiteboardOpen, setWhiteboardOpen] = useState(false);
   const [remoteInitiatorInfo, setRemoteInitiatorInfo] = useState<UserInfo>();
   const [privateChatOpen, setPrivateChatOpen] = useState(false);
   const dispatch = useDispatch();
 
-  const isBreakoutGroup = /.+#d/.test(roomId);
+  const isBreakoutGroup = groupId !== undefined;
+  console.log(isBreakoutGroup);
+  if (isBreakoutGroup) roomName = atob(roomName);
+  console.log(roomName);
 
   useEffect(() => {
     dispatch(initSocket(roomId));
@@ -194,7 +197,7 @@ const RoomComponent = (props: any) => {
       case "Deadline":
         return <DeadlineListComponent roomId={roomId} creatorId={creatorId} />;
       case "Groups":
-        return <GroupComponent roomId={roomId} creatorId={creatorId} />;
+        return <GroupComponent roomId={roomId} roomName={roomName} creatorId={creatorId} />;
     }
   }
 
@@ -329,7 +332,7 @@ const RoomComponent = (props: any) => {
         </InvisibleDiv>
       ) : null}
       {whiteboardOpen ? <Whiteboard roomId={roomId} creatorId={creatorId} /> : null}
-      {/* <JitsiMeetComponent roomId={roomId} roomName={roomName} creatorId={creatorId} /> */}
+      <JitsiMeetComponent roomId={roomId} roomName={roomName} creatorId={creatorId} groupId={groupId} />
 
       <StyledModal
         isOpen={peopleProfileState.peopleProfileModalOpen}

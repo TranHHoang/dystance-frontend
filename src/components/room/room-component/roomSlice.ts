@@ -9,11 +9,20 @@ import { setUserInfoList } from "../user-list/userListSlice";
 import { UserInfo } from "~utils/types";
 import { toggleWhiteboard, setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
 import { socket } from "~app/App";
+import { fetchAllGroups } from "../group/groupSlice";
+
+export interface BreakoutGroup {
+  id: string;
+  roomPath: string;
+  name: string;
+  endTime: string;
+}
 
 interface RoomState {
   roomId: string;
   isDrawerOpen: boolean;
   tabsetValue: string;
+  group?: BreakoutGroup;
   error?: ErrorResponse;
   chatBadge: number;
 }
@@ -41,13 +50,25 @@ const roomSlice = createSlice({
     resetChatBadge(state) {
       state.chatBadge = 0;
     },
-    resetRoomState() {
-      return initialState;
+    resetRoomState(state) {
+      // Do not reset group
+      state = { ...initialState, group: state.group };
+      return state;
+    },
+    switchToGroup(state, action: PayloadAction<BreakoutGroup>) {
+      state.group = action.payload;
     }
   }
 });
 export default roomSlice.reducer;
-export const { setDrawerOpen, setTabsetValue, resetRoomState, incrementChatBadge, resetChatBadge } = roomSlice.actions;
+export const {
+  setDrawerOpen,
+  setTabsetValue,
+  resetRoomState,
+  switchToGroup,
+  incrementChatBadge,
+  resetChatBadge
+} = roomSlice.actions;
 
 export function initSocket(roomId: string): AppThunk {
   return (dispatch) => {
@@ -80,6 +101,9 @@ export function initSocket(roomId: string): AppThunk {
           break;
         case RoomActionType.ToggleWhiteboard:
           dispatch(toggleWhiteboard());
+          break;
+        case RoomActionType.StartGroupSession:
+          dispatch(fetchAllGroups(roomId));
           break;
       }
     });

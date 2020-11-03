@@ -4,11 +4,17 @@ import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { post, get } from "~utils/axiosUtils";
 import _ from "lodash";
+import moment from "moment";
+import { socket } from "~app/App";
+import { RoomAction, RoomActionType } from "~utils/types";
+import { getLoginData } from "~utils/tokenStorage";
 
 export interface BreakoutGroup {
   groupId?: string;
   name?: string;
   userIds: string[];
+  startTime?: string;
+  endTime?: string;
 }
 
 const groupSlice = createSlice({
@@ -77,6 +83,7 @@ export function fetchAllGroups(roomId: string): AppThunk {
   return async (dispatch) => {
     try {
       const response = await get(`/rooms/groups/get?roomId=${roomId}`);
+      console.log(response.data);
       dispatch(setBreakoutGroups(response.data as BreakoutGroup[]));
     } catch (ex) {
       console.log(ex);
@@ -110,5 +117,22 @@ export function resetGroups(groupIds: string[]): AppThunk {
         console.log(ex);
       }
     });
+  };
+}
+
+export function startNewSession(roomId: string, duration: number): AppThunk {
+  return async (dispatch) => {
+    const startTime = moment().toISOString();
+    try {
+      const form = new FormData();
+      form.append("roomId", roomId);
+      form.append("startTime", startTime);
+      form.append("duration", duration.toString());
+      await post("/rooms/groups/start", form);
+    } catch (ex) {
+      console.log(ex);
+    }
+    await socket.invoke(RoomAction, roomId, RoomActionType.StartGroupSession, getLoginData().id);
+    dispatch(fetchAllGroups(roomId));
   };
 }
