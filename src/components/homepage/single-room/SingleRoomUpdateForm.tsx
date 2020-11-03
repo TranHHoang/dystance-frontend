@@ -1,7 +1,11 @@
 import * as React from "react";
 import { useState } from "react";
 import { Field, Form, Formik, FormikProps } from "formik";
-import { CreateRoomFormValues, validationSchema } from "../../room-management/create-room/CreateRoomForm";
+import {
+  CreateRoomFormValues,
+  validationSchema,
+  weekDayConvert
+} from "../../room-management/create-room/CreateRoomForm";
 import { useDispatch } from "react-redux";
 import { Room } from "~utils/types";
 import moment from "moment";
@@ -176,6 +180,7 @@ const SingleRoomUpdateForm = (props: any) => {
                 value={values.startDate}
                 onChange={(e) => {
                   setFieldValue("startDate", e);
+                  setFieldValue("repeatDays", [weekDayConvert(moment(e).isoWeekday())]);
                   if (moment(e).isAfter(moment(values.endDate), "day")) {
                     setFieldValue("endDate", e);
                     values.endDate = e;

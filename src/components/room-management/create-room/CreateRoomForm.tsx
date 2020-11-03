@@ -2,7 +2,7 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Field, Form, Formik, FormikProps } from "formik";
 import moment from "moment";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   Button,
   DatePicker,
@@ -102,7 +102,6 @@ const RoomFormComponent = (props: any) => {
   const dispatch = useDispatch();
   const { innerRef } = props;
   const createRoomState = useSelector((state: RootState) => state.roomCreation);
-
   function onSubmit(values: CreateRoomFormValues) {
     if (!createRoomState.isLoading) {
       dispatch(createRoom(values));
@@ -126,6 +125,7 @@ const RoomFormComponent = (props: any) => {
             value={values.startDate}
             onChange={(e) => {
               setFieldValue("startDate", e);
+              setFieldValue("repeatDays", [weekDayConvert(moment(e).isoWeekday())]);
               if (moment(e).isAfter(moment(values.endDate), "day")) {
                 setFieldValue("endDate", e);
               }
