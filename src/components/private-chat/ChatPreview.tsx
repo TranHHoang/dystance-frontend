@@ -16,6 +16,7 @@ import { socket } from "~app/App";
 import * as Yup from "yup";
 import { Field, Form, Formik, FormikProps } from "formik";
 import { LookupValue } from "react-rainbow-components/components/types";
+import _ from "lodash";
 
 declare module "react-rainbow-components/components/types" {
   interface LookupValue {
@@ -162,7 +163,7 @@ const ChatPreview = (props: any) => {
               <Title>Private Messages</Title>
             </div>
           ) : null}
-          {previews.map((preview) => {
+          {_.orderBy(previews, ["date"], ["desc"]).map((preview) => {
             const id = preview.senderId !== getLoginData().id ? preview.senderId : preview.receiverId;
             return (
               <StyledPreview key={preview.id} onClick={() => setSelectedUserId(id)}>
