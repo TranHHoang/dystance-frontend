@@ -85,7 +85,7 @@ const schema = Yup.object({
 const ChatPreview = (props: any) => {
   const { inRoom, inSidebar } = props;
   const [usersInfo, setUsersInfo] = useState<{ [key: string]: UserInfo }>({});
-  const previews = useSelector((root: RootState) => root.chatPreviewState);
+  const previews = useSelector((root: RootState) => root.chatPreviewState.chatPreview);
   const [selectedUserId, setSelectedUserId] = useState<string>();
   const [showNewMessageModal, setShowNewMessageModal] = useState(false);
   const [autoCompleteOptions, setAutoCompleteOptions] = useState([]);

@@ -16,21 +16,33 @@ interface ChatPreview {
   type: number;
   fileName: string;
 }
-
+interface ChatPreviewState {
+  chatPreview: ChatPreview[];
+  privateChatBadge: number;
+}
+const initialState: ChatPreviewState = {
+  chatPreview: [],
+  privateChatBadge: 0
+};
 const chatPreviewSlice = createSlice({
   name: "chatPreview",
-  initialState: [] as ChatPreview[],
+  initialState,
   reducers: {
     initPreview(state, action: PayloadAction<ChatPreview[]>) {
-      state = action.payload;
-      return state;
+      state.chatPreview = action.payload;
+    },
+    incrementPrivateChatBadge(state) {
+      state.privateChatBadge += 1;
+    },
+    resetPrivateChatBadge(state) {
+      state.privateChatBadge = 0;
     }
   }
 });
 
 export default chatPreviewSlice.reducer;
 
-export const { initPreview } = chatPreviewSlice.actions;
+export const { initPreview, incrementPrivateChatBadge, resetPrivateChatBadge } = chatPreviewSlice.actions;
 
 export function fetchAllPreview(userId: string): AppThunk {
   return async (dispatch) => {
@@ -50,6 +62,7 @@ export function initSocket(): AppThunk {
     socket.on(PrivateMessage, (data) => {
       console.log("received", data);
       const senderId = JSON.parse(data).senderId;
+      dispatch(incrementPrivateChatBadge());
       dispatch(fetchLatestMessage(undefined, { id1: getLoginData().id, id2: senderId }));
       dispatch(fetchAllPreview(getLoginData().id));
     });

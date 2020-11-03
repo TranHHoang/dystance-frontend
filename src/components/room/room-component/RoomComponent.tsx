@@ -161,6 +161,7 @@ const RoomComponent = (props: any) => {
   const userCardState = useSelector((state: RootState) => state.userCardState);
   const deadlineCardState = useSelector((state: RootState) => state.deadlineCardState);
   const userListState = useSelector((state: RootState) => state.userListState);
+  const chatPreviewState = useSelector((state: RootState) => state.chatPreviewState);
   const formRef = useRef(null);
   const remoteControlState = useSelector((state: RootState) => state.remoteControlState);
   const { roomId, roomName, creatorId } = props.match.params;
@@ -249,7 +250,13 @@ const RoomComponent = (props: any) => {
               setPrivateChatOpen(true);
             }}
           >
-            <FontAwesomeIcon icon={faComments} size="2x" />
+            {chatPreviewState.privateChatBadge > 0 ? (
+              <BadgeOverlay className="rainbow-m-around_medium">
+                <FontAwesomeIcon icon={faComments} size="2x" />
+              </BadgeOverlay>
+            ) : (
+              <FontAwesomeIcon icon={faComments} size="2x" />
+            )}
           </NormalButton>
           <RearButton variant="neutral" onClick={() => setWhiteboardOpen(!whiteboardOpen)}>
             <FontAwesomeIcon icon={faChalkboard} size="2x" />
