@@ -149,7 +149,9 @@ const GroupComponent = (props: any) => {
       .value();
 
     // Update userIds in all groups
-    dispatch(updateGroups(usersByGroupList));
+    if (usersByGroupList) {
+      dispatch(updateGroups(usersByGroupList));
+    }
   }
 
   function joinGroup(groupId: number) {

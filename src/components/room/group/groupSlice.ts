@@ -34,7 +34,11 @@ const groupSlice = createSlice({
     },
     updateBreakoutGroup(state, action: PayloadAction<BreakoutGroup>) {
       // Update user list only
-      _.find(state, { groupId: action.payload.groupId }).userIds = action.payload.userIds;
+      if (action.payload) {
+        _.find(state, { groupId: action.payload.groupId }).userIds = action.payload.userIds;
+      } else {
+        return [];
+      }
     }
   }
 });
@@ -44,7 +48,10 @@ export default groupSlice.reducer;
 export const { setBreakoutGroups, addBreakoutGroup, removeBreakoutGroup, updateBreakoutGroup } = groupSlice.actions;
 
 async function all<T>(array: T[], fn: (value: T) => Promise<void>) {
-  return Promise.all(array.map(async (value) => await fn(value)));
+  return array.reduce(async (p, item) => {
+    await p;
+    return await fn(item);
+  }, Promise.resolve());
 }
 
 export function createGroups(roomId: string, creatorId: string, groups: BreakoutGroup[]): AppThunk {
