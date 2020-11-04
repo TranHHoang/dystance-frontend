@@ -10,12 +10,14 @@ interface PeopleProfileState {
   peopleProfileModalOpen: boolean;
   user: User;
   error?: ErrorResponse;
+  roomId: string;
 }
 
 const initialState: PeopleProfileState = {
   userId: null,
   peopleProfileModalOpen: false,
-  user: null
+  user: null,
+  roomId: null
 };
 
 const peopleProfileSlice = createSlice({
@@ -31,6 +33,10 @@ const peopleProfileSlice = createSlice({
     },
     fetchPeopleProfileFailure(state, action: PayloadAction<ErrorResponse>) {
       state.error = action.payload;
+    },
+    setCreatorProfileOpen(state, action: PayloadAction<{ roomId: string; peopleProfileModalOpen: boolean }>) {
+      state.roomId = action.payload.roomId;
+      state.peopleProfileModalOpen = action.payload.peopleProfileModalOpen;
     }
   }
 });
@@ -38,7 +44,8 @@ export default peopleProfileSlice.reducer;
 export const {
   setPeopleProfileModalOpen,
   fetchPeopleProfileSuccess,
-  fetchPeopleProfileFailure
+  fetchPeopleProfileFailure,
+  setCreatorProfileOpen
 } = peopleProfileSlice.actions;
 
 export function showPeopleProfile(userId: string): AppThunk {

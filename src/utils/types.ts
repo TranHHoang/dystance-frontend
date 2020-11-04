@@ -28,7 +28,6 @@ export interface Room {
   startDate: string;
   endDate: string;
   repeatOccurrence: string;
-  repeatDays: string;
   roomTimes: string;
 }
 
@@ -101,4 +100,10 @@ export interface TimetableEvent {
   description: string;
   startDate: string;
   endDate: string;
+}
+
+export interface RoomTimes {
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
 }

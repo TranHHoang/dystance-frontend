@@ -5,22 +5,20 @@ import styled from "styled-components";
 
 export const StyledCard = styled(Card)`
   width: 350px;
-  height: 420px;
+  height: fit-content;
 `;
 export const FlexRowContainer = styled.div`
   display: flex;
   width: 100%;
-  flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
 `;
 export const ImageContainer = styled.div`
-  width: 30%;
   margin: 5% 5% 5% 5%;
 `;
 export const StyledImage = styled.img`
   position: relative;
-  width: 105px;
-  height: 105px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
   z-index: 2;
   object-fit: cover;
@@ -35,6 +33,20 @@ export const Time = styled.h2`
   font-size: 1.5em;
   margin: 10% 5% 0 0;
   color: ${(props) => props.theme.rainbow.palette.text.label};
+`;
+export const Creator = styled.h2`
+  font-size: 1.25em;
+  margin: 10 0 10 0;
+  color: ${(props) => props.theme.rainbow.palette.text.label};
+`;
+export const CreatorName = styled.span`
+  color: ${(props) => props.theme.rainbow.palette.brand.main};
+  font-weight: 500;
+  transition: 0.2s;
+  :hover {
+    filter: brightness(80%);
+    cursor: pointer;
+  }
 `;
 
 export const TextContainer = styled.div`
@@ -62,7 +74,7 @@ export const Separator = styled.hr`
   background-color: ${(props) => props.theme.rainbow.palette.text.label};
   position: absolute;
   width: 100%;
-  top: 12%;
+  top: 50px;
   z-index: 1;
   opacity: 0.2;
 `;
@@ -87,4 +99,8 @@ export const Error = styled(StyledNotification)`
 `;
 export const StyledNotifications = styled(Notification)`
   width: 100%;
+`;
+export const TimeText = styled.h1`
+  font-size: 16px;
+  margin-bottom: 10px;
 `;
