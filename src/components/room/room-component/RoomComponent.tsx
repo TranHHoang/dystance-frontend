@@ -42,7 +42,7 @@ import DeadlineListComponent, { DeadlineFormComponent } from "../deadline/Deadli
 import { deleteDeadline, setDeleteModalOpen, setUpdateModalOpen } from "../deadline/deadline-card/deadlineCardSlice";
 import ChatPreview from "../../private-chat/ChatPreview";
 import { ipcRenderer } from "electron";
-
+import { resetPrivateChatBadge, initPrivateChatSocket } from "../../private-chat/chatPreviewSlice";
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
   margin: 0 1.25rem;
@@ -161,6 +161,7 @@ const RoomComponent = (props: any) => {
   const userCardState = useSelector((state: RootState) => state.userCardState);
   const deadlineCardState = useSelector((state: RootState) => state.deadlineCardState);
   const userListState = useSelector((state: RootState) => state.userListState);
+  const chatPreviewState = useSelector((state: RootState) => state.chatPreviewState);
   const formRef = useRef(null);
   const remoteControlState = useSelector((state: RootState) => state.remoteControlState);
   const { roomId, roomName, creatorId } = props.match.params;
@@ -172,6 +173,7 @@ const RoomComponent = (props: any) => {
   useEffect(() => {
     dispatch(initSocket(roomId));
     dispatch(fetchAllMessages(roomId, undefined));
+    dispatch(initPrivateChatSocket());
     //Listen to the event sent from ipcMain and leave Room and remove socket
     ipcRenderer.on("app-close", () => {
       socket.invoke(RoomAction, roomId, RoomActionType.Leave, getLoginData().id);
@@ -236,7 +238,7 @@ const RoomComponent = (props: any) => {
             }}
           >
             {roomState.chatBadge > 0 ? (
-              <BadgeOverlay className="rainbow-m-around_medium">
+              <BadgeOverlay>
                 <FontAwesomeIcon icon={faBars} size="2x" />
               </BadgeOverlay>
             ) : (
@@ -247,9 +249,16 @@ const RoomComponent = (props: any) => {
             variant="neutral"
             onClick={() => {
               setPrivateChatOpen(true);
+              dispatch(resetPrivateChatBadge());
             }}
           >
-            <FontAwesomeIcon icon={faComments} size="2x" />
+            {chatPreviewState.privateChatBadge > 0 ? (
+              <BadgeOverlay>
+                <FontAwesomeIcon icon={faComments} size="2x" />
+              </BadgeOverlay>
+            ) : (
+              <FontAwesomeIcon icon={faComments} size="2x" />
+            )}
           </NormalButton>
           <RearButton variant="neutral" onClick={() => setWhiteboardOpen(!whiteboardOpen)}>
             <FontAwesomeIcon icon={faChalkboard} size="2x" />

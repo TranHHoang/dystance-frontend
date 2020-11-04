@@ -8,6 +8,7 @@ import { Modal } from "react-rainbow-components";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import { broadcastMessage } from "./chatSlice";
+import { resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
 
 const StyledChatBox = styled.div`
   display: flex;
@@ -74,6 +75,7 @@ const ChatBox = ({
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     dispatch(resetChatBadge());
+    dispatch(resetPrivateChatBadge());
     if (e.key === "Enter") {
       if (messageInput.current.value.trim()) {
         dispatch(broadcastMessage(roomId, receiverId, messageInput.current.value));
@@ -100,7 +102,10 @@ const ChatBox = ({
           ref={messageInput}
           placeholder="Enter your message"
           onKeyDown={handleKeyDown}
-          onFocus={() => dispatch(resetChatBadge())}
+          onFocus={() => {
+            dispatch(resetChatBadge());
+            dispatch(resetPrivateChatBadge());
+          }}
         />
         <FontAwesomeIcon icon={faSmileBeam} onClick={() => setToggleEmoji(!toggleEmoji)} />
       </StyledChatBox>
