@@ -18,7 +18,7 @@ import { withRouter } from "react-router-dom";
 import moment from "moment";
 import { Logger, LogType } from "~utils/logger";
 import fs from "fs";
-import moment from "moment";
+import { resetGroupJoinedLeftState, setGroupJoined } from "../group/groupSlice";
 
 const loader = styled.div`
   display: none;
@@ -40,6 +40,7 @@ const StyledClock = styled.div`
 
 const JitsiMeetComponent = (props: any) => {
   const userCardState = useSelector((state: RootState) => state.userCardState);
+  const groupState = useSelector((state: RootState) => state.groupState);
   const roomState = useSelector((state: RootState) => state.roomState);
   const profile = JSON.parse(localStorage.getItem("profile")) as User;
   const dispatch = useDispatch();
@@ -50,7 +51,6 @@ const JitsiMeetComponent = (props: any) => {
   const groupRef = useRef<BreakoutGroup>();
   const intervalRef = useRef<number>();
   const logger = Logger.getInstance();
-
   useEffect(() => {
     if (userCardState.muteOtherUser) {
       api?.current?.isAudioMuted().then((response: any) => {
@@ -105,6 +105,8 @@ const JitsiMeetComponent = (props: any) => {
       if (groupId) {
         // Redirect back to room
         history.push("/temp");
+        logger.logGroup(LogType.GroupLeave, groupState.mainRoomId, groupState.groupId, "left group");
+        dispatch(setGroupJoined(false));
         history.replace(`${groupRef.current.roomPath}`);
         groupRef.current = undefined;
       } else {
@@ -115,7 +117,9 @@ const JitsiMeetComponent = (props: any) => {
       }
     } else {
       history.replace("/homepage");
+      dispatch(resetGroupJoinedLeftState());
       groupRef.current = undefined;
+      logger.log(LogType.AttendanceLeave, roomId, `left room`);
     }
   }
 
@@ -146,11 +150,12 @@ const JitsiMeetComponent = (props: any) => {
       interval = setInterval(() => {
         saveFile();
       }, 5000 * 60);
-      logger.log(LogType.AttendanceJoin, roomId, `joined room`);
+      if (groupState.isGroupJoined === false && groupState.isGroupLeft === false) {
+        logger.log(LogType.AttendanceJoin, roomId, `joined room`);
+      }
     });
     jitsiMeetAPI.on("readyToClose", () => {
       socket.invoke(RoomAction, roomId, RoomActionType.Leave, getLoginData().id);
-      logger.log(LogType.AttendanceLeave, roomId, `left room`);
       dispatch(setShowUpperToolbar(false));
       dispatch(setRemoteControlAccepted(undefined));
       dispatch(resetRoomState());

@@ -225,6 +225,7 @@ const RoomComponent = (props: any) => {
       });
     }
   }, [roomState.isDrawerOpen]);
+
   socket.on(REMOTE_CONTROL_SIGNAL, async (data) => {
     const objData = JSON.parse(data);
     switch (objData.type) {

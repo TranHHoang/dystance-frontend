@@ -21,7 +21,13 @@ export enum LogType {
   RemoteControlReject = "REMOTE_CONTROL_REJECT",
   RemoteControlStop = "REMOTE_CONTROL_STOP",
   WhiteboardAllow = "WHITEBOARD_ALLOW",
-  WhiteboardDisable = "WHITEBOARD_DISABLE"
+  WhiteboardDisable = "WHITEBOARD_DISABLE",
+  GroupCreate = "GROUP_CREATE",
+  GroupDelete = "GROUP_DELETE",
+  GroupStart = "GROUP_START",
+  GroupStop = "GROUP_STOP",
+  GroupJoin = "GROUP_JOIN",
+  GroupLeave = "GROUP_LEAVE"
 }
 
 export class Logger {
@@ -49,6 +55,14 @@ export class Logger {
 
   public logPrivateChat(type: string, description: string, receiverId: string): void {
     const log = `${moment().format("YYYY-MM-DDTHH:mm:ss")} ${type} ${getLoginData().id} ${description} ${receiverId}`;
+    this.logs.push(log);
+    console.log(this.logs);
+  }
+
+  public logGroup(type: string, roomId: string, groupId: string, description: string) {
+    const log = `${moment().format("YYYY-MM-DDTHH:mm:ss")} ${type} ${roomId} ${groupId} ${
+      getLoginData().id
+    } ${description}`;
     this.logs.push(log);
     console.log(this.logs);
   }
