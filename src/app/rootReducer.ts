@@ -24,6 +24,7 @@ import eventDetailsReducer from "../components/timetable/event-details/eventDeta
 import remoteControlReducer from "../components/room/remote-control/remoteControlSlice";
 import chatPreviewReducer from "../components/private-chat/chatPreviewSlice";
 import invitedUserCardReducer from "../components/room/invite/invited-user-card-component/invitedUserCardSlice";
+import groupReducer from "../components/room/group/groupSlice";
 
 const appReducer = combineReducers({
   roomCreation: createRoomReducer,
@@ -49,7 +50,8 @@ const appReducer = combineReducers({
   eventDetailsState: eventDetailsReducer,
   remoteControlState: remoteControlReducer,
   chatPreviewState: chatPreviewReducer,
-  invitedUserCardState: invitedUserCardReducer
+  invitedUserCardState: invitedUserCardReducer,
+  groupState: groupReducer
 });
 
 const rootReducer = (state: any, action: AnyAction) => {
