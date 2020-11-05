@@ -12,9 +12,7 @@ import {
   setRemoteControlWaitingModalOpen,
   toggleWhiteboardUsage
 } from "./userCardSlice";
-import { RootState } from "~app/rootReducer";
-import { useEffect } from "react";
-import { setDrawerOpen } from "../../room-component/roomSlice";
+import { Logger, LogType } from "~utils/logger";
 
 const StyledCard = styled(Card)`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
@@ -23,7 +21,7 @@ const StyledCard = styled(Card)`
 const UserCardComponent = (props: any) => {
   const { userId, icon, title, creatorId, roomId } = props;
   const dispatch = useDispatch();
-
+  const logger = Logger.getInstance();
   return (
     <div>
       <StyledCard
@@ -48,11 +46,17 @@ const UserCardComponent = (props: any) => {
                   />
                   <MenuItem
                     label="Remote control"
-                    onClick={() => dispatch(setRemoteControlWaitingModalOpen({ userId, isModalOpen: true }))}
+                    onClick={() => {
+                      dispatch(setRemoteControlWaitingModalOpen({ userId, isModalOpen: true }));
+                      logger.log(LogType.RemoteControlPermission, roomId, `asked to remote control ${userId}`);
+                    }}
                   />
                   <MenuItem
                     label="Toggle Whiteboard Usage"
-                    onClick={() => dispatch(toggleWhiteboardUsage(roomId, userId))}
+                    onClick={() => {
+                      dispatch(toggleWhiteboardUsage(roomId, userId));
+                      logger.log(LogType.ToggleWhiteboard, roomId, `toggled whiteboard usage for ${userId}`);
+                    }}
                   />
                 </div>
               ) : null}

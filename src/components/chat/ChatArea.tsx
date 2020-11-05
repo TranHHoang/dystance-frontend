@@ -2,9 +2,9 @@ import { faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
 import { Button, Modal, ProgressBar } from "react-rainbow-components";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import styled from "styled-components";
-import { RootState } from "~app/rootReducer";
+import { Logger, LogType } from "~utils/logger";
 import ChatBox from "./ChatBox";
 import ChatHistory from "./ChatHistory";
 import { broadcastMessage, ChatType } from "./chatSlice";
@@ -61,8 +61,9 @@ const ChatArea = (props: any) => {
   const [imagePreview, setImagePreview] = useState("");
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const chatBox = useRef<HTMLDivElement>();
-  const { roomId, receiverId } = props;
+  const { roomId, receiverId, inRoom } = props;
   const dispatch = useDispatch();
+  const logger = Logger.getInstance();
 
   function isImageFile(file: File) {
     return file?.type.includes("image") ?? false;
@@ -95,12 +96,26 @@ const ChatArea = (props: any) => {
   }
 
   function sendFile() {
-    if (file.size < MAX_FILE_SIZE)
+    if (file.size < MAX_FILE_SIZE) {
       dispatch(
         broadcastMessage(roomId, receiverId, file, isImageFile(file) ? ChatType.Image : ChatType.File, (percentage) => {
           setUploadPercentage(percentage);
         })
       );
+      if (roomId) {
+        if (isImageFile(file)) {
+          logger.log(LogType.RoomChatImage, roomId, `sent image ${file?.name}`);
+        } else {
+          logger.log(LogType.RoomChatFile, roomId, `sent file ${file.name}`);
+        }
+      } else if (!roomId && inRoom === true) {
+        if (isImageFile(file)) {
+          logger.logPrivateChat(LogType.PrivateChatImage, `sent image ${file?.name} to `, receiverId);
+        } else {
+          logger.logPrivateChat(LogType.PrivateChatFile, `sent file ${file.name} to `, receiverId);
+        }
+      }
+    }
   }
 
   useEffect(() => {
@@ -163,7 +178,7 @@ const ChatArea = (props: any) => {
         <ChatHistoryArea id="chatbox" ref={chatBox}>
           <ChatHistory isPrivateChat={roomId === undefined} />
         </ChatHistoryArea>
-        <ChatBox setFile={setFile} roomId={roomId} receiverId={receiverId} />
+        <ChatBox setFile={setFile} roomId={roomId} receiverId={receiverId} inRoom={inRoom} />
       </StyledChatArea>
     </div>
   );

@@ -16,6 +16,7 @@ import { BreakoutGroup, resetRoomState, switchToGroup, removeListeners } from ".
 import { Spinner } from "react-rainbow-components";
 import { withRouter } from "react-router-dom";
 import moment from "moment";
+import { Logger, LogType } from "~utils/logger";
 
 const loader = styled.div`
   display: none;
@@ -46,11 +47,13 @@ const JitsiMeetComponent = (props: any) => {
   const api = useRef(null);
   const groupRef = useRef<BreakoutGroup>();
   const intervalRef = useRef<number>();
+  const logger = Logger.getInstance();
 
   useEffect(() => {
     if (userCardState.muteOtherUser) {
       api?.current?.isAudioMuted().then((response: any) => {
         if (!response) {
+          logger.log(LogType.Mute, roomId, `got muted`);
           api?.current?.executeCommand("toggleAudio");
           dispatch(setMuteOtherUser(false));
         }
@@ -63,6 +66,7 @@ const JitsiMeetComponent = (props: any) => {
 
   useEffect(() => {
     if (userCardState.kickOtherUser) {
+      logger.log(LogType.Kick, roomId, `got kicked`);
       api?.current?.executeCommand("hangup");
       dispatch(setKickOtherUser(false));
     }
@@ -124,9 +128,11 @@ const JitsiMeetComponent = (props: any) => {
 
     jitsiMeetAPI.addEventListener("videoConferenceJoined", () => {
       dispatch(setShowUpperToolbar(true));
+      logger.log(LogType.AttendanceJoin, roomId, `joined room`);
     });
     jitsiMeetAPI.on("readyToClose", () => {
       socket.invoke(RoomAction, roomId, RoomActionType.Leave, getLoginData().id);
+      logger.log(LogType.AttendanceLeave, roomId, `left room`);
       dispatch(setShowUpperToolbar(false));
       dispatch(setRemoteControlAccepted(undefined));
       dispatch(resetRoomState());

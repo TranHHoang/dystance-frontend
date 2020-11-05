@@ -112,7 +112,7 @@ export const SingleRoom = (props: any) => {
           <Creator>
             Created By{" "}
             <CreatorName onClick={() => dispatch(setCreatorProfileOpen({ roomId, peopleProfileModalOpen: true }))}>
-              {creatorInfo.realName}
+              {creatorInfo?.realName}
             </CreatorName>
           </Creator>
         </TextContainer>
@@ -258,7 +258,7 @@ export const SingleRoom = (props: any) => {
         isOpen={peopleProfileState.roomId === roomId && peopleProfileState.peopleProfileModalOpen}
         onRequestClose={() => dispatch(setCreatorProfileOpen({ roomId: null, peopleProfileModalOpen: false }))}
       >
-        <PeopleProfilePage userId={creatorInfo.id} />
+        <PeopleProfilePage userId={creatorInfo?.id} />
       </Modal>
     </div>
   );

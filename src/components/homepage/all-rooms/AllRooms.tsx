@@ -64,7 +64,6 @@ export const AllRooms = () => {
                 image={room.image}
                 description={room.description}
                 repeatOccurrence={room.repeatOccurrence}
-                repeatDays={room.repeatDays}
                 roomTimes={room.roomTimes}
               />
             </div>

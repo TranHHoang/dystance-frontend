@@ -6,6 +6,7 @@ import { hostName } from "~utils/hostUtils";
 import { AxiosError } from "axios";
 import { CreateDeadlineFormValues } from "./DeadlineListComponent";
 import moment from "moment";
+import { Logger, LogType } from "~utils/logger";
 
 interface DeadlineListState {
   isLoading: boolean;
@@ -67,6 +68,7 @@ export const {
   resetDeadlines
 } = deadlineListSlice.actions;
 
+const logger = Logger.getInstance();
 export function showDeadlines(roomId: string): AppThunk {
   return async (dispatch) => {
     try {
@@ -110,6 +112,7 @@ export function createDeadline({
 
       await Axios.post(`${hostName}/api/rooms/deadline/create`, fd, config);
       dispatch(deadlineCreationSuccess());
+      logger.log(LogType.DeadlineCreate, roomId, `created a new deadline`);
       dispatch(resetDeadlines());
       dispatch(showDeadlines(roomId));
     } catch (ex) {

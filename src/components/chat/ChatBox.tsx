@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import { broadcastMessage } from "./chatSlice";
 import { resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
+import { Logger, LogType } from "~utils/logger";
 
 const StyledChatBox = styled.div`
   display: flex;
@@ -57,18 +58,20 @@ const StyledModal = styled(Modal)`
 const ChatBox = ({
   setFile,
   roomId,
-  receiverId
+  receiverId,
+  inRoom
 }: {
   setFile: (file: File) => void;
   roomId: string;
   receiverId: string;
+  inRoom: boolean;
 }) => {
   const [toggleEmoji, setToggleEmoji] = useState(false);
   const dispatch = useDispatch();
   const imageInput = useRef<HTMLInputElement>();
   const messageInput = useRef<HTMLInputElement>();
   const fileInput = useRef<HTMLInputElement>();
-
+  const logger = Logger.getInstance();
   function addEmoji(emoji: any) {
     messageInput.current.value += emoji.native;
   }
@@ -80,6 +83,11 @@ const ChatBox = ({
       if (messageInput.current.value.trim()) {
         dispatch(broadcastMessage(roomId, receiverId, messageInput.current.value));
         messageInput.current.value = "";
+        if (roomId) {
+          logger.log(LogType.RoomChatText, roomId, `sent message`);
+        } else if (!roomId && inRoom === true) {
+          logger.logPrivateChat(LogType.PrivateChatMessage, `sent message to`, receiverId);
+        }
       }
     }
   }

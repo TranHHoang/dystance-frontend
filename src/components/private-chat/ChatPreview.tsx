@@ -262,7 +262,7 @@ const ChatPreview = (props: any) => {
             </span>
           </StyledHeader>
           <div style={{ margin: "0 5 0 5" }}>
-            <ChatArea receiverId={selectedUserId} />
+            <ChatArea receiverId={selectedUserId} inRoom={inRoom} />
           </div>
         </>
       )}
