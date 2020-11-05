@@ -38,7 +38,6 @@ const StyledClock = styled.div`
 const JitsiMeetComponent = (props: any) => {
   const userCardState = useSelector((state: RootState) => state.userCardState);
   const roomState = useSelector((state: RootState) => state.roomState);
-  const groupState = useSelector((state: RootState) => state.groupState);
   const profile = JSON.parse(localStorage.getItem("profile")) as User;
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
@@ -89,13 +88,11 @@ const JitsiMeetComponent = (props: any) => {
   }, [roomState.group]);
 
   useEffect(() => {
-    // Because all rooms are the same, only need to check the first one
-    const [group] = groupState;
-    if (group && group.endTime === group.startTime && groupRef.current && groupId) {
+    if (roomState.groupStopped && groupRef.current && groupId) {
       clearInterval(intervalRef.current);
       api.current?.executeCommand("hangup");
     }
-  }, [groupState]);
+  }, [roomState.groupStopped]);
 
   function redirect() {
     if (groupRef.current) {

@@ -23,6 +23,7 @@ interface RoomState {
   isDrawerOpen: boolean;
   tabsetValue: string;
   group?: BreakoutGroup;
+  groupStopped: boolean;
   error?: ErrorResponse;
   chatBadge: number;
 }
@@ -30,6 +31,7 @@ const initialState: RoomState = {
   roomId: null,
   isDrawerOpen: false,
   tabsetValue: "",
+  groupStopped: false,
   chatBadge: 0
 };
 
@@ -57,6 +59,9 @@ const roomSlice = createSlice({
     },
     switchToGroup(state, action: PayloadAction<BreakoutGroup>) {
       state.group = action.payload;
+    },
+    stopGroup(state) {
+      state.groupStopped = true;
     }
   }
 });
@@ -67,7 +72,8 @@ export const {
   resetRoomState,
   switchToGroup,
   incrementChatBadge,
-  resetChatBadge
+  resetChatBadge,
+  stopGroup
 } = roomSlice.actions;
 
 export function initSocket(roomId: string): AppThunk {
@@ -102,8 +108,11 @@ export function initSocket(roomId: string): AppThunk {
         case RoomActionType.ToggleWhiteboard:
           dispatch(toggleWhiteboard());
           break;
-        case RoomActionType.Group:
+        case RoomActionType.GroupNotification:
           dispatch(fetchAllGroups(roomId));
+          break;
+        case RoomActionType.StopGroup:
+          dispatch(stopGroup());
           break;
       }
     });

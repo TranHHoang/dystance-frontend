@@ -88,7 +88,7 @@ const GroupComponent = (props: any) => {
         });
 
         result[key] =
-          usersByGroup[key] ||
+          // usersByGroup[key] ||
           _.map(value.userIds, (value) => {
             const user = _.find(allUsers, { id: value });
 
@@ -194,7 +194,13 @@ const GroupComponent = (props: any) => {
 
   function handleSession() {
     if (timeout > 0 && timeout <= 60) {
-      dispatch(startNewSession(roomId, status === "Not started" ? timeout : 0));
+      dispatch(
+        startNewSession(
+          roomId,
+          status === "Not started" ? timeout : 0,
+          _.map(groupState, (group) => group.groupId)
+        )
+      );
     }
   }
 
