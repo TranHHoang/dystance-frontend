@@ -13,6 +13,7 @@ import {
   toggleWhiteboardUsage
 } from "./userCardSlice";
 import { Logger, LogType } from "~utils/logger";
+import { setUserId } from "../../../../components/room/remote-control/remoteControlSlice";
 
 const StyledCard = styled(Card)`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
@@ -49,6 +50,7 @@ const UserCardComponent = (props: any) => {
                     onClick={() => {
                       dispatch(setRemoteControlWaitingModalOpen({ userId, isModalOpen: true }));
                       logger.log(LogType.RemoteControlPermission, roomId, `asked to remote control ${userId}`);
+                      dispatch(setUserId(userId));
                     }}
                   />
                   <MenuItem

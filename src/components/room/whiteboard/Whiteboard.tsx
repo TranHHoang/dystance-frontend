@@ -61,7 +61,7 @@ const Whiteboard = (props: any) => {
       logger.log(LogType.WhiteboardAllow, roomId, `gained whiteboard permissions`);
     } else {
       ReadOnlyService.activateReadOnlyMode();
-      logger.log(LogType.WhiteboardAllow, roomId, `lost whiteboard permissions`);
+      logger.log(LogType.WhiteboardDisable, roomId, `lost whiteboard permissions`);
     }
   }, [userCardState.allowWhiteboard]);
   return (

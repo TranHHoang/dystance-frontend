@@ -341,8 +341,9 @@ const RoomComponent = (props: any) => {
             <Button
               variant="destructive"
               onClick={() => {
+                // eslint-disable-next-line prettier/prettier
+                logger.log(LogType.RemoteControlStop, roomId, `stopped remote-controlling ${remoteControlState.userId}`);
                 dispatch(setRemoteControlAccepted(undefined));
-                logger.log(LogType.RemoteControlStop, roomId, `stopped remote-controlling ${userCardState.userId}`);
               }}
             >
               <FontAwesomeIcon icon={faVideoSlash} className="rainbow-m-right_medium" /> Stop Connection
