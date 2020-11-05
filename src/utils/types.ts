@@ -78,7 +78,7 @@ export enum RoomActionType {
   Kick,
   Mute,
   ToggleWhiteboard,
-  StartGroupSession
+  Group
 }
 export interface DeadlineInfo {
   deadlineId: string;

@@ -70,10 +70,11 @@ export function createGroups(roomId: string, creatorId: string, groups: Breakout
         console.log(ex);
       }
     });
+    await socket.invoke(RoomAction, roomId, RoomActionType.Group, getLoginData().id);
   };
 }
 
-export function deleteGroups(groupIds: string[]): AppThunk {
+export function deleteGroups(roomId: string, groupIds: string[]): AppThunk {
   return async (dispatch) => {
     await all(groupIds, async (groupId) => {
       try {
@@ -83,6 +84,7 @@ export function deleteGroups(groupIds: string[]): AppThunk {
         console.log(ex);
       }
     });
+    await socket.invoke(RoomAction, roomId, RoomActionType.Group, getLoginData().id);
   };
 }
 
@@ -98,7 +100,7 @@ export function fetchAllGroups(roomId: string): AppThunk {
   };
 }
 
-export function updateGroups(groups: BreakoutGroup[]): AppThunk {
+export function updateGroups(roomId: string, groups: BreakoutGroup[]): AppThunk {
   return async (dispatch) => {
     await all(groups, async ({ groupId, userIds }) => {
       try {
@@ -114,10 +116,11 @@ export function updateGroups(groups: BreakoutGroup[]): AppThunk {
         console.log(ex);
       }
     });
+    await socket.invoke(RoomAction, roomId, RoomActionType.Group, getLoginData().id);
   };
 }
 
-export function resetGroups(groupIds: string[]): AppThunk {
+export function resetGroups(roomId: string, groupIds: string[]): AppThunk {
   return async () => {
     await all(groupIds, async (groupId) => {
       try {
@@ -126,6 +129,7 @@ export function resetGroups(groupIds: string[]): AppThunk {
         console.log(ex);
       }
     });
+    await socket.invoke(RoomAction, roomId, RoomActionType.Group, getLoginData().id);
   };
 }
 
@@ -141,7 +145,7 @@ export function startNewSession(roomId: string, duration: number): AppThunk {
     } catch (ex) {
       console.log(ex);
     }
-    await socket.invoke(RoomAction, roomId, RoomActionType.StartGroupSession, getLoginData().id);
+    await socket.invoke(RoomAction, roomId, RoomActionType.Group, getLoginData().id);
     dispatch(fetchAllGroups(roomId));
   };
 }

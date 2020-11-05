@@ -125,7 +125,12 @@ const GroupComponent = (props: any) => {
           clearInterval(intervalRef.current);
           setStatus("Not started");
           if (getLoginData().id === creatorId) {
-            dispatch(resetGroups(_.map(groupState, (group) => group.groupId)));
+            dispatch(
+              resetGroups(
+                roomId,
+                _.map(groupState, (group) => group.groupId)
+              )
+            );
           }
         }
       }, 1000);
@@ -150,7 +155,10 @@ const GroupComponent = (props: any) => {
       // Delete existing, always delete from end to start
       // Because the deleted groups are existing, they are guaranteed to have key in `keyToRoomNameDict`
       dispatch(
-        deleteGroups(_.range(picklistValue + 1, groupState.length + 1).map((key) => keyToRoomNameDict.current[key]))
+        deleteGroups(
+          roomId,
+          _.range(picklistValue + 1, groupState.length + 1).map((key) => keyToRoomNameDict.current[key])
+        )
       );
     }
 
@@ -165,7 +173,7 @@ const GroupComponent = (props: any) => {
 
     // Update userIds in all groups
     if (usersByGroupList) {
-      dispatch(updateGroups(usersByGroupList));
+      dispatch(updateGroups(roomId, usersByGroupList));
     }
 
     setSaveDisabled(true);

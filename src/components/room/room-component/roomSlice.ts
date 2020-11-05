@@ -102,7 +102,7 @@ export function initSocket(roomId: string): AppThunk {
         case RoomActionType.ToggleWhiteboard:
           dispatch(toggleWhiteboard());
           break;
-        case RoomActionType.StartGroupSession:
+        case RoomActionType.Group:
           dispatch(fetchAllGroups(roomId));
           break;
       }

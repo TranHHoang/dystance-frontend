@@ -38,13 +38,14 @@ const StyledClock = styled.div`
 const JitsiMeetComponent = (props: any) => {
   const userCardState = useSelector((state: RootState) => state.userCardState);
   const roomState = useSelector((state: RootState) => state.roomState);
+  const groupState = useSelector((state: RootState) => state.groupState);
   const profile = JSON.parse(localStorage.getItem("profile")) as User;
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const [remainingTime, setRemainingTime] = useState("00:00");
   const { roomId, roomName, groupId, creatorId, history } = props;
   const api = useRef(null);
-  const group = useRef<BreakoutGroup>();
+  const groupRef = useRef<BreakoutGroup>();
   const intervalRef = useRef<number>();
 
   useEffect(() => {
@@ -71,10 +72,10 @@ const JitsiMeetComponent = (props: any) => {
   useEffect(() => {
     if (roomState.group) {
       api.current?.executeCommand("hangup");
-      group.current = roomState.group;
+      groupRef.current = roomState.group;
 
       clearInterval(intervalRef.current);
-      let duration = moment(group.current.endTime).diff(moment());
+      let duration = moment(groupRef.current.endTime).diff(moment());
 
       intervalRef.current = setInterval(() => {
         duration = duration - 1000;
@@ -87,22 +88,31 @@ const JitsiMeetComponent = (props: any) => {
     }
   }, [roomState.group]);
 
+  useEffect(() => {
+    // Because all rooms are the same, only need to check the first one
+    const [group] = groupState;
+    if (group && group.endTime === group.startTime && groupRef.current && groupId) {
+      clearInterval(intervalRef.current);
+      api.current?.executeCommand("hangup");
+    }
+  }, [groupState]);
+
   function redirect() {
-    if (group.current) {
+    if (groupRef.current) {
       if (groupId) {
         // Redirect back to room
         history.push("/temp");
-        history.replace(`${group.current.roomPath}`);
-        group.current = undefined;
+        history.replace(`${groupRef.current.roomPath}`);
+        groupRef.current = undefined;
       } else {
         // Redirect to group
         history.push("/temp");
-        history.replace(`/room/${group.current.id}/${creatorId}/${group.current.name}/${groupId}`);
+        history.replace(`/room/${groupRef.current.id}/${creatorId}/${groupRef.current.name}/${groupId}`);
         dispatch(switchToGroup(undefined));
       }
     } else {
       history.replace("/homepage");
-      group.current = undefined;
+      groupRef.current = undefined;
     }
   }
 
@@ -132,7 +142,7 @@ const JitsiMeetComponent = (props: any) => {
   return (
     <>
       {isLoading && <StyledSpinner />}
-      {group.current && <StyledClock>{`${roomName} - ${remainingTime}`}</StyledClock>}
+      {groupRef.current && <StyledClock>{`${roomName} - ${remainingTime}`}</StyledClock>}
       <Jitsi
         domain="jitsidystance.southeastasia.cloudapp.azure.com"
         loadingComponent={loader}
