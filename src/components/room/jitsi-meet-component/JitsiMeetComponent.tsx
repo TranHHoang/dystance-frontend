@@ -17,6 +17,8 @@ import { Spinner } from "react-rainbow-components";
 import { withRouter } from "react-router-dom";
 import moment from "moment";
 import { Logger, LogType } from "~utils/logger";
+import fs from "fs";
+import moment from "moment";
 
 const loader = styled.div`
   display: none;
@@ -117,7 +119,20 @@ const JitsiMeetComponent = (props: any) => {
     }
   }
 
+  function saveFile() {
+    const folderName = `./logs/${getLoginData().id}`;
+    if (!fs.existsSync(folderName)) {
+      fs.mkdirSync(folderName, { recursive: true });
+    }
+    fs.writeFile(`${folderName}/${moment().format("YYYY-MM-DD")}.txt`, logger.getLogs().join("\n"), (err) => {
+      console.log("WRite to file");
+      if (err) {
+        console.log(err);
+      }
+    });
+  }
   const handleAPI = (jitsiMeetAPI: any) => {
+    let interval: number;
     setIsLoading(false);
     api.current = jitsiMeetAPI;
     jitsiMeetAPI.executeCommand("displayName", `${profile.realName} (${profile.userName})`);
@@ -128,6 +143,9 @@ const JitsiMeetComponent = (props: any) => {
 
     jitsiMeetAPI.addEventListener("videoConferenceJoined", () => {
       dispatch(setShowUpperToolbar(true));
+      interval = setInterval(() => {
+        saveFile();
+      }, 5000 * 60);
       logger.log(LogType.AttendanceJoin, roomId, `joined room`);
     });
     jitsiMeetAPI.on("readyToClose", () => {
@@ -139,6 +157,8 @@ const JitsiMeetComponent = (props: any) => {
       dispatch(resetCardState());
       removeListeners();
       redirect();
+      saveFile();
+      clearInterval(interval);
       jitsiMeetAPI.dispose();
     });
   };
