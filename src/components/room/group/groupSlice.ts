@@ -107,6 +107,8 @@ export function updateGroups(groups: BreakoutGroup[]): AppThunk {
         form.append("userIds", JSON.stringify(userIds));
 
         const response = await post("/rooms/groups/update", form);
+        if (response.data === null) return;
+
         dispatch(updateBreakoutGroup(response.data));
       } catch (ex) {
         console.log(ex);

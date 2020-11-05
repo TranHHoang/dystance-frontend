@@ -65,7 +65,12 @@ const GroupComponent = (props: any) => {
     dispatch(fetchAllGroups(roomId));
     get(`/rooms/getUsers?id=${roomId}`).then(({ data: userIds }) => {
       console.log(userIds);
-      setUsersInRoom(_.map(userIds, (id) => _.find(allUsers, { id })));
+      setUsersInRoom(
+        _(userIds)
+          .reject((id) => id === getLoginData().id)
+          .map((id) => _.find(allUsers, { id }))
+          .value()
+      );
     });
     setHidden(getLoginData().id !== creatorId);
   }, []);
@@ -77,7 +82,9 @@ const GroupComponent = (props: any) => {
         key += 1;
         keyToRoomNameDict.current[key] = value.groupId;
         _.each(usersInRoom, (user) => {
-          user.selected = user.selected || _.some(value.userIds, (id) => user.id === id);
+          user.selected = _(groupState)
+            .flatMap((group) => group.userIds)
+            .some((id) => id === user.id);
         });
 
         result[key] =
@@ -94,11 +101,19 @@ const GroupComponent = (props: any) => {
         return result;
       }, {} as UsersByGroup);
 
+    // If no room was found, release all users
+    if (groupState.length === 0) {
+      _.each(usersInRoom, (user) => {
+        user.selected = false;
+      });
+    }
+
     setUsersByGroup(usersDict);
     setPicklistValue(Object.values(usersDict).length);
-
     const [group] = groupState;
+
     clearInterval(intervalRef.current);
+    setStatus("Not started");
     if (group && group.startTime && group.endTime && group.startTime !== group.endTime) {
       let duration = moment(group.endTime).diff(moment());
 
@@ -152,6 +167,8 @@ const GroupComponent = (props: any) => {
     if (usersByGroupList) {
       dispatch(updateGroups(usersByGroupList));
     }
+
+    setSaveDisabled(true);
   }
 
   function joinGroup(groupId: number) {
@@ -167,14 +184,16 @@ const GroupComponent = (props: any) => {
     );
   }
 
-  function startSession() {
-    dispatch(startNewSession(roomId, timeout));
+  function handleSession() {
+    if (timeout > 0 && timeout <= 60) {
+      dispatch(startNewSession(roomId, status === "Not started" ? timeout : 0));
+    }
   }
 
   return (
     <div>
       {!hidden && (
-        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", marginBottom: 8 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", marginBottom: 8 }}>
           <Picklist
             value={{ label: picklistValue.toString() }}
             onChange={(value) => {
@@ -197,14 +216,15 @@ const GroupComponent = (props: any) => {
             min="1"
             max="60"
             onChange={(e) => setTimeout(parseInt(e.target.value))}
+            error={(timeout < 1 || timeout > 60) && "Invalid timeout"}
           />
           <Button
             variant="outline-brand"
             style={{ marginLeft: 8, marginTop: 23 }}
-            onClick={startSession}
-            disabled={status !== "Not started"}
+            onClick={handleSession}
+            disabled={!saveDisabled || picklistValue === 0}
           >
-            {status === "Not started" ? "Start" : status}
+            {status === "Not started" ? "Start" : "Stop"}
           </Button>
         </div>
       )}
