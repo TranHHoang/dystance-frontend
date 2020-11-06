@@ -381,7 +381,7 @@ const RoomComponent = (props: any) => {
               type="submit"
               onClick={() => {
                 dispatch(muteUser(roomId, userCardState.userId));
-                logger.log(LogType.Mute, roomId, `Mute User ${userCardState.userId}`);
+                logger.log(LogType.Mute, roomId, `muted user ${userCardState.userId}`);
               }}
               disabled={userCardState.isLoading || userCardState.isMuteSuccess}
             />
@@ -412,7 +412,7 @@ const RoomComponent = (props: any) => {
               type="submit"
               onClick={() => {
                 dispatch(kickUser(roomId, userCardState.userId));
-                logger.log(LogType.Kick, roomId, `Kicked User ${userCardState.userId}`);
+                logger.log(LogType.Kick, roomId, `kicked user ${userCardState.userId}`);
               }}
               disabled={userCardState.isLoading || userCardState.isKickSuccess}
             />

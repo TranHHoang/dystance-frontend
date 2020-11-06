@@ -6,12 +6,14 @@ export enum LogType {
   AttendanceLeave = "ATTENDANCE_LEAVE",
   PrivateChatImage = "PRIVATE_CHAT_IMAGE",
   PrivateChatFile = "PRIVATE_CHAT_FILE",
-  PrivateChatMessage = "PRIVATE_CHAT_MESSAGE",
+  PrivateChatText = "PRIVATE_CHAT_TEXT",
   RoomChatImage = "ROOM_CHAT_IMAGE",
   RoomChatFile = "ROOM_CHAT_FILE",
   RoomChatText = "ROOM_CHAT_TEXT",
   Kick = "KICK",
+  GotKicked = "GOT_KICKED",
   Mute = "MUTE",
+  GotMuted = "GOT_MUTED",
   ToggleWhiteboard = "TOGGLE_WHITEBOARD",
   DeadlineCreate = "DEADLINE_CREATE",
   DeadlineUpdate = "DEADLINE_UPDATE",
@@ -45,6 +47,9 @@ export class Logger {
   }
   public getLogs() {
     return this.logs;
+  }
+  public resetLogs() {
+    this.logs = [];
   }
   //2020-12-12T12:00:00 ATTENDANCE 1231-4322f-7765y5r Enter room id = 12
   public log(type: string, roomId: string, description: string): void {

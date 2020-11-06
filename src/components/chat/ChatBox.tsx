@@ -86,7 +86,7 @@ const ChatBox = ({
         if (roomId) {
           logger.log(LogType.RoomChatText, roomId, `sent message`);
         } else if (!roomId && inRoom === true) {
-          logger.logPrivateChat(LogType.PrivateChatMessage, `sent message to`, receiverId);
+          logger.logPrivateChat(LogType.PrivateChatText, `sent message to`, receiverId);
         }
       }
     }

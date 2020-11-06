@@ -55,7 +55,7 @@ const JitsiMeetComponent = (props: any) => {
     if (userCardState.muteOtherUser) {
       api?.current?.isAudioMuted().then((response: any) => {
         if (!response) {
-          logger.log(LogType.Mute, roomId, `got muted`);
+          logger.log(LogType.GotMuted, roomId, `got muted`);
           api?.current?.executeCommand("toggleAudio");
           dispatch(setMuteOtherUser(false));
         }
@@ -68,7 +68,7 @@ const JitsiMeetComponent = (props: any) => {
 
   useEffect(() => {
     if (userCardState.kickOtherUser) {
-      logger.log(LogType.Kick, roomId, `got kicked`);
+      logger.log(LogType.GotKicked, roomId, `got kicked`);
       api?.current?.executeCommand("hangup");
       dispatch(setKickOtherUser(false));
     }
@@ -127,6 +127,10 @@ const JitsiMeetComponent = (props: any) => {
     const folderName = `./logs/${getLoginData().id}`;
     if (!fs.existsSync(folderName)) {
       fs.mkdirSync(folderName, { recursive: true });
+    }
+    if (!fs.existsSync(`${folderName}/${moment().format("YYYY-MM-DD")}.txt`)) {
+      console.log("Reset Logs");
+      logger.resetLogs();
     }
     fs.writeFile(`${folderName}/${moment().format("YYYY-MM-DD")}.txt`, logger.getLogs().join("\n"), (err) => {
       console.log("WRite to file");
