@@ -11,6 +11,7 @@ import robot from "robotjs";
 import styled from "styled-components";
 import { setRemoteControlWaitingModalOpen } from "../user-list/user-card/userCardSlice";
 import { useDispatch } from "react-redux";
+import { createNotification, NotificationType } from "~utils/notification";
 
 const StyledVideo = styled.video`
   width: 100%;
@@ -82,6 +83,7 @@ function createPeer(remoteId: string, initiator: boolean, stream?: MediaStream) 
   });
 
   peer.on("close", () => {
+    createNotification(NotificationType.RoomNotification, "Remote control session has stopped");
     console.log("Destroyed");
   });
 
@@ -255,6 +257,7 @@ const RemoteControl = (props: any) => {
           socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Pong, objData.payload, getLoginData().id);
           setIsInitiator(false);
           setHasPeer(true);
+          createNotification(NotificationType.RoomNotification, "Remote control session has started");
           break;
         case RemoteControlSignalType.Pong:
           peer.current = createPeer(objData.payload, true);
@@ -301,6 +304,7 @@ const RemoteControl = (props: any) => {
       peer.current.on("error", () => {
         peer.current.destroy();
         setHasPeer(false);
+        createNotification(NotificationType.RoomNotification, "Remote control session has stopped");
       });
     }
   }, [hasPeer]);

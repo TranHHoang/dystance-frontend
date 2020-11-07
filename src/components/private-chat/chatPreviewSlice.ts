@@ -6,6 +6,7 @@ import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { PrivateMessage } from "~utils/types";
+import { createNotification, NotificationType } from "~utils/notification";
 
 interface ChatPreview {
   id: string;
@@ -59,11 +60,11 @@ export function fetchAllPreview(userId: string): AppThunk {
 export function initPrivateChatSocket(): AppThunk {
   return (dispatch) => {
     socket.on(PrivateMessage, (data) => {
-      console.log("received", data);
       const senderId = JSON.parse(data).senderId;
       dispatch(incrementPrivateChatBadge());
       dispatch(fetchLatestMessage(undefined, { id1: getLoginData().id, id2: senderId }));
       dispatch(fetchAllPreview(getLoginData().id));
+      createNotification(NotificationType.PrivateChat, `New message from #${senderId}`);
     });
   };
 }

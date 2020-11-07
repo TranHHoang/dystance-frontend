@@ -10,6 +10,7 @@ import { UserInfo } from "~utils/types";
 import { toggleWhiteboard, setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
 import { socket } from "~app/App";
 import { fetchAllGroups } from "../group/groupSlice";
+import { createNotification, NotificationType } from "~utils/notification";
 
 export interface BreakoutGroup {
   id: string;
@@ -85,6 +86,7 @@ export function initSocket(roomId: string): AppThunk {
       switch (response.type) {
         case RoomActionType.Chat:
           dispatch(fetchLatestMessage(roomId, undefined));
+          createNotification(NotificationType.RoomNotification, `New message from #${response.payload}`);
           if (response.payload !== getLoginData().id) {
             dispatch(incrementChatBadge());
           }
@@ -101,18 +103,23 @@ export function initSocket(roomId: string): AppThunk {
           break;
         case RoomActionType.Mute:
           dispatch(setMuteOtherUser(true));
+          createNotification(NotificationType.RoomNotification, "You have been muted");
           break;
         case RoomActionType.Kick:
           dispatch(setKickOtherUser(true));
+          createNotification(NotificationType.RoomNotification, "You have been kicked");
           break;
         case RoomActionType.ToggleWhiteboard:
           dispatch(toggleWhiteboard());
+          createNotification(NotificationType.RoomNotification, "Your whiteboard permission has been changed");
           break;
         case RoomActionType.GroupNotification:
           dispatch(fetchAllGroups(roomId));
+          createNotification(NotificationType.RoomNotification, "Breakout groups have been updated");
           break;
         case RoomActionType.StopGroup:
           dispatch(stopGroup());
+          createNotification(NotificationType.RoomNotification, "All breakout groups have been stopped");
           break;
       }
     });
