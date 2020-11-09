@@ -30,9 +30,6 @@ export const AllRooms = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(showRoom());
-    return () => {
-      dispatch(resetRoom());
-    };
   }, []);
 
   return (

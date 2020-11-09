@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { hot } from "react-hot-loader";
 import LoginForm from "../components/account-management/login/LoginForm";
 import GoogleUpdateInfoForm from "../components/account-management/google-update-info/GoogleUpdateInfo";
@@ -26,6 +26,7 @@ export default hot(module)(function App() {
   const roomState = useSelector((root: RootState) => root.showRoomState);
   const deadlineListState = useSelector((root: RootState) => root.deadlineListState);
   const dispatch = useDispatch();
+  const intervalRef = useRef<number>();
 
   useEffect(() => {
     if (socket && socket.state === "Disconnected") {
@@ -36,33 +37,39 @@ export default hot(module)(function App() {
         dispatch(initPrivateChatSocket());
       });
     }
-
     _.each(deadlineListState.deadlines, (deadline) => {
       const hourDiff = moment.duration(moment().diff(moment(deadline.endDate))).asHours();
+      console.log(hourDiff);
       if (hourDiff > 0 && hourDiff < 48) {
+        console.log(`Deadline "${deadline.title}" will due in ${Math.ceil(hourDiff)} hours`);
         createNotification(
           NotificationType.IncomingDeadline,
-          `Deadline "${deadline.title}" will due in ${Math.round(hourDiff)} hours`
+          `Deadline "${deadline.title}" will due in ${Math.ceil(hourDiff)} hours`
         );
       }
     });
+  }, []);
 
-    setInterval(() => {
+  useEffect(() => {
+    clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
       _.each(roomState.rooms, (room) => {
         _.each(JSON.parse(room.roomTimes) as RoomTimes[], (time) => {
+          console.log(moment().format("dddd").toLowerCase() === time.dayOfWeek.toLowerCase());
+
           if (moment().format("dddd").toLowerCase() === time.dayOfWeek.toLowerCase()) {
-            const minuteDiff = moment.duration(moment().diff(moment(time.startTime, "HH:mm"))).asMinutes();
+            const minuteDiff = moment.duration(moment(time.startTime, "HH:mm").diff(moment())).asMinutes();
             if (minuteDiff > 0 && minuteDiff <= 15) {
               createNotification(
                 NotificationType.IncomingClass,
-                `Room "${room.roomName}" will start in ${Math.round(minuteDiff)} minutes`
+                `Room "${room.roomName}" will start in ${Math.ceil(minuteDiff)} minutes`
               );
             }
           }
         });
       });
-    }, 5000);
-  }, []);
+    }, 5000 * 60);
+  }, [roomState.rooms]);
 
   return (
     <HashRouter>

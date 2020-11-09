@@ -7,7 +7,7 @@ import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { ErrorResponse, Room } from "~utils/types";
-import { resetRoom, showRoom } from "../showRoomsSlice";
+import { showRoom } from "../showRoomsSlice";
 import { UpdateRoomFormValues } from "./SingleRoomUpdateForm";
 interface SingleRoomState {
   roomId: string;
@@ -101,7 +101,6 @@ export function deleteRoom(roomId: string): AppThunk {
       dispatch(deleteRoomStart());
       await Axios.delete(`${hostName}/api/rooms?id=${roomId}`);
       dispatch(deleteRoomSuccess());
-      dispatch(resetRoom());
       dispatch(showRoom());
     } catch (e) {
       const ex = e as AxiosError;
@@ -154,7 +153,6 @@ export function updateRoom({
       await Axios.post(`${hostName}/api/rooms/update`, fd, config);
       dispatch(updateRoomSuccess());
       dispatch(resetState());
-      dispatch(resetRoom());
       dispatch(showRoom());
     } catch (ex) {
       // Error code != 200
