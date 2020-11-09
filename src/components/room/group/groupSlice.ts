@@ -70,7 +70,6 @@ export function createGroups(roomId: string, creatorId: string, groups: Breakout
         console.log(ex);
       }
     });
-    await socket.invoke(RoomAction, roomId, RoomActionType.GroupNotification, getLoginData().id);
   };
 }
 
@@ -84,7 +83,6 @@ export function deleteGroups(roomId: string, groupIds: string[]): AppThunk {
         console.log(ex);
       }
     });
-    await socket.invoke(RoomAction, roomId, RoomActionType.GroupNotification, getLoginData().id);
   };
 }
 

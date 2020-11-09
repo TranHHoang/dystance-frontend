@@ -3,7 +3,7 @@ import { AppThunk } from "~app/store";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
-import { ErrorResponse, RoomAction, RoomActionType } from "~utils/types";
+import { AllUsersInfo, ErrorResponse, RoomAction, RoomActionType, User } from "~utils/types";
 import { fetchLatestMessage } from "../../chat/chatSlice";
 import { setUserInfoList } from "../user-list/userListSlice";
 import { UserInfo } from "~utils/types";
@@ -11,6 +11,7 @@ import { toggleWhiteboard, setKickOtherUser, setMuteOtherUser } from "../user-li
 import { socket } from "~app/App";
 import { fetchAllGroups } from "../group/groupSlice";
 import { createNotification, NotificationType } from "~utils/notification";
+import _ from "lodash";
 
 export interface BreakoutGroup {
   id: string;
@@ -80,15 +81,17 @@ export const {
 export function initSocket(roomId: string): AppThunk {
   return (dispatch) => {
     socket.invoke(RoomAction, roomId, RoomActionType.Join, getLoginData().id);
+    const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
 
     socket.on(RoomAction, async (data: string) => {
       const response = JSON.parse(data);
       switch (response.type) {
         case RoomActionType.Chat:
           dispatch(fetchLatestMessage(roomId, undefined));
-          createNotification(NotificationType.RoomNotification, `New message from #${response.payload}`);
           if (response.payload !== getLoginData().id) {
+            const user = _.find(allUsers, { id: response.payload });
             dispatch(incrementChatBadge());
+            createNotification(NotificationType.RoomNotification, `New message from ${user.userName}`);
           }
           break;
         case RoomActionType.Join:
