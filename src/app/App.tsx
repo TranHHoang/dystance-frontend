@@ -12,13 +12,21 @@ import ProfilePage from "../components/profile-page/ProfilePage";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { initPrivateChatSocket } from "../components/private-chat/chatPreviewSlice";
+import { RootState } from "./rootReducer";
+import _ from "lodash";
+import { RoomTimes } from "~utils/types";
+import moment from "moment";
+import { createNotification, NotificationType } from "~utils/notification";
 
 export const socket = new HubConnectionBuilder().withUrl(`${hostName}/socket`).build();
 
 export default hot(module)(function App() {
+  const roomState = useSelector((root: RootState) => root.showRoomState);
+  const deadlineListState = useSelector((root: RootState) => root.deadlineListState);
   const dispatch = useDispatch();
+
   useEffect(() => {
     if (socket && socket.state === "Disconnected") {
       console.log("Start socket...");
@@ -28,6 +36,32 @@ export default hot(module)(function App() {
         dispatch(initPrivateChatSocket());
       });
     }
+
+    _.each(deadlineListState.deadlines, (deadline) => {
+      const hourDiff = moment.duration(moment().diff(moment(deadline.endDate))).asHours();
+      if (hourDiff > 0 && hourDiff < 48) {
+        createNotification(
+          NotificationType.IncomingDeadline,
+          `Deadline "${deadline.title}" will due in ${Math.round(hourDiff)} hours`
+        );
+      }
+    });
+
+    setInterval(() => {
+      _.each(roomState.rooms, (room) => {
+        _.each(JSON.parse(room.roomTimes) as RoomTimes[], (time) => {
+          if (moment().format("dddd").toLowerCase() === time.dayOfWeek.toLowerCase()) {
+            const minuteDiff = moment.duration(moment().diff(moment(time.startTime, "HH:mm"))).asMinutes();
+            if (minuteDiff > 0 && minuteDiff <= 15) {
+              createNotification(
+                NotificationType.IncomingClass,
+                `Room "${room.roomName}" will start in ${Math.round(minuteDiff)} minutes`
+              );
+            }
+          }
+        });
+      });
+    }, 5000);
   }, []);
 
   return (
