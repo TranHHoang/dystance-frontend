@@ -37,17 +37,17 @@ export default hot(module)(function App() {
         dispatch(initPrivateChatSocket());
       });
     }
-    _.each(deadlineListState.deadlines, (deadline) => {
-      const hourDiff = moment.duration(moment().diff(moment(deadline.endDate))).asHours();
-      console.log(hourDiff);
-      if (hourDiff > 0 && hourDiff < 48) {
-        console.log(`Deadline "${deadline.title}" will due in ${Math.ceil(hourDiff)} hours`);
-        createNotification(
-          NotificationType.IncomingDeadline,
-          `Deadline "${deadline.title}" will due in ${Math.ceil(hourDiff)} hours`
-        );
-      }
-    });
+    // _.each(deadlineListState.deadlines, (deadline) => {
+    //   const hourDiff = moment.duration(moment().diff(moment(deadline.endDate))).asHours();
+    //   console.log(hourDiff);
+    //   if (hourDiff > 0 && hourDiff < 48) {
+    //     console.log(`Deadline "${deadline.title}" will due in ${Math.ceil(hourDiff)} hours`);
+    //     createNotification(
+    //       NotificationType.IncomingDeadline,
+    //       `Deadline "${deadline.title}" will due in ${Math.ceil(hourDiff)} hours`
+    //     );
+    //   }
+    // });
   }, []);
 
   useEffect(() => {
