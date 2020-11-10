@@ -21,7 +21,13 @@ import {
   Title
 } from "./profilePageStyles";
 import { showProfile } from "./showProfileInfoSlice";
-import { cancelChangePassword, changePasswordStart, updateProfile } from "./updateProfileSlice";
+import {
+  cancelChangePassword,
+  changePasswordStart,
+  resetUpdateProfileState,
+  updateProfile
+} from "./updateProfileSlice";
+import { StyledNotifications } from "../../components/homepage/single-room/styles";
 
 export interface UpdateProfileFormValues {
   realName: string;
@@ -103,6 +109,7 @@ const ProfilePage = () => {
   };
 
   useEffect(() => {
+    dispatch(resetUpdateProfileState());
     dispatch(showProfile());
   }, []);
 
@@ -113,6 +120,7 @@ const ProfilePage = () => {
     formRef?.current.resetForm();
     setImgSrc(null);
     dispatch(cancelChangePassword());
+    dispatch(resetUpdateProfileState());
   }
   return (
     <Container>
@@ -153,6 +161,24 @@ const ProfilePage = () => {
           >
             {({ errors, touched, values, setFieldValue }: FormikProps<UpdateProfileFormValues>) => (
               <StyledForm>
+                {updateProfileState.isUpdateSuccess && (
+                  <StyledNotifications
+                    hideCloseButton={true}
+                    style={{ marginBottom: "10px" }}
+                    title="Profile Updated Successfully"
+                    description="Your profile has been updated successfully"
+                    icon="success"
+                  />
+                )}
+                {updateProfileState.error && (
+                  <StyledNotifications
+                    style={{ marginBottom: "10px" }}
+                    title="An Error Occured"
+                    hideCloseButton={true}
+                    description={updateProfileState.error.message}
+                    icon="error"
+                  />
+                )}
                 <Field name="email" as={DisabledInput} type="email" label="Email" value={values.email || ""} readOnly />
                 <Field
                   name="userName"

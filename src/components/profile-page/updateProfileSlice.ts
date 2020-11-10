@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
+import { fetchAllUsers } from "../../components/homepage/showRoomsSlice";
 import moment from "moment";
 import { AppThunk } from "~app/store";
 import Axios from "~utils/fakeAPI";
@@ -41,7 +42,11 @@ const updateProfileSlice = createSlice({
     },
     updateProfileFailure(state, action: PayloadAction<ErrorResponse>) {
       state.isLoading = false;
+      state.isUpdateSuccess = false;
       state.error = action.payload;
+    },
+    resetUpdateProfileState() {
+      return initialState;
     }
   }
 });
@@ -52,7 +57,8 @@ export const {
   updateProfileStart,
   updateProfileSuccess,
   updateProfileFailure,
-  cancelChangePassword
+  cancelChangePassword,
+  resetUpdateProfileState
 } = updateProfileSlice.actions;
 
 export function updateProfile({ realName, dob, newAvatar, password, newPassword }: UpdateProfileFormValues): AppThunk {
@@ -79,6 +85,7 @@ export function updateProfile({ realName, dob, newAvatar, password, newPassword 
       localStorage.setItem("profile", JSON.stringify(response.data));
 
       dispatch(setProfileInfo(data));
+      dispatch(fetchAllUsers());
       dispatch(updateProfileSuccess());
     } catch (ex) {
       const e = ex as AxiosError;
