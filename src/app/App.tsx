@@ -19,6 +19,7 @@ import _ from "lodash";
 import { RoomTimes } from "~utils/types";
 import moment from "moment";
 import { createNotification, NotificationType } from "~utils/notification";
+import { getAllDeadlines } from "../components/room/deadline/deadlineListSlice";
 
 export const socket = new HubConnectionBuilder().withUrl(`${hostName}/socket`).build();
 
@@ -27,6 +28,7 @@ export default hot(module)(function App() {
   const deadlineListState = useSelector((root: RootState) => root.deadlineListState);
   const dispatch = useDispatch();
   const intervalRef = useRef<number>();
+  const deadlineIntervalRef = useRef<number>();
 
   useEffect(() => {
     if (socket && socket.state === "Disconnected") {
@@ -37,17 +39,7 @@ export default hot(module)(function App() {
         dispatch(initPrivateChatSocket());
       });
     }
-    // _.each(deadlineListState.deadlines, (deadline) => {
-    //   const hourDiff = moment.duration(moment().diff(moment(deadline.endDate))).asHours();
-    //   console.log(hourDiff);
-    //   if (hourDiff > 0 && hourDiff < 48) {
-    //     console.log(`Deadline "${deadline.title}" will due in ${Math.ceil(hourDiff)} hours`);
-    //     createNotification(
-    //       NotificationType.IncomingDeadline,
-    //       `Deadline "${deadline.title}" will due in ${Math.ceil(hourDiff)} hours`
-    //     );
-    //   }
-    // });
+    dispatch(getAllDeadlines());
   }, []);
 
   useEffect(() => {
@@ -70,6 +62,26 @@ export default hot(module)(function App() {
       });
     }, 5000 * 60);
   }, [roomState.rooms]);
+
+  useEffect(() => {
+    console.log("Run into deadline State", deadlineListState.allDeadlines);
+    function notifyDeadline() {
+      _.each(deadlineListState.allDeadlines, (deadline) => {
+        const hourDiff = moment.duration(moment(deadline.endDate).diff(moment())).asHours();
+        console.log(hourDiff);
+        if (hourDiff > 0 && hourDiff < 48) {
+          console.log(`Deadline "${deadline.title}" will be due in ${Math.ceil(hourDiff)} hours`);
+          createNotification(
+            NotificationType.IncomingDeadline,
+            `Deadline "${deadline.title}" will be due in ${Math.ceil(hourDiff)} hours`
+          );
+        }
+      });
+    }
+    notifyDeadline();
+    clearInterval(deadlineIntervalRef.current);
+    deadlineIntervalRef.current = setInterval(notifyDeadline, 1000 * 60 * 60);
+  }, [deadlineListState.allDeadlines]);
 
   return (
     <HashRouter>
