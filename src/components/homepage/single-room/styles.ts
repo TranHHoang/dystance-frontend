@@ -1,5 +1,5 @@
 import { StyledNotification } from "../../../components/account-management/styles";
-import { Button, ButtonMenu, Card, Textarea, Notification } from "react-rainbow-components";
+import { Button, ButtonMenu, Card, Textarea, Notification, AccordionSection } from "react-rainbow-components";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
@@ -47,6 +47,7 @@ export const CreatorName = styled.span`
     filter: brightness(80%);
     cursor: pointer;
   }
+  font-size: 1.25em !important;
 `;
 
 export const TextContainer = styled.div`
@@ -103,4 +104,7 @@ export const StyledNotifications = styled(Notification)`
 export const TimeText = styled.h1`
   font-size: 16px;
   margin-bottom: 10px;
+`;
+export const StyledAccordionSection = styled(AccordionSection)`
+  font-size: 1.25em;
 `;

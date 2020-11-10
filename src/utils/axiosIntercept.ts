@@ -6,7 +6,7 @@ Axios.interceptors.request.use(
   (config) => {
     const url = config.url;
 
-    const isPublicRoute = /api\/users\/(login|register|google|resendEmail)/.test(url);
+    const isPublicRoute = /api\/users\/(login|register|google|resendEmail|resetPassword)/.test(url);
 
     if (!isPublicRoute) {
       // only need token for api access

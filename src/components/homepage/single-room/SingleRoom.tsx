@@ -1,19 +1,10 @@
 import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { weekDayConvert } from "../../room-management/create-room/CreateRoomForm";
-import _, { isObject } from "lodash";
+import _ from "lodash";
 import moment from "moment";
 import * as React from "react";
 import { useRef } from "react";
-import {
-  Button,
-  ButtonMenu,
-  MenuItem,
-  Modal,
-  WeekDayPicker,
-  Accordion,
-  AccordionSection
-} from "react-rainbow-components";
+import { Button, MenuItem, Modal, WeekDayPicker, Accordion } from "react-rainbow-components";
 import { WeekDayPickerProps } from "react-rainbow-components/components/WeekDayPicker";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
@@ -38,12 +29,12 @@ import {
   StyledText,
   TextContainer,
   Creator,
-  Time,
   Title,
   Error,
   StyledNotifications,
   CreatorName,
-  TimeText
+  TimeText,
+  StyledAccordionSection
 } from "./styles";
 import { setCreatorProfileOpen } from "../../profile-page/people-profile/peopleProfileSlice";
 import PeopleProfilePage from "../../profile-page/people-profile/PeopleProfilePage";
@@ -120,13 +111,13 @@ export const SingleRoom = (props: any) => {
         <WeekDayPicker multiple label="Study Days" value={repeatDays as WeekDayPickerProps["value"]} readOnly />
 
         <Accordion>
-          <AccordionSection label="Class Times">
+          <StyledAccordionSection label="Class Times">
             {times.map((time, i) => (
               <TimeText key={i}>
                 {capitalizeString(time?.dayOfWeek)}: {formatTime(time?.startTime)} - {formatTime(time?.endTime)}
               </TimeText>
             ))}
-          </AccordionSection>
+          </StyledAccordionSection>
         </Accordion>
 
         <Description readOnly value={description} rows={3} className="rainbow-p-horizontal_medium rainbow-m_auto" />

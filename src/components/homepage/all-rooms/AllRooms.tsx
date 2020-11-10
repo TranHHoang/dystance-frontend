@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useEffect, useRef } from "react";
-import { Button, Input, Picklist, Spinner, Option, Accordion, AccordionSection } from "react-rainbow-components";
+import { useEffect } from "react";
+import { Button, Input, Spinner, Accordion, AccordionSection } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
@@ -115,7 +115,6 @@ export const AllRooms = () => {
                     image={room.image}
                     description={room.description}
                     repeatOccurrence={room.repeatOccurrence}
-                    repeatDays={room.repeatDays}
                     roomTimes={room.roomTimes}
                   />
                 </div>
@@ -142,7 +141,6 @@ export const AllRooms = () => {
                     image={room.image}
                     description={room.description}
                     repeatOccurrence={room.repeatOccurrence}
-                    repeatDays={room.repeatDays}
                     roomTimes={room.roomTimes}
                   />
                 </div>

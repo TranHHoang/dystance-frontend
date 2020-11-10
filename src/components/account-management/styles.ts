@@ -64,7 +64,12 @@ export const StyledLink = styled(Link)`
     filter: brightness(80%);
   }
 `;
-
+export const StyledReturnLink = styled(StyledLink)`
+  :hover {
+    text-decoration: none;
+    filter: brightness(100%);
+  }
+`;
 export const StyledCard = styled(Card)`
   display: flex;
   justify-content: center;
