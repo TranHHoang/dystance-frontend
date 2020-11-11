@@ -117,7 +117,7 @@ export function updateDeadline({
 
       await Axios.post(`${hostName}/api/rooms/deadline/update`, fd, config);
       dispatch(deadlineUpdateSuccess());
-      logger.log(LogType.DeadlineUpdate, roomId, `updated deadline ${deadlineId}`);
+      logger.log(LogType.DeadlineUpdate, roomId, `updated deadline ${title}`);
       dispatch(resetDeadlineCardState());
       dispatch(resetDeadlines());
       dispatch(showDeadlines(roomId));
@@ -133,13 +133,13 @@ export function updateDeadline({
     }
   };
 }
-export function deleteDeadline(deadlineId: string, roomId: string): AppThunk {
+export function deleteDeadline(deadlineId: string, title: string, roomId: string): AppThunk {
   return async (dispatch) => {
     try {
       dispatch(deadlineDeleteStart());
       await Axios.delete(`${hostName}/api/rooms/deadline?id=${deadlineId}`);
       dispatch(deadlineDeleteSuccess());
-      logger.log(LogType.DeadlineDelete, roomId, `deleted deadline ${deadlineId}`);
+      logger.log(LogType.DeadlineDelete, roomId, `deleted deadline ${title}`);
       dispatch(resetDeadlineCardState());
       dispatch(resetDeadlines());
       dispatch(showDeadlines(roomId));

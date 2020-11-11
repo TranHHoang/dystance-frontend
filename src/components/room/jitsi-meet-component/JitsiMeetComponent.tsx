@@ -37,7 +37,25 @@ const StyledClock = styled.div`
   border-bottom-right-radius: 10px;
   opacity: 50%;
 `;
-
+export function saveFile() {
+  const folderName = `./logs/${getLoginData().id}`;
+  if (!fs.existsSync(folderName)) {
+    fs.mkdirSync(folderName, { recursive: true });
+  }
+  if (!fs.existsSync(`${folderName}/${moment().format("YYYY-MM-DD")}.txt`)) {
+    Logger.getInstance().resetLogs();
+  }
+  fs.writeFile(
+    `${folderName}/${moment().format("YYYY-MM-DD")}.txt`,
+    Logger.getInstance().getLogs().join("\n"),
+    (err) => {
+      console.log("WRite to file");
+      if (err) {
+        console.log(err);
+      }
+    }
+  );
+}
 const JitsiMeetComponent = (props: any) => {
   const userCardState = useSelector((state: RootState) => state.userCardState);
   const groupState = useSelector((state: RootState) => state.groupState);
@@ -105,7 +123,7 @@ const JitsiMeetComponent = (props: any) => {
       if (groupId) {
         // Redirect back to room
         history.push("/temp");
-        logger.logGroup(LogType.GroupLeave, groupState.mainRoomId, groupState.groupId, "left group");
+        logger.log(LogType.GroupLeave, groupState.mainRoomId, `left group ${groupState.groupId}`);
         dispatch(setGroupJoined(false));
         history.replace(`${groupRef.current.roomPath}`);
         groupRef.current = undefined;
@@ -123,22 +141,6 @@ const JitsiMeetComponent = (props: any) => {
     }
   }
 
-  function saveFile() {
-    const folderName = `./logs/${getLoginData().id}`;
-    if (!fs.existsSync(folderName)) {
-      fs.mkdirSync(folderName, { recursive: true });
-    }
-    if (!fs.existsSync(`${folderName}/${moment().format("YYYY-MM-DD")}.txt`)) {
-      console.log("Reset Logs");
-      logger.resetLogs();
-    }
-    fs.writeFile(`${folderName}/${moment().format("YYYY-MM-DD")}.txt`, logger.getLogs().join("\n"), (err) => {
-      console.log("WRite to file");
-      if (err) {
-        console.log(err);
-      }
-    });
-  }
   const handleAPI = (jitsiMeetAPI: any) => {
     let interval: number;
     setIsLoading(false);

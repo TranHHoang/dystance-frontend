@@ -14,6 +14,8 @@ import {
 } from "./userCardSlice";
 import { Logger, LogType } from "~utils/logger";
 import { setUserId } from "../../../../components/room/remote-control/remoteControlSlice";
+import { allUsers } from "~utils/types";
+import _ from "lodash";
 
 const StyledCard = styled(Card)`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
@@ -21,6 +23,7 @@ const StyledCard = styled(Card)`
 
 const UserCardComponent = (props: any) => {
   const { userId, icon, title, creatorId, roomId } = props;
+  const user = _.find(allUsers, { id: userId });
   const dispatch = useDispatch();
   const logger = Logger.getInstance();
   return (
@@ -49,7 +52,7 @@ const UserCardComponent = (props: any) => {
                     label="Remote control"
                     onClick={() => {
                       dispatch(setRemoteControlWaitingModalOpen({ userId, isModalOpen: true }));
-                      logger.log(LogType.RemoteControlPermission, roomId, `asked to remote control ${userId}`);
+                      logger.log(LogType.RemoteControlPermission, roomId, `asked to remote control ${user.realName}`);
                       dispatch(setUserId(userId));
                     }}
                   />
@@ -57,7 +60,7 @@ const UserCardComponent = (props: any) => {
                     label="Toggle Whiteboard Usage"
                     onClick={() => {
                       dispatch(toggleWhiteboardUsage(roomId, userId));
-                      logger.log(LogType.ToggleWhiteboard, roomId, `toggled whiteboard usage for ${userId}`);
+                      logger.log(LogType.ToggleWhiteboard, roomId, `toggled whiteboard usage for ${user.realName}`);
                     }}
                   />
                 </div>

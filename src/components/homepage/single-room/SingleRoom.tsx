@@ -1,19 +1,10 @@
 import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { weekDayConvert } from "../../room-management/create-room/CreateRoomForm";
-import _, { isObject } from "lodash";
+import _ from "lodash";
 import moment from "moment";
 import * as React from "react";
 import { useRef } from "react";
-import {
-  Button,
-  ButtonMenu,
-  MenuItem,
-  Modal,
-  WeekDayPicker,
-  Accordion,
-  AccordionSection
-} from "react-rainbow-components";
+import { Button, MenuItem, WeekDayPicker, Accordion, AccordionSection, Modal } from "react-rainbow-components";
 import { WeekDayPickerProps } from "react-rainbow-components/components/WeekDayPicker";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
@@ -38,7 +29,6 @@ import {
   StyledText,
   TextContainer,
   Creator,
-  Time,
   Title,
   Error,
   StyledNotifications,

@@ -3,7 +3,6 @@ import Axios from "./fakeAPI";
 import { hostName } from "./hostUtils";
 
 export const AllUsersInfo = "allUsersInfo"; // For autocomplete function
-
 export interface UserLoginData {
   id: string;
   userName: string;
@@ -108,3 +107,5 @@ export interface RoomTimes {
   startTime: string;
   endTime: string;
 }
+
+export const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];

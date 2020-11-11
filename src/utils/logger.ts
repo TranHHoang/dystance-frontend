@@ -57,18 +57,4 @@ export class Logger {
     this.logs.push(log);
     console.log(this.logs);
   }
-
-  public logPrivateChat(type: string, description: string, receiverId: string): void {
-    const log = `${moment().format("YYYY-MM-DDTHH:mm:ss")} ${type} ${getLoginData().id} ${description} ${receiverId}`;
-    this.logs.push(log);
-    console.log(this.logs);
-  }
-
-  public logGroup(type: string, roomId: string, groupId: string, description: string) {
-    const log = `${moment().format("YYYY-MM-DDTHH:mm:ss")} ${type} ${roomId} ${groupId} ${
-      getLoginData().id
-    } ${description}`;
-    this.logs.push(log);
-    console.log(this.logs);
-  }
 }

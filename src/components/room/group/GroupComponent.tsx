@@ -207,7 +207,7 @@ const GroupComponent = (props: any) => {
     dispatch(setGroupId(groupId.toString()));
     dispatch(setGroupJoined(true));
     dispatch(setMainRoomId(roomId));
-    logger.logGroup(LogType.GroupJoin, roomId, groupId.toString(), "joined group");
+    logger.log(LogType.GroupJoin, roomId, `joined group ${groupId.toString()}`);
   }
 
   function handleSession() {

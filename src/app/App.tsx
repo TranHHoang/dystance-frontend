@@ -14,6 +14,7 @@ import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { useDispatch } from "react-redux";
 import { initPrivateChatSocket } from "../components/private-chat/chatPreviewSlice";
+import { saveFile } from "../components/room/jitsi-meet-component/JitsiMeetComponent";
 
 export const socket = new HubConnectionBuilder().withUrl(`${hostName}/socket`).build();
 
@@ -28,6 +29,7 @@ export default hot(module)(function App() {
         dispatch(initPrivateChatSocket());
       });
     }
+    saveFile();
   }, []);
 
   return (

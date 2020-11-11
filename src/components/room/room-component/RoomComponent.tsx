@@ -19,11 +19,11 @@ import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import ChatArea from "../../chat/ChatArea";
 import { fetchAllMessages } from "../../chat/chatSlice";
-import { getUserInfo, RoomAction, RoomActionType } from "~utils/types";
+import { allUsers, getUserInfo, RoomAction, RoomActionType } from "~utils/types";
 import JitsiMeetComponent from "../jitsi-meet-component/JitsiMeetComponent";
 import UserListComponent from "../user-list/UserListComponent";
 import Whiteboard from "../whiteboard/Whiteboard";
-import { initSocket, removeListeners, resetChatBadge, setDrawerOpen, setTabsetValue } from "./roomSlice";
+import { initSocket, removeListeners, resetChatBadge, setDrawerOpen, setRoomId, setTabsetValue } from "./roomSlice";
 import { socket } from "~app/App";
 import {
   kickUser,
@@ -46,6 +46,7 @@ import { ipcRenderer } from "electron";
 import { resetPrivateChatBadge, initPrivateChatSocket } from "../../private-chat/chatPreviewSlice";
 import GroupComponent from "../group/GroupComponent";
 import { Logger, LogType } from "~utils/logger";
+import _ from "lodash";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -176,8 +177,10 @@ const RoomComponent = (props: any) => {
   const dispatch = useDispatch();
   const logger = Logger.getInstance();
 
+  const user = _.find(allUsers, { id: userCardState.userId });
+  const remoteControlUser = _.find(allUsers, { id: remoteControlState.userId });
+  const creatorUser = _.find(allUsers, { id: creatorId });
   const isBreakoutGroup = groupId !== undefined;
-  console.log(isBreakoutGroup);
   if (isBreakoutGroup) roomName = atob(roomName);
   console.log(roomName);
 
@@ -185,6 +188,8 @@ const RoomComponent = (props: any) => {
     dispatch(initSocket(roomId));
     dispatch(fetchAllMessages(roomId, undefined));
     dispatch(initPrivateChatSocket());
+    dispatch(setRoomId(roomId));
+
     //Listen to the event sent from ipcMain and leave Room and remove socket
     ipcRenderer.on("app-close", () => {
       socket.invoke(RoomAction, roomId, RoomActionType.Leave, getLoginData().id);
@@ -342,7 +347,7 @@ const RoomComponent = (props: any) => {
               variant="destructive"
               onClick={() => {
                 // eslint-disable-next-line prettier/prettier
-                logger.log(LogType.RemoteControlStop, roomId, `stopped remote-controlling ${remoteControlState.userId}`);
+                logger.log(LogType.RemoteControlStop, roomId, `stopped remote-controlling ${remoteControlUser.realName}`);
                 dispatch(setRemoteControlAccepted(undefined));
               }}
             >
@@ -381,7 +386,7 @@ const RoomComponent = (props: any) => {
               type="submit"
               onClick={() => {
                 dispatch(muteUser(roomId, userCardState.userId));
-                logger.log(LogType.Mute, roomId, `muted user ${userCardState.userId}`);
+                logger.log(LogType.Mute, roomId, `muted user ${user.realName}`);
               }}
               disabled={userCardState.isLoading || userCardState.isMuteSuccess}
             />
@@ -412,7 +417,7 @@ const RoomComponent = (props: any) => {
               type="submit"
               onClick={() => {
                 dispatch(kickUser(roomId, userCardState.userId));
-                logger.log(LogType.Kick, roomId, `kicked user ${userCardState.userId}`);
+                logger.log(LogType.Kick, roomId, `kicked user ${user.realName}`);
               }}
               disabled={userCardState.isLoading || userCardState.isKickSuccess}
             />
@@ -488,7 +493,11 @@ const RoomComponent = (props: any) => {
               label="Delete"
               variant="brand"
               type="submit"
-              onClick={() => dispatch(deleteDeadline(deadlineCardState.deadline?.deadlineId, roomId))}
+              onClick={() =>
+                dispatch(
+                  deleteDeadline(deadlineCardState.deadline?.deadlineId, deadlineCardState.deadline?.title, roomId)
+                )
+              }
               disabled={deadlineCardState.isLoading || deadlineCardState.isDeadlineDeleteSuccess}
             />
           </div>
@@ -513,7 +522,11 @@ const RoomComponent = (props: any) => {
         isOpen={userCardState.isRemoteControlOfferModalOpen}
         onRequestClose={() => {
           socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Reject, remoteInitiatorInfo.id, null);
-          logger.log(LogType.RemoteControlReject, roomId, `rejected remote control request from ${creatorId}`);
+          logger.log(
+            LogType.RemoteControlReject,
+            roomId,
+            `rejected remote control request from ${creatorUser.realName}`
+          );
           dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
         }}
         footer={
@@ -522,7 +535,11 @@ const RoomComponent = (props: any) => {
               label="Decline"
               onClick={() => {
                 socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Reject, remoteInitiatorInfo.id, null);
-                logger.log(LogType.RemoteControlReject, roomId, `rejected remote control request from ${creatorId}`);
+                logger.log(
+                  LogType.RemoteControlReject,
+                  roomId,
+                  `rejected remote control request from ${creatorUser.realName}`
+                );
                 dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
               }}
             />
@@ -531,7 +548,11 @@ const RoomComponent = (props: any) => {
               variant="brand"
               onClick={() => {
                 socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Accept, remoteInitiatorInfo.id, null);
-                logger.log(LogType.RemoteControlAccept, roomId, `accepted remote control request from ${creatorId}`);
+                logger.log(
+                  LogType.RemoteControlAccept,
+                  roomId,
+                  `accepted remote control request from ${creatorUser.realName}`
+                );
                 dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
               }}
             />

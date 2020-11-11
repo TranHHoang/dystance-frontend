@@ -1,10 +1,13 @@
 import { faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import _ from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { Button, Modal, ProgressBar } from "react-rainbow-components";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import { RootState } from "~app/rootReducer";
 import { Logger, LogType } from "~utils/logger";
+import { allUsers } from "~utils/types";
 import ChatBox from "./ChatBox";
 import ChatHistory from "./ChatHistory";
 import { broadcastMessage, ChatType } from "./chatSlice";
@@ -60,11 +63,12 @@ const ChatArea = (props: any) => {
   const [file, setFile] = useState<File>();
   const [imagePreview, setImagePreview] = useState("");
   const [uploadPercentage, setUploadPercentage] = useState(0);
+  const roomState = useSelector((state: RootState) => state.roomState);
   const chatBox = useRef<HTMLDivElement>();
   const { roomId, receiverId, inRoom } = props;
   const dispatch = useDispatch();
   const logger = Logger.getInstance();
-
+  const user = _.find(allUsers, { id: receiverId });
   function isImageFile(file: File) {
     return file?.type.includes("image") ?? false;
   }
@@ -110,9 +114,9 @@ const ChatArea = (props: any) => {
         }
       } else if (!roomId && inRoom === true) {
         if (isImageFile(file)) {
-          logger.logPrivateChat(LogType.PrivateChatImage, `sent image ${file?.name} to `, receiverId);
+          logger.log(LogType.PrivateChatImage, roomState.roomId, `sent image ${file?.name} to ${user.realName}`);
         } else {
-          logger.logPrivateChat(LogType.PrivateChatFile, `sent file ${file.name} to `, receiverId);
+          logger.log(LogType.PrivateChatFile, roomState.roomId, `sent file ${file.name} to ${user.realName}`);
         }
       }
     }
