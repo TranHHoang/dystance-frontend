@@ -11,7 +11,9 @@ import SideNavigationBar from "../sidebar/Sidebar";
 import { setSidebarValue } from "../sidebar/sidebarSlice";
 import { AllRooms } from "./all-rooms/AllRooms";
 import { fetchAllUsers } from "./showRoomsSlice";
-import { resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
+import { initPrivateChatSocket, resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
+import { socket } from "~app/App";
+import { getLoginData } from "~utils/tokenStorage";
 
 const CreateRoomDiv = styled.div`
   display: flex;
@@ -38,6 +40,19 @@ const Container = styled.div`
 `;
 
 const HomePageDisplay = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (socket && socket.state === "Disconnected") {
+      console.log("Start socket...");
+      socket.start().then(() => {
+        console.log("Started");
+        socket.invoke("ConnectionState", 0, getLoginData().id);
+        dispatch(initPrivateChatSocket());
+      });
+    }
+  }, []);
+
   return (
     <HomePageContainer>
       <CreateRoomDiv>
