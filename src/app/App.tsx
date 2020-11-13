@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { hot } from "react-hot-loader";
 import LoginForm from "../components/account-management/login/LoginForm";
 import GoogleUpdateInfoForm from "../components/account-management/google-update-info/GoogleUpdateInfo";
@@ -12,13 +12,24 @@ import ProfilePage from "../components/profile-page/ProfilePage";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { initPrivateChatSocket } from "../components/private-chat/chatPreviewSlice";
+import { RootState } from "./rootReducer";
+import _ from "lodash";
+import { RoomTimes } from "~utils/types";
+import moment from "moment";
+import { createNotification, NotificationType } from "~utils/notification";
+import { getAllDeadlines } from "../components/room/deadline/deadlineListSlice";
 
 export const socket = new HubConnectionBuilder().withUrl(`${hostName}/socket`).build();
 
 export default hot(module)(function App() {
+  const roomState = useSelector((root: RootState) => root.showRoomState);
+  const deadlineListState = useSelector((root: RootState) => root.deadlineListState);
   const dispatch = useDispatch();
+  const intervalRef = useRef<number>();
+  const deadlineIntervalRef = useRef<number>();
+
   useEffect(() => {
     if (socket && socket.state === "Disconnected") {
       console.log("Start socket...");
@@ -28,7 +39,49 @@ export default hot(module)(function App() {
         dispatch(initPrivateChatSocket());
       });
     }
+    dispatch(getAllDeadlines());
   }, []);
+
+  useEffect(() => {
+    clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      _.each(roomState.rooms, (room) => {
+        _.each(JSON.parse(room.roomTimes) as RoomTimes[], (time) => {
+          console.log(moment().format("dddd").toLowerCase() === time.dayOfWeek.toLowerCase());
+
+          if (moment().format("dddd").toLowerCase() === time.dayOfWeek.toLowerCase()) {
+            const minuteDiff = moment.duration(moment(time.startTime, "HH:mm").diff(moment())).asMinutes();
+            if (minuteDiff > 0 && minuteDiff <= 15) {
+              createNotification(
+                NotificationType.IncomingClass,
+                `Room "${room.roomName}" will start in ${Math.ceil(minuteDiff)} minutes`
+              );
+            }
+          }
+        });
+      });
+    }, 5000 * 60);
+  }, [roomState.rooms]);
+
+  useEffect(() => {
+    console.log("Run into deadline State", deadlineListState.allDeadlines);
+    function notifyDeadline() {
+      _.each(deadlineListState.allDeadlines, (deadline) => {
+        const hourDiff = moment.duration(moment(deadline.endDate).diff(moment())).asHours();
+        console.log(hourDiff);
+        if (hourDiff > 0 && hourDiff < 48) {
+          console.log(`Deadline "${deadline.title}" will be due in ${Math.ceil(hourDiff)} hours`);
+          createNotification(
+            NotificationType.IncomingDeadline,
+            `Deadline "${deadline.title}" will be due in ${Math.ceil(hourDiff)} hours`
+          );
+        }
+      });
+    }
+    notifyDeadline();
+    clearInterval(deadlineIntervalRef.current);
+    deadlineIntervalRef.current = setInterval(notifyDeadline, 1000 * 60 * 60);
+  }, [deadlineListState.allDeadlines]);
 
   return (
     <HashRouter>

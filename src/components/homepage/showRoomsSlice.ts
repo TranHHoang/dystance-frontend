@@ -32,7 +32,7 @@ const showRoomSlice = createSlice({
   reducers: {
     fetchRoomSuccess(state, action: PayloadAction<Room[]>) {
       state.isLoading = false;
-      state.rooms = state.rooms.concat(action.payload);
+      state.rooms = action.payload;
     },
     fetchRoomFailed(state, action: PayloadAction<ErrorResponse>) {
       state.isLoading = false;

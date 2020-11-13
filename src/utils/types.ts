@@ -108,3 +108,10 @@ export interface RoomTimes {
   startTime: string;
   endTime: string;
 }
+
+export async function all<T>(array: T[], fn: (value: T) => Promise<void>) {
+  return array.reduce(async (p, item) => {
+    await p;
+    return await fn(item);
+  }, Promise.resolve());
+}

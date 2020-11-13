@@ -82,7 +82,6 @@ function getAxiosError(e: AxiosError) {
 export function startSendEmail(email: string): AppThunk {
   return async (dispatch) => {
     dispatch(requestStart());
-
     try {
       const form = new FormData();
       form.append("email", email);
@@ -98,6 +97,7 @@ export function startSendEmail(email: string): AppThunk {
       dispatch(requestSuccess());
       dispatch(addEmail(response.data.email));
     } catch (ex) {
+      console.log(ex as AxiosError);
       dispatch(getAxiosError(ex as AxiosError));
     }
   };

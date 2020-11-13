@@ -6,7 +6,7 @@ import { post, get } from "~utils/axiosUtils";
 import _ from "lodash";
 import moment from "moment";
 import { socket } from "~app/App";
-import { RoomAction, RoomActionType } from "~utils/types";
+import { all, RoomAction, RoomActionType } from "~utils/types";
 import { getLoginData } from "~utils/tokenStorage";
 
 export interface BreakoutGroup {
@@ -47,13 +47,6 @@ export default groupSlice.reducer;
 
 export const { setBreakoutGroups, addBreakoutGroup, removeBreakoutGroup, updateBreakoutGroup } = groupSlice.actions;
 
-async function all<T>(array: T[], fn: (value: T) => Promise<void>) {
-  return array.reduce(async (p, item) => {
-    await p;
-    return await fn(item);
-  }, Promise.resolve());
-}
-
 export function createGroups(roomId: string, creatorId: string, groups: BreakoutGroup[]): AppThunk {
   return async (dispatch) => {
     await all(groups, async ({ name, userIds }) => {
@@ -70,7 +63,6 @@ export function createGroups(roomId: string, creatorId: string, groups: Breakout
         console.log(ex);
       }
     });
-    await socket.invoke(RoomAction, roomId, RoomActionType.GroupNotification, getLoginData().id);
   };
 }
 
@@ -84,7 +76,6 @@ export function deleteGroups(roomId: string, groupIds: string[]): AppThunk {
         console.log(ex);
       }
     });
-    await socket.invoke(RoomAction, roomId, RoomActionType.GroupNotification, getLoginData().id);
   };
 }
 

@@ -60,9 +60,6 @@ export const AllRooms = () => {
 
   useEffect(() => {
     dispatch(showRoom());
-    return () => {
-      dispatch(resetRoom());
-    };
   }, []);
 
   return (

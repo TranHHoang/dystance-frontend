@@ -182,7 +182,7 @@ const RoomComponent = (props: any) => {
   useEffect(() => {
     dispatch(initSocket(roomId));
     dispatch(fetchAllMessages(roomId, undefined));
-    dispatch(initPrivateChatSocket());
+    // dispatch(initPrivateChatSocket());
     //Listen to the event sent from ipcMain and leave Room and remove socket
     ipcRenderer.on("app-close", () => {
       socket.invoke(RoomAction, roomId, RoomActionType.Leave, getLoginData().id);

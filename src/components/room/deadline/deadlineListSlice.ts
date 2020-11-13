@@ -1,17 +1,20 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import Axios from "~utils/fakeAPI";
 import { AppThunk } from "~app/store";
-import { DeadlineInfo, ErrorResponse } from "~utils/types";
+import { all, DeadlineInfo, ErrorResponse, Room } from "~utils/types";
 import { hostName } from "~utils/hostUtils";
 import { AxiosError } from "axios";
 import { CreateDeadlineFormValues } from "./DeadlineListComponent";
 import moment from "moment";
+import { getLoginData } from "~utils/tokenStorage";
+import _ from "lodash";
 
 interface DeadlineListState {
   isLoading: boolean;
   isDeadlineModalOpen: boolean;
   isDeadlineCreationSuccess: boolean;
   deadlines: DeadlineInfo[];
+  allDeadlines: DeadlineInfo[];
   error?: ErrorResponse;
 }
 
@@ -19,7 +22,8 @@ const initialState: DeadlineListState = {
   isLoading: false,
   isDeadlineModalOpen: false,
   isDeadlineCreationSuccess: false,
-  deadlines: []
+  deadlines: [],
+  allDeadlines: []
 };
 
 const deadlineListSlice = createSlice({
@@ -51,6 +55,9 @@ const deadlineListSlice = createSlice({
     fetchDeadlinesFailure(state, action: PayloadAction<ErrorResponse>) {
       state.error = action.payload;
     },
+    addAllDeadlines(state, action: PayloadAction<DeadlineInfo[]>) {
+      state.allDeadlines = state.allDeadlines.concat(action.payload);
+    },
     resetDeadlines() {
       return initialState;
     }
@@ -64,9 +71,25 @@ export const {
   deadlineCreationFailure,
   fetchDeadlinesSuccess,
   fetchDeadlinesFailure,
-  resetDeadlines
+  resetDeadlines,
+  addAllDeadlines
 } = deadlineListSlice.actions;
 
+export function getAllDeadlines(): AppThunk {
+  return async (dispatch) => {
+    const response = await Axios.get(`${hostName}/api/Rooms/getByUserId?id=${getLoginData().id}`);
+    const data = response.data as Room[];
+
+    await all(
+      _.map(data, (room) => room.roomId),
+      async (roomId) => {
+        const response = await Axios.get(`${hostName}/api/rooms/deadline/get?roomId=${roomId}`);
+        const data = response.data as DeadlineInfo[];
+        dispatch(addAllDeadlines(data));
+      }
+    );
+  };
+}
 export function showDeadlines(roomId: string): AppThunk {
   return async (dispatch) => {
     try {
