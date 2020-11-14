@@ -18,7 +18,7 @@ import InvitedUserCardComponent from "./invited-user-card-component/InvitedUserC
 import { kickInvitedUser, setKickModalOpen } from "./invited-user-card-component/invitedUserCardSlice";
 import { StyledText } from "../..//homepage/single-room/styles";
 
-const theme = createMuiTheme({
+export const theme = createMuiTheme({
   palette: {
     type: "dark",
     primary: {

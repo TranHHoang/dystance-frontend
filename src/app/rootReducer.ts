@@ -25,6 +25,9 @@ import remoteControlReducer from "../components/room/remote-control/remoteContro
 import chatPreviewReducer from "../components/private-chat/chatPreviewSlice";
 import invitedUserCardReducer from "../components/room/invite/invited-user-card-component/invitedUserCardSlice";
 import groupReducer from "../components/room/group/groupSlice";
+import studentListReducer from "../components/lists/student-list/StudentListSlice";
+import teacherListReducer from "../components/lists/teacher-list/teacherListSlice";
+import semesterPageReducer from "../components/semester-page/semesterPageSlice";
 
 const appReducer = combineReducers({
   roomCreation: createRoomReducer,
@@ -51,7 +54,10 @@ const appReducer = combineReducers({
   remoteControlState: remoteControlReducer,
   chatPreviewState: chatPreviewReducer,
   invitedUserCardState: invitedUserCardReducer,
-  groupState: groupReducer
+  groupState: groupReducer,
+  studentListState: studentListReducer,
+  teacherListState: teacherListReducer,
+  semesterPageState: semesterPageReducer
 });
 
 const rootReducer = (state: any, action: AnyAction) => {

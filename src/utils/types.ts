@@ -46,6 +46,12 @@ export interface User {
   avatar: string;
 }
 
+export interface UserTableInfo {
+  id: string;
+  email: string;
+  realName: string;
+  dob: string;
+}
 export interface UserInfo {
   userName: string;
   realName: string;
