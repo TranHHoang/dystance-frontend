@@ -22,6 +22,7 @@ Axios.interceptors.request.use(
 Axios.interceptors.response.use(
   (response) => response,
   async (error) => {
+    return Promise.reject(error);
     if (error.response?.status !== 401 || error.config._retry) {
       return Promise.reject(error);
     }
