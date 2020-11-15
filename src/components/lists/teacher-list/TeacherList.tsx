@@ -17,7 +17,7 @@ const TeacherList = () => {
     };
   }, []);
 
-  return <StudentTeacherTableComponent data={teacherData} title="Teacher List" />;
+  return <StudentTeacherTableComponent data={teacherData} title="Teacher List" isStudent={false} />;
 };
 
 export default TeacherList;

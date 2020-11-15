@@ -1,11 +1,11 @@
-import StudentList from "../../components/lists/student-list/StudentList";
-import TeacherList from "../../components/lists/teacher-list/TeacherList";
+import StudentList from "../../lists/student-list/StudentList";
+import TeacherList from "../../lists/teacher-list/TeacherList";
 import React, { useEffect } from "react";
 import { Tabset, Tab } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { setSemesterPageTabsetValue } from "./semesterPageSlice";
+import { setSemesterDetailsTabsetValue } from "./semesterDetailsSlice";
 
 const Title = styled.h1`
   font-size: 2.5em;
@@ -24,18 +24,16 @@ const StyledTab = styled(Tab)`
   }
 `;
 
-const SemesterPageComponent = () => {
-  const semesterPageState = useSelector((state: RootState) => state.semesterPageState);
+const SemesterDetails = () => {
+  const semesterPageState = useSelector((state: RootState) => state.semesterDetailsState);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(setSemesterPageTabsetValue("students"));
+    dispatch(setSemesterDetailsTabsetValue("students"));
   }, []);
 
   function getTabContent() {
     switch (semesterPageState.tabsetValue) {
-      case "semester":
-        return;
       case "schedule":
         return;
       case "classes":
@@ -49,16 +47,15 @@ const SemesterPageComponent = () => {
   return (
     <>
       <div style={{ padding: "20px 0 10px 20px" }}>
-        <Title>Your Semester</Title>
+        <Title>Semester Details</Title>
       </div>
       <Container>
         <Tabset
           activeTabName={semesterPageState.tabsetValue}
           onSelect={(_, selected) => {
-            dispatch(setSemesterPageTabsetValue(selected));
+            dispatch(setSemesterDetailsTabsetValue(selected));
           }}
         >
-          <StyledTab label="Semester" name="semester" />
           <StyledTab label="Schedule" name="schedule" />
           <StyledTab label="Classes" name="classes" />
           <StyledTab label="Students" name="students" />
@@ -70,4 +67,4 @@ const SemesterPageComponent = () => {
   );
 };
 
-export default SemesterPageComponent;
+export default SemesterDetails;

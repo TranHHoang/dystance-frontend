@@ -24,6 +24,12 @@ export const theme = createMuiTheme({
     primary: {
       main: "#4ecca3",
       contrastText: "#36393f"
+    },
+    background: {
+      paper: "#36393f"
+    },
+    secondary: {
+      main: "#4ecca3"
     }
   }
 });

@@ -14,7 +14,7 @@ const StudentList = () => {
     dispatch(showStudentList());
   }, []);
 
-  return <StudentTeacherTableComponent data={studentData} title="Student List" />;
+  return <StudentTeacherTableComponent data={studentData} title="Student List" isStudent={true} />;
 };
 
 export default StudentList;

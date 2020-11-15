@@ -1,5 +1,7 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, current, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
+import _ from "lodash";
+import moment from "moment";
 import { AppThunk } from "~app/store";
 import { ErrorResponse, UserTableInfo } from "~utils/types";
 
@@ -22,6 +24,22 @@ const studentListSlice = createSlice({
     fetchStudentListFailed(state, action: PayloadAction<ErrorResponse>) {
       state.error = action.payload;
     },
+    addStudentToList(state, action: PayloadAction<UserTableInfo>) {
+      state.students.push(action.payload);
+    },
+    updateStudentList(state, action: PayloadAction<UserTableInfo>) {
+      _.find(state.students, { id: action.payload.id }).email = action.payload.email;
+      _.find(state.students, { id: action.payload.id }).realName = action.payload.realName;
+      _.find(state.students, { id: action.payload.id }).dob = action.payload.dob;
+    },
+    removeStudentsFromList(state, action: PayloadAction<string[]>) {
+      _.forEach(current(state.students), (student: UserTableInfo) => {
+        if (action.payload.includes(student.id)) {
+          _.remove(state.students, student);
+        }
+      });
+    },
+
     resetStudentList() {
       return initialState;
     }
@@ -29,7 +47,14 @@ const studentListSlice = createSlice({
 });
 
 export default studentListSlice.reducer;
-export const { fetchStudentListFailed, fetchStudentListSuccess, resetStudentList } = studentListSlice.actions;
+export const {
+  fetchStudentListFailed,
+  fetchStudentListSuccess,
+  resetStudentList,
+  removeStudentsFromList,
+  addStudentToList,
+  updateStudentList
+} = studentListSlice.actions;
 
 export function showStudentList(): AppThunk {
   return async (dispatch) => {
@@ -118,5 +143,30 @@ export function showStudentList(): AppThunk {
         );
       }
     }
+  };
+}
+
+export function addStudent(student: UserTableInfo): AppThunk {
+  return async (dispatch) => {
+    const studentFormat: UserTableInfo = {
+      id: "12121",
+      email: student.email,
+      realName: student.realName,
+      dob: moment(student.dob).format("YYYY-MM-DD")
+    };
+
+    dispatch(addStudentToList(studentFormat));
+  };
+}
+export function deleteStudents(userIds: string[]): AppThunk {
+  return async (dispatch) => {
+    console.log(JSON.stringify(userIds));
+    dispatch(removeStudentsFromList(userIds));
+  };
+}
+
+export function updateStudent(student: UserTableInfo): AppThunk {
+  return async (dispatch) => {
+    dispatch(updateStudentList(student));
   };
 }

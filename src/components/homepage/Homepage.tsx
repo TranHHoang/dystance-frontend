@@ -11,7 +11,7 @@ import SideNavigationBar from "../sidebar/Sidebar";
 import { setSidebarValue } from "../sidebar/sidebarSlice";
 import { fetchAllUsers } from "./showRoomsSlice";
 import { resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
-import SemesterPageComponent from "../../components/semester-page/SemesterPageComponent";
+import SemesterDetails from "../../components/semester-page/semester-details/SemesterDetails";
 
 const CreateRoomDiv = styled.div`
   display: flex;
@@ -46,7 +46,7 @@ export const HomePage = () => {
   function getCurrentSidebarValue() {
     switch (sidebarState.sidebarValue) {
       case "Homepage":
-        return <SemesterPageComponent />;
+        return <SemesterDetails />;
       case "Profile":
         return <ProfilePage />;
       case "Timetable":
