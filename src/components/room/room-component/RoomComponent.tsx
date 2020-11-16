@@ -210,19 +210,6 @@ const RoomComponent = (props: any) => {
     }
   }, [userCardState.isRemoteControlWaitingModalOpen]);
 
-  useEffect(() => {
-    if (roomState.isDrawerOpen) {
-      const closeAction = setInterval(() => {
-        if ($("#drawer-close-button").length) {
-          clearInterval(closeAction);
-        }
-        $("#drawer-close-button").on("click", () => {
-          dispatch(setDrawerOpen(false));
-        }),
-          500;
-      });
-    }
-  }, [roomState.isDrawerOpen]);
   socket.on(REMOTE_CONTROL_SIGNAL, async (data) => {
     const objData = JSON.parse(data);
     switch (objData.type) {
@@ -327,6 +314,7 @@ const RoomComponent = (props: any) => {
           </span>
         }
         isOpen={roomState.isDrawerOpen}
+        onRequestClose={() => dispatch(setDrawerOpen(false))}
       >
         {getTabContent()}
       </StyledDrawer>
