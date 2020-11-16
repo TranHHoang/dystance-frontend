@@ -1,14 +1,15 @@
 import { MuiThemeProvider } from "@material-ui/core";
 import { theme } from "../room/invite/InviteForm";
 import MaterialTable from "material-table";
-import * as React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
-import { addStudent, deleteStudents, updateStudent } from "./student-list/StudentListSlice";
+import { addStudent, deleteStudents, updateStudents } from "./student-list/StudentListSlice";
 import { UserTableInfo } from "~utils/types";
 import _ from "lodash";
 import * as Yup from "yup";
-import { addTeacher, deleteTeachers, updateTeacher } from "./teacher-list/teacherListSlice";
+import { addTeacher, deleteTeachers, updateTeachers } from "./teacher-list/teacherListSlice";
+import moment from "moment";
 
 const StyledDiv = styled.div`
   div::before {
@@ -17,7 +18,7 @@ const StyledDiv = styled.div`
 `;
 
 const StudentTeacherTableComponent = (props: any) => {
-  const { semesterId, data, title, isStudent } = props;
+  const { semesterId, data, title, isStudent, isLoading } = props;
   const dispatch = useDispatch();
   return (
     <StyledDiv>
@@ -33,18 +34,33 @@ const StudentTeacherTableComponent = (props: any) => {
               editable: "never"
             },
             {
+              title: isStudent ? "Student Code" : "Employee Code",
+              field: "code",
+              validate: (rowData: UserTableInfo) => Yup.string().required().isValidSync(rowData.code),
+              filterPlaceholder: isStudent ? "Student Code" : "Employee Code"
+            },
+            {
               title: "Email",
               field: "email",
-              validate: (rowData: UserTableInfo) => Yup.string().email().required().isValidSync(rowData.email)
+              validate: (rowData: UserTableInfo) => Yup.string().email().required().isValidSync(rowData.email),
+              filterPlaceholder: "Email"
             },
             {
               title: "Real Name",
               field: "realName",
-              validate: (rowData: UserTableInfo) => Yup.string().required().isValidSync(rowData.realName)
+              validate: (rowData: UserTableInfo) => Yup.string().required().isValidSync(rowData.realName),
+              filterPlaceholder: "Real Name"
             },
-            { title: "DOB", field: "dob", type: "date", validate: (rowData: UserTableInfo) => rowData.dob !== "" }
+            {
+              title: "DOB",
+              field: "dob",
+              type: "date",
+              validate: (rowData: UserTableInfo) => Yup.date().required().isValidSync(rowData.dob),
+              filterPlaceholder: "Date Of Birth"
+            }
           ]}
           data={data}
+          isLoading={isLoading}
           options={{
             rowStyle: {
               color: "white",
@@ -63,20 +79,37 @@ const StudentTeacherTableComponent = (props: any) => {
           }}
           editable={{
             onRowAdd: (newData: UserTableInfo) => {
-              if (isStudent) {
+              const format = {
+                code: newData.code,
+                email: newData.email,
+                realName: newData.realName,
+                dob: moment(newData.dob).format("YYYY-MM-DD")
+              };
+              console.log(format);
+              console.log(_.some(format, _.isEmpty));
+              console.log(!Yup.string().email().isValidSync(format.email));
+              if (_.some(format, _.isEmpty) || !Yup.string().email().isValidSync(format.email)) {
+                return Promise.reject();
+              } else if (isStudent) {
                 dispatch(addStudent(newData));
+                return Promise.resolve();
               } else {
                 dispatch(addTeacher(newData));
+                return Promise.resolve();
               }
-              return Promise.resolve();
             },
-            onRowUpdate: (newData, _) => {
-              if (isStudent) {
-                dispatch(updateStudent(newData));
+            onRowUpdate: (newData: UserTableInfo) => {
+              console.log(newData);
+              console.log(_.some(newData, _.isEmpty));
+              if (_.some(newData, _.isEmpty) || !Yup.string().email().isValidSync(newData.email)) {
+                return Promise.reject();
+              } else if (isStudent) {
+                dispatch(updateStudents([newData]));
+                return Promise.resolve();
               } else {
-                dispatch(updateTeacher(newData));
+                dispatch(updateTeachers([newData]));
+                return Promise.resolve();
               }
-              return Promise.resolve();
             },
             onRowDelete: (oldData: UserTableInfo) => {
               if (isStudent) {
@@ -85,7 +118,22 @@ const StudentTeacherTableComponent = (props: any) => {
                 dispatch(deleteTeachers([oldData.id]));
               }
               return Promise.resolve();
-            }
+            },
+            onBulkUpdate: (changes) =>
+              new Promise((resolve, reject) => {
+                _.forEach(_.map(changes, "newData"), (change) => {
+                  if (_.some(change, _.isEmpty) || !Yup.string().email().isValidSync(change.email)) {
+                    reject();
+                  }
+                });
+                if (isStudent) {
+                  dispatch(updateStudents(_.map(changes, "newData")));
+                  resolve();
+                } else {
+                  dispatch(updateTeachers(_.map(changes, "newData")));
+                  resolve();
+                }
+              })
           }}
           actions={[
             {

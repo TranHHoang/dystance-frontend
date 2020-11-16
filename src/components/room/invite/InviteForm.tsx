@@ -31,6 +31,13 @@ export const theme = createMuiTheme({
     secondary: {
       main: "#4ecca3"
     }
+  },
+  overrides: {
+    MuiInputBase: {
+      root: {
+        height: "2em"
+      }
+    }
   }
 });
 

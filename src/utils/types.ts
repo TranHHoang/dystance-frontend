@@ -47,7 +47,8 @@ export interface User {
 }
 
 export interface UserTableInfo {
-  id: string;
+  id?: string;
+  code: string;
   email: string;
   realName: string;
   dob: string;

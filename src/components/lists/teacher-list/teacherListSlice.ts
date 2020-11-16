@@ -7,10 +7,12 @@ import { ErrorResponse, UserTableInfo } from "~utils/types";
 
 interface TeacherListState {
   teachers: UserTableInfo[];
+  isLoading: boolean;
   error?: ErrorResponse;
 }
 
 const initialState: TeacherListState = {
+  isLoading: true,
   teachers: []
 };
 
@@ -19,18 +21,21 @@ const teacherListSlice = createSlice({
   initialState,
   reducers: {
     fetchTeacherListSuccess(state, action: PayloadAction<UserTableInfo[]>) {
+      state.isLoading = false;
       state.teachers = action.payload;
     },
     fetchTeacherListFailed(state, action: PayloadAction<ErrorResponse>) {
+      state.isLoading = false;
       state.error = action.payload;
     },
     addTeacherToList(state, action: PayloadAction<UserTableInfo>) {
       state.teachers.push(action.payload);
     },
-    updateTeacherList(state, action: PayloadAction<UserTableInfo>) {
-      _.find(state.teachers, { id: action.payload.id }).email = action.payload.email;
-      _.find(state.teachers, { id: action.payload.id }).realName = action.payload.realName;
-      _.find(state.teachers, { id: action.payload.id }).dob = action.payload.dob;
+    updateTeacherList(state, action: PayloadAction<UserTableInfo[]>) {
+      _.forEach(action.payload, (change: UserTableInfo) => {
+        const index = _.findIndex(state.teachers, { id: change.id });
+        state.teachers.splice(index, 1, change);
+      });
     },
     removeTeachersFromList(state, action: PayloadAction<string[]>) {
       _.forEach(current(state.teachers), (teacher: UserTableInfo) => {
@@ -61,12 +66,14 @@ export function showTeacherList(): AppThunk {
       const data: UserTableInfo[] = [
         {
           id: "1",
+          code: "he130268",
           email: "chilp@fe.edu.vn",
           realName: "Le Phuong Chi",
           dob: "2020-12-12"
         },
         {
           id: "2",
+          code: "he130268",
           email: "sonnt5@fe.edu.vn",
           realName: "Ngo Tung Son",
           dob: "2020-12-12"
@@ -101,6 +108,7 @@ export function addTeacher(teacher: UserTableInfo): AppThunk {
   return async (dispatch) => {
     const teacherFormat: UserTableInfo = {
       id: "1231231541254",
+      code: teacher.code,
       email: teacher.email,
       realName: teacher.realName,
       dob: moment(teacher.dob).format("YYYY-MM-DD")
@@ -109,9 +117,9 @@ export function addTeacher(teacher: UserTableInfo): AppThunk {
   };
 }
 
-export function updateTeacher(teacher: UserTableInfo): AppThunk {
+export function updateTeachers(teachers: UserTableInfo[]): AppThunk {
   return async (dispatch) => {
-    dispatch(updateTeacherList(teacher));
+    dispatch(updateTeacherList(teachers));
   };
 }
 

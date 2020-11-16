@@ -11,13 +11,22 @@ const TeacherList = () => {
     ...teacher
   }));
   useEffect(() => {
-    dispatch(showTeacherList());
+    setTimeout(() => {
+      dispatch(showTeacherList());
+    }, 2000);
     return () => {
       dispatch(resetTeacherList());
     };
   }, []);
 
-  return <StudentTeacherTableComponent data={teacherData} title="Teacher List" isStudent={false} />;
+  return (
+    <StudentTeacherTableComponent
+      data={teacherData}
+      title="Teacher List"
+      isStudent={false}
+      isLoading={teacherListState.isLoading}
+    />
+  );
 };
 
 export default TeacherList;
