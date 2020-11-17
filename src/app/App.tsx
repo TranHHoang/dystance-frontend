@@ -15,11 +15,16 @@ import { getLoginData } from "~utils/tokenStorage";
 import { useDispatch } from "react-redux";
 import { initPrivateChatSocket } from "../components/private-chat/chatPreviewSlice";
 import { saveFile } from "../components/room/jitsi-meet-component/JitsiMeetComponent";
+import { Logger } from "~utils/logger";
+import fs from "fs";
+import moment from "moment";
+import _ from "lodash";
 
 export const socket = new HubConnectionBuilder().withUrl(`${hostName}/socket`).build();
 
 export default hot(module)(function App() {
   const dispatch = useDispatch();
+  const logger = Logger.getInstance();
   useEffect(() => {
     if (socket && socket.state === "Disconnected") {
       console.log("Start socket...");
@@ -29,7 +34,17 @@ export default hot(module)(function App() {
         dispatch(initPrivateChatSocket());
       });
     }
-    saveFile();
+    if (
+      logger.getLogs().length === 0 &&
+      fs.existsSync(`./logs/${getLoginData().id}/${moment().format("YYYY-MM-DD")}.txt`)
+    ) {
+      fs.readFile(`./logs/${getLoginData().id}/${moment().format("YYYY-MM-DD")}.txt`, "utf8", (err, data) => {
+        const fileData: string[] = data.split("\n");
+        _.forEach(fileData, (line) => {
+          logger.getLogs().push(line);
+        });
+      });
+    }
   }, []);
 
   return (

@@ -11,7 +11,7 @@ import { RoomAction, RoomActionType, User } from "~utils/types";
 import { setRemoteControlAccepted } from "../remote-control/remoteControlSlice";
 import { socket } from "~app/App";
 import { resetCardState, setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
-import { setShowUpperToolbar } from "./jitsiMeetSlice";
+import { sendLog, setShowUpperToolbar } from "./jitsiMeetSlice";
 import { BreakoutGroup, resetRoomState, switchToGroup, removeListeners } from "../room-component/roomSlice";
 import { Spinner } from "react-rainbow-components";
 import { withRouter } from "react-router-dom";
@@ -37,7 +37,7 @@ const StyledClock = styled.div`
   border-bottom-right-radius: 10px;
   opacity: 50%;
 `;
-export function saveFile() {
+export async function saveFile() {
   const folderName = `./logs/${getLoginData().id}`;
   if (!fs.existsSync(folderName)) {
     fs.mkdirSync(folderName, { recursive: true });
@@ -45,17 +45,22 @@ export function saveFile() {
   if (!fs.existsSync(`${folderName}/${moment().format("YYYY-MM-DD")}.txt`)) {
     Logger.getInstance().resetLogs();
   }
-  fs.writeFile(
-    `${folderName}/${moment().format("YYYY-MM-DD")}.txt`,
-    Logger.getInstance().getLogs().join("\n"),
-    (err) => {
-      console.log("WRite to file");
-      if (err) {
-        console.log(err);
+  return new Promise((resolve, reject) => {
+    fs.writeFile(
+      `${folderName}/${moment().format("YYYY-MM-DD")}.txt`,
+      Logger.getInstance().getLogs().join("\n"),
+      (err) => {
+        console.log("WRite to file");
+        resolve();
+        if (err) {
+          console.log(err);
+          reject();
+        }
       }
-    }
-  );
+    );
+  });
 }
+
 const JitsiMeetComponent = (props: any) => {
   const userCardState = useSelector((state: RootState) => state.userCardState);
   const groupState = useSelector((state: RootState) => state.groupState);
@@ -69,6 +74,7 @@ const JitsiMeetComponent = (props: any) => {
   const groupRef = useRef<BreakoutGroup>();
   const intervalRef = useRef<number>();
   const logger = Logger.getInstance();
+
   useEffect(() => {
     if (userCardState.muteOtherUser) {
       api?.current?.isAudioMuted().then((response: any) => {
@@ -138,6 +144,7 @@ const JitsiMeetComponent = (props: any) => {
       dispatch(resetGroupJoinedLeftState());
       groupRef.current = undefined;
       logger.log(LogType.AttendanceLeave, roomId, `left room`);
+      dispatch(sendLog());
     }
   }
 
@@ -155,7 +162,7 @@ const JitsiMeetComponent = (props: any) => {
       dispatch(setShowUpperToolbar(true));
       interval = setInterval(() => {
         saveFile();
-      }, 5000 * 60);
+      }, 5000);
       if (groupState.isGroupJoined === false && groupState.isGroupLeft === false) {
         logger.log(LogType.AttendanceJoin, roomId, `joined room`);
       }
@@ -168,7 +175,7 @@ const JitsiMeetComponent = (props: any) => {
       dispatch(resetCardState());
       removeListeners();
       redirect();
-      saveFile();
+      // saveFile();
       clearInterval(interval);
       jitsiMeetAPI.dispose();
     });

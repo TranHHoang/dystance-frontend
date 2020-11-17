@@ -1,10 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
-import { post } from "jquery";
+import moment from "moment";
 import { AppThunk } from "~app/store";
+import { post } from "~utils/axiosUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { ErrorResponse } from "~utils/types";
-
+import { saveFile } from "./JitsiMeetComponent";
+import fs from "fs";
 interface JitsiMeetState {
   showUpperToolbar: boolean;
   error?: ErrorResponse;
@@ -28,12 +30,16 @@ const jitsiMeetSlice = createSlice({
 export default jitsiMeetSlice.reducer;
 export const { setShowUpperToolbar, sendLogFailed } = jitsiMeetSlice.actions;
 
-export function sendLog(logFile: File): AppThunk {
+export function sendLog(): AppThunk {
   return async (dispatch) => {
     try {
+      await saveFile();
+      const filePath = `./logs/${getLoginData().id}/${moment().format("YYYY-MM-DD")}.txt`;
+      const logFileBuf = fs.readFileSync(filePath);
+
       const fd = new FormData();
-      fd.append("userId", getLoginData().id);
-      fd.append("log", logFile);
+      fd.append("log", new Blob([Uint8Array.from(logFileBuf)]));
+
       await post("/users/log", fd);
     } catch (ex) {
       // Error code != 200

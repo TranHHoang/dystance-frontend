@@ -37,6 +37,7 @@ const Timetable = () => {
     endDate: new Date(`${event.endDate}`),
     backgroundColor: event.eventType === TimetableEventType.Deadline ? "rgba(254,72,73,1)" : null
   }));
+
   useEffect(() => {
     dispatch(resetTimetable());
     const startOfWeek = moment().startOf("week").toDate();

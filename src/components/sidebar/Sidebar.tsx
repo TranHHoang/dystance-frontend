@@ -27,6 +27,10 @@ const StyledSidebar = styled(Sidebar)`
   ::-webkit-scrollbar {
     display: none;
   }
+  ul {
+    height: 100%;
+    margin-bottom: 10px;
+  }
   @media (min-height: 860px) {
     justify-content: flex-end;
     ul {
@@ -104,8 +108,7 @@ const SideNavigationBar = () => {
           name="Chat"
           label="Chat"
         />
-        <StyledSidebarItem icon={<StyledIcon icon={faPencilAlt} size="2x" />} name="Other" label="Other" />
-        <StyledSidebarItem icon={<StyledIcon icon={faCog} size="2x" />} name="Settings" label="Settings" />
+        <StyledSidebarItem icon={<StyledIcon icon={faPencilAlt} size="2x" />} name="logs" label="Logs" />
       </SidebarItemContainer>
 
       <StyledAvatarMenu
