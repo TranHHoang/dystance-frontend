@@ -4,7 +4,6 @@ import _ from "lodash";
 import { AppThunk } from "~app/store";
 import { get, postForm, postJson } from "~utils/axiosUtils";
 import { ErrorResponse } from "~utils/types";
-
 export interface Semester {
   id: string;
   name: string;
