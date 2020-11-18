@@ -9,17 +9,14 @@ import { showProfile } from "../profile-page/showProfileInfoSlice";
 import CreateRoomForm from "../room-management/create-room/CreateRoomForm";
 import SideNavigationBar from "../sidebar/Sidebar";
 import { setSidebarValue } from "../sidebar/sidebarSlice";
-import { AllRooms } from "./all-rooms/AllRooms";
 import { fetchAllUsers } from "./showRoomsSlice";
 import { resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
+import SemesterDetails from "../../components/semester-page/semester-details/SemesterDetails";
 
 const CreateRoomDiv = styled.div`
   display: flex;
   align-items: center;
   padding: 10px 0 20px 20px;
-`;
-const AllRoomsDiv = styled.div`
-  display: flex;
 `;
 const Title = styled.h1`
   font-size: 2.5em;
@@ -37,20 +34,6 @@ const Container = styled.div`
   height: auto;
 `;
 
-const HomePageDisplay = () => {
-  return (
-    <HomePageContainer>
-      <CreateRoomDiv>
-        <Title>All Rooms</Title>
-        <CreateRoomForm />
-      </CreateRoomDiv>
-      <AllRoomsDiv>
-        <AllRooms />
-      </AllRoomsDiv>
-    </HomePageContainer>
-  );
-};
-
 export const HomePage = () => {
   const sidebarState = useSelector((state: RootState) => state.sidebarState);
   const dispatch = useDispatch();
@@ -63,7 +46,7 @@ export const HomePage = () => {
   function getCurrentSidebarValue() {
     switch (sidebarState.sidebarValue) {
       case "Homepage":
-        return <HomePageDisplay />;
+        return <SemesterDetails />;
       case "Profile":
         return <ProfilePage />;
       case "Timetable":
