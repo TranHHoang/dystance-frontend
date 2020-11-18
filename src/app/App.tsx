@@ -88,7 +88,7 @@ export default hot(module)(function App() {
   return (
     <HashRouter>
       <Switch>
-        <Route exact path="/" component={ScheduleManagement} />
+        <Route exact path="/" component={SemesterManagement} />
         <Route exact path="/homepage" component={HomePage} />
         <Route exact path="/register" component={RegisterForm} />
         <Route exact path="/googleUpdateInfo" component={GoogleUpdateInfoForm} />

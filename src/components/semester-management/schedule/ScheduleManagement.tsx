@@ -1,18 +1,21 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/display-name */
 import React, { useEffect } from "react";
-import MaterialTable, { Action, Column } from "material-table";
+import MaterialTable, { Column } from "material-table";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import {
   addNewSchedule,
-  deleteExistingSchedule,
+  deleteExistingSchedules,
   fetchAllSchedule,
   Schedule,
-  updateExistingSchedule
+  updateExistingSchedules
 } from "./scheduleSlice";
 import { TimePicker } from "react-rainbow-components";
+import _ from "lodash";
+import { RootState } from "~app/rootReducer";
+import Table from "../Table";
 
 const StyledDiv = styled.div`
   div::before {
@@ -60,58 +63,38 @@ const theme = createMuiTheme({
   }
 });
 
-const data = [
-  { id: 1, date: "12-12-2020", startTime: "12:04", endTime: "15:00", subject: "SWD301", class: "IS1301" },
-  { id: 1, date: "12-12-2020", startTime: "12:04", endTime: "15:00", subject: "SWD301", class: "IS1301" },
-  { id: 1, date: "12-12-2020", startTime: "12:04", endTime: "15:00", subject: "SWD301", class: "IS1301" },
-  { id: 1, date: "12-12-2020", startTime: "12:04", endTime: "15:00", subject: "SWD301", class: "IS1301" },
-  { id: 1, date: "12-12-2020", startTime: "12:04", endTime: "15:00", subject: "SWD301", class: "IS1301" }
-];
-
 const ScheduleManagement = () => {
+  const scheduleState = useSelector((root: RootState) => root.scheduleState);
   const dispatch = useDispatch();
+  const schedules = scheduleState.map((s) => ({ ...s }));
 
   useEffect(() => {
     dispatch(fetchAllSchedule());
   }, []);
 
   return (
-    <StyledDiv style={{ margin: 8 }}>
-      <MuiThemeProvider theme={theme}>
-        <MaterialTable
-          title="Schedules"
-          columns={columns}
-          data={data}
-          options={{
-            actionsColumnIndex: -1,
-            rowStyle: { color: "#fff" },
-            filtering: true,
-            selection: true
-          }}
-          editable={{
-            onRowAdd: (newData: Schedule) => {
-              dispatch(addNewSchedule(newData));
-              return Promise.resolve();
-            },
-            onRowUpdate: (oldData, newData: Schedule) => {
-              dispatch(updateExistingSchedule(newData));
-              return Promise.resolve();
-            },
-            onRowDelete: (oldData: { id: string }) => {
-              dispatch(deleteExistingSchedule(oldData.id));
-              return Promise.resolve();
-            }
-          }}
-          actions={[
-            {
-              icon: "delete",
-              tooltip: "Delete all selected",
-              onClick: (e, data) => dispatch(deleteExistingSchedule(data.id))
-            }
-          ]}
-        />
-      </MuiThemeProvider>
-    </StyledDiv>
+    <Table
+      title="Schedule"
+      data={schedules}
+      columns={columns}
+      onRowAdd={(newData: Schedule) => {
+        dispatch(addNewSchedule(newData));
+        return Promise.resolve();
+      }}
+      onRowUpdate={(newData: Schedule) => {
+        dispatch(updateExistingSchedules([newData]));
+        return Promise.resolve();
+      }}
+      onRowDelete={(oldData: { id: string }) => {
+        dispatch(deleteExistingSchedules([oldData.id]));
+        return Promise.resolve();
+      }}
+      onBulkUpdate={(changes) => {
+        dispatch(updateExistingSchedules(changes as Schedule[]));
+        return Promise.resolve();
+      }}
+      onBulkDelete={(data) => dispatch(deleteExistingSchedules(_.map(data, "id")))}
+    />
   );
 };
 

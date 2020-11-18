@@ -1,29 +1,22 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/display-name */
 import React, { useEffect } from "react";
-import MaterialTable, { Column } from "material-table";
+import { Column } from "material-table";
 import { FileSelector } from "react-rainbow-components";
-import { createMuiTheme, MuiThemeProvider } from "@material-ui/core";
-import { addNewSemester, deleteExistingSemester, fetchAllSemesters, updateExistingSemester } from "./semesterSlice";
-import { useDispatch } from "react-redux";
-import styled from "styled-components";
-
-const StyledDiv = styled.div`
-  div::before {
-    display: initial;
-  }
-`;
+import {
+  addNewSemester,
+  deleteExistingSemesters,
+  fetchAllSemesters,
+  Semester,
+  updateExistingSemesters
+} from "./semesterSlice";
+import { useDispatch, useSelector } from "react-redux";
+import Table from "./Table";
+import _ from "lodash";
+import { data } from "jquery";
+import { RootState } from "~app/rootReducer";
 
 const columns: Column<object>[] = [
-  {
-    title: "No",
-    field: "no",
-    editable: "never",
-    width: 8,
-    render: (row: any) => row.tableData.id + 1,
-    filtering: false,
-    sorting: false
-  },
   { title: "Name", field: "name" },
   {
     title: "Schedule File",
@@ -33,72 +26,46 @@ const columns: Column<object>[] = [
   { title: "Last Updated", field: "lastUpdated", editable: "never", width: "20%" }
 ];
 
-const theme = createMuiTheme({
-  palette: {
-    type: "dark",
-    primary: {
-      main: "#4ecca3"
-    }
-  },
-  typography: {
-    allVariants: {
-      color: "#fff"
-    }
-  }
-});
-
-const data = [
-  { id: 1, name: "Test", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
-  { id: 1, name: "Test2", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
-  { id: 1, name: "Test3", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
-  { id: 1, name: "Test4", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
-  { id: 1, name: "Test5", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
-  { id: 1, name: "Test6", lastUpdated: "02/02/2020 at 13:20", file: "1234" }
-];
-
 const SemesterManagement = () => {
+  const semesterState = useSelector((root: RootState) => root.semesterState);
   const dispatch = useDispatch();
+  const semesters = semesterState.map((s) => ({ ...s }));
 
   useEffect(() => {
     dispatch(fetchAllSemesters());
   }, []);
 
   return (
-    <StyledDiv style={{ margin: 8 }}>
-      <MuiThemeProvider theme={theme}>
-        <MaterialTable
-          title="Semesters"
-          columns={columns}
-          data={data}
-          options={{
-            actionsColumnIndex: -1,
-            rowStyle: { color: "#fff" },
-            filtering: true
-          }}
-          onRowClick={() => console.log("A")}
-          editable={{
-            onRowAdd: (newData: { name: string; file: File }) => {
-              dispatch(addNewSemester(newData.name, newData.file));
-              return Promise.resolve();
-            },
-            onRowUpdate: (oldData, newData: { id: string; name: string; file: string | File }) => {
-              dispatch(
-                updateExistingSemester(
-                  newData.id,
-                  newData.name,
-                  typeof newData.file === "string" ? undefined : newData.file
-                )
-              );
-              return Promise.resolve();
-            },
-            onRowDelete: (oldData: { id: string }) => {
-              dispatch(deleteExistingSemester(oldData.id));
-              return Promise.resolve();
+    <Table
+      title="Semester"
+      columns={columns}
+      data={semesters}
+      onRowAdd={(newData: Semester) => {
+        dispatch(addNewSemester(newData.name, newData.file as File));
+        return Promise.resolve();
+      }}
+      onRowUpdate={(newData: Semester) => {
+        dispatch(
+          updateExistingSemesters([
+            {
+              id: newData.id,
+              name: newData.name,
+              file: typeof newData.file === "string" ? undefined : newData.file
             }
-          }}
-        />
-      </MuiThemeProvider>
-    </StyledDiv>
+          ])
+        );
+        return Promise.resolve();
+      }}
+      onRowDelete={(oldData: { id: string }) => {
+        dispatch(deleteExistingSemesters([oldData.id]));
+        return Promise.resolve();
+      }}
+      onBulkUpdate={(changes) => {
+        dispatch(updateExistingSemesters(changes as Semester[]));
+        return Promise.resolve();
+      }}
+      onBulkDelete={(data) => dispatch(deleteExistingSemesters(_.map(data, "id")))}
+    />
   );
 };
 
