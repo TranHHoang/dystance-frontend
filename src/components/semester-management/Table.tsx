@@ -1,5 +1,5 @@
 import React from "react";
-import MaterialTable, { Column } from "material-table";
+import MaterialTable, { Column, MaterialTableProps } from "material-table";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core";
 import styled from "styled-components";
 import _ from "lodash";
@@ -33,7 +33,7 @@ const theme = createMuiTheme({
   }
 });
 
-export interface TableProps {
+export interface TableProps extends MaterialTableProps<object> {
   title: string;
   columns: Column<object>[];
   data: any[];
@@ -43,7 +43,6 @@ export interface TableProps {
   onRowDelete: (oldData: any) => Promise<void>;
   onBulkUpdate?: (changes: any[]) => Promise<void>;
   onBulkDelete: (data: any[]) => void;
-  isLoading?: boolean;
 }
 
 const Table = (props: TableProps) => {
@@ -64,6 +63,7 @@ const Table = (props: TableProps) => {
     <StyledDiv>
       <MuiThemeProvider theme={theme}>
         <MaterialTable
+          {...props}
           title={title}
           isLoading={isLoading}
           columns={[
