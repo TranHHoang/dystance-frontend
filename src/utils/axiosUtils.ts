@@ -1,7 +1,7 @@
 import Axios from "~utils/fakeAPI";
 import { hostName } from "./hostUtils";
 
-export async function post(relativeUrl: string, form: FormData) {
+export async function post(relativeUrl: string, form: any) {
   return Axios.post(`${hostName}/api/${relativeUrl}`, form, {
     headers: { "Content-Type": "multipart/form-data" }
   });
