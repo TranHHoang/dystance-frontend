@@ -52,7 +52,7 @@ const UserCardComponent = (props: any) => {
                     label="Remote control"
                     onClick={() => {
                       dispatch(setRemoteControlWaitingModalOpen({ userId, isModalOpen: true }));
-                      logger.log(LogType.RemoteControlPermission, roomId, `asked to remote control ${user.realName}`);
+                      logger.log(LogType.RemoteControlPermission, roomId, `Asked to remote control ${user.realName}`);
                       dispatch(setUserId(userId));
                     }}
                   />
@@ -60,7 +60,7 @@ const UserCardComponent = (props: any) => {
                     label="Toggle Whiteboard Usage"
                     onClick={() => {
                       dispatch(toggleWhiteboardUsage(roomId, userId));
-                      logger.log(LogType.ToggleWhiteboard, roomId, `toggled whiteboard usage for ${user.realName}`);
+                      logger.log(LogType.ToggleWhiteboard, roomId, `Toggled whiteboard usage for ${user.realName}`);
                     }}
                   />
                 </div>

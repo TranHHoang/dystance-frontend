@@ -34,17 +34,32 @@ export default hot(module)(function App() {
         dispatch(initPrivateChatSocket());
       });
     }
+    if (!fs.existsSync(`./logs/${getLoginData().id}/${moment().format("YYYY-MM-DD")}.txt`)) {
+      fs.writeFile(
+        `./logs/${getLoginData().id}/${moment().format("YYYY-MM-DD")}.txt`,
+        Logger.getInstance().getLogs().join("\n"),
+        (err) => {
+          console.log("WRite to file");
+          if (err) {
+            console.log(err);
+          }
+        }
+      );
+    }
     if (
       logger.getLogs().length === 0 &&
       fs.existsSync(`./logs/${getLoginData().id}/${moment().format("YYYY-MM-DD")}.txt`)
     ) {
       fs.readFile(`./logs/${getLoginData().id}/${moment().format("YYYY-MM-DD")}.txt`, "utf8", (err, data) => {
-        const fileData: string[] = data.split("\n");
-        _.forEach(fileData, (line) => {
-          logger.getLogs().push(line);
-        });
+        if (data !== "") {
+          const fileData: string[] = data.split("\n");
+          _.forEach(fileData, (line) => {
+            logger.getLogs().push(line);
+          });
+        }
       });
     }
+    // saveFile();
   }, []);
 
   return (

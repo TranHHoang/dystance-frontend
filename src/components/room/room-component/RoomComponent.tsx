@@ -347,7 +347,7 @@ const RoomComponent = (props: any) => {
               variant="destructive"
               onClick={() => {
                 // eslint-disable-next-line prettier/prettier
-                logger.log(LogType.RemoteControlStop, roomId, `stopped remote-controlling ${remoteControlUser.realName}`);
+                logger.log(LogType.RemoteControlStop, roomId, `Stopped remote-controlling ${remoteControlUser.realName}`);
                 dispatch(setRemoteControlAccepted(undefined));
               }}
             >
@@ -386,7 +386,7 @@ const RoomComponent = (props: any) => {
               type="submit"
               onClick={() => {
                 dispatch(muteUser(roomId, userCardState.userId));
-                logger.log(LogType.Mute, roomId, `muted user ${user.realName}`);
+                logger.log(LogType.Mute, roomId, `Muted user ${user.realName}`);
               }}
               disabled={userCardState.isLoading || userCardState.isMuteSuccess}
             />
@@ -417,7 +417,7 @@ const RoomComponent = (props: any) => {
               type="submit"
               onClick={() => {
                 dispatch(kickUser(roomId, userCardState.userId));
-                logger.log(LogType.Kick, roomId, `kicked user ${user.realName}`);
+                logger.log(LogType.Kick, roomId, `Kicked user ${user.realName}`);
               }}
               disabled={userCardState.isLoading || userCardState.isKickSuccess}
             />
@@ -525,7 +525,7 @@ const RoomComponent = (props: any) => {
           logger.log(
             LogType.RemoteControlReject,
             roomId,
-            `rejected remote control request from ${creatorUser.realName}`
+            `Rejected remote control request from ${creatorUser.realName}`
           );
           dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
         }}
@@ -538,7 +538,7 @@ const RoomComponent = (props: any) => {
                 logger.log(
                   LogType.RemoteControlReject,
                   roomId,
-                  `rejected remote control request from ${creatorUser.realName}`
+                  `Rejected remote control request from ${creatorUser.realName}`
                 );
                 dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
               }}
@@ -551,7 +551,7 @@ const RoomComponent = (props: any) => {
                 logger.log(
                   LogType.RemoteControlAccept,
                   roomId,
-                  `accepted remote control request from ${creatorUser.realName}`
+                  `Accepted remote control request from ${creatorUser.realName}`
                 );
                 dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
               }}

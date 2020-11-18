@@ -90,9 +90,9 @@ const ChatBox = ({
         dispatch(broadcastMessage(roomId, receiverId, messageInput.current.value));
         messageInput.current.value = "";
         if (roomId) {
-          logger.log(LogType.RoomChatText, roomId, `sent message`);
+          logger.log(LogType.RoomChatText, roomId, `Sent message`);
         } else if (!roomId && inRoom === true) {
-          logger.log(LogType.PrivateChatText, roomState.roomId, `sent message to ${user.realName}`);
+          logger.log(LogType.PrivateChatText, roomState.roomId, `Sent message to ${user.realName}`);
         }
       }
     }

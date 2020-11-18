@@ -43,6 +43,7 @@ export async function saveFile() {
     fs.mkdirSync(folderName, { recursive: true });
   }
   if (!fs.existsSync(`${folderName}/${moment().format("YYYY-MM-DD")}.txt`)) {
+    console.log("File doesn't exist");
     Logger.getInstance().resetLogs();
   }
   return new Promise((resolve, reject) => {
@@ -79,7 +80,7 @@ const JitsiMeetComponent = (props: any) => {
     if (userCardState.muteOtherUser) {
       api?.current?.isAudioMuted().then((response: any) => {
         if (!response) {
-          logger.log(LogType.GotMuted, roomId, `got muted`);
+          logger.log(LogType.GotMuted, roomId, `Got muted`);
           api?.current?.executeCommand("toggleAudio");
           dispatch(setMuteOtherUser(false));
         }
@@ -92,7 +93,7 @@ const JitsiMeetComponent = (props: any) => {
 
   useEffect(() => {
     if (userCardState.kickOtherUser) {
-      logger.log(LogType.GotKicked, roomId, `got kicked`);
+      logger.log(LogType.GotKicked, roomId, `Got kicked`);
       api?.current?.executeCommand("hangup");
       dispatch(setKickOtherUser(false));
     }
@@ -129,7 +130,7 @@ const JitsiMeetComponent = (props: any) => {
       if (groupId) {
         // Redirect back to room
         history.push("/temp");
-        logger.log(LogType.GroupLeave, groupState.mainRoomId, `left group ${groupState.groupId}`);
+        logger.log(LogType.GroupLeave, groupState.mainRoomId, `Left group ${groupState.groupId}`);
         dispatch(setGroupJoined(false));
         history.replace(`${groupRef.current.roomPath}`);
         groupRef.current = undefined;
@@ -143,7 +144,7 @@ const JitsiMeetComponent = (props: any) => {
       history.replace("/homepage");
       dispatch(resetGroupJoinedLeftState());
       groupRef.current = undefined;
-      logger.log(LogType.AttendanceLeave, roomId, `left room`);
+      logger.log(LogType.AttendanceLeave, roomId, `Left room`);
       dispatch(sendLog());
     }
   }
@@ -160,11 +161,12 @@ const JitsiMeetComponent = (props: any) => {
 
     jitsiMeetAPI.addEventListener("videoConferenceJoined", () => {
       dispatch(setShowUpperToolbar(true));
+      saveFile();
       interval = setInterval(() => {
         saveFile();
       }, 5000);
       if (groupState.isGroupJoined === false && groupState.isGroupLeft === false) {
-        logger.log(LogType.AttendanceJoin, roomId, `joined room`);
+        logger.log(LogType.AttendanceJoin, roomId, `Joined room`);
       }
     });
     jitsiMeetAPI.on("readyToClose", () => {

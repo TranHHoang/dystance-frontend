@@ -117,7 +117,7 @@ export function updateDeadline({
 
       await Axios.post(`${hostName}/api/rooms/deadline/update`, fd, config);
       dispatch(deadlineUpdateSuccess());
-      logger.log(LogType.DeadlineUpdate, roomId, `updated deadline ${title}`);
+      logger.log(LogType.DeadlineUpdate, roomId, `Updated deadline ${title}`);
       dispatch(resetDeadlineCardState());
       dispatch(resetDeadlines());
       dispatch(showDeadlines(roomId));
@@ -139,7 +139,7 @@ export function deleteDeadline(deadlineId: string, title: string, roomId: string
       dispatch(deadlineDeleteStart());
       await Axios.delete(`${hostName}/api/rooms/deadline?id=${deadlineId}`);
       dispatch(deadlineDeleteSuccess());
-      logger.log(LogType.DeadlineDelete, roomId, `deleted deadline ${title}`);
+      logger.log(LogType.DeadlineDelete, roomId, `Deleted deadline ${title}`);
       dispatch(resetDeadlineCardState());
       dispatch(resetDeadlines());
       dispatch(showDeadlines(roomId));

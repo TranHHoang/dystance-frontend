@@ -163,7 +163,7 @@ const GroupComponent = (props: any) => {
           }))
         )
       );
-      logger.log(LogType.GroupCreate, roomId, `created ${picklistValue - breakoutGroups.length} groups`);
+      logger.log(LogType.GroupCreate, roomId, `Created ${picklistValue - breakoutGroups.length} groups`);
     } else if (picklistValue < breakoutGroups.length) {
       // Delete existing, always delete from end to start
       // Because the deleted groups are existing, they are guaranteed to have key in `keyToRoomNameDict`
@@ -173,7 +173,7 @@ const GroupComponent = (props: any) => {
           _.range(picklistValue + 1, breakoutGroups.length + 1).map((key) => keyToRoomNameDict.current[key])
         )
       );
-      logger.log(LogType.GroupDelete, roomId, `deleted ${breakoutGroups.length - picklistValue} groups`);
+      logger.log(LogType.GroupDelete, roomId, `Deleted ${breakoutGroups.length - picklistValue} groups`);
     }
 
     const usersByGroupList = _(usersByGroup)
@@ -207,7 +207,7 @@ const GroupComponent = (props: any) => {
     dispatch(setGroupId(groupId.toString()));
     dispatch(setGroupJoined(true));
     dispatch(setMainRoomId(roomId));
-    logger.log(LogType.GroupJoin, roomId, `joined group ${groupId.toString()}`);
+    logger.log(LogType.GroupJoin, roomId, `Joined group ${groupId.toString()}`);
   }
 
   function handleSession() {
@@ -220,9 +220,9 @@ const GroupComponent = (props: any) => {
         )
       );
       if (status === "Not started") {
-        logger.log(LogType.GroupStart, roomId, "started groups");
+        logger.log(LogType.GroupStart, roomId, "Started groups");
       } else {
-        logger.log(LogType.GroupStop, roomId, "stopped groups");
+        logger.log(LogType.GroupStop, roomId, "Stopped groups");
       }
     }
   }

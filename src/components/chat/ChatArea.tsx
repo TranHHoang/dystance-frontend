@@ -108,15 +108,15 @@ const ChatArea = (props: any) => {
       );
       if (roomId) {
         if (isImageFile(file)) {
-          logger.log(LogType.RoomChatImage, roomId, `sent image ${file?.name}`);
+          logger.log(LogType.RoomChatImage, roomId, `Sent image ${file?.name}`);
         } else {
-          logger.log(LogType.RoomChatFile, roomId, `sent file ${file.name}`);
+          logger.log(LogType.RoomChatFile, roomId, `Sent file ${file.name}`);
         }
       } else if (!roomId && inRoom === true) {
         if (isImageFile(file)) {
-          logger.log(LogType.PrivateChatImage, roomState.roomId, `sent image ${file?.name} to ${user.realName}`);
+          logger.log(LogType.PrivateChatImage, roomState.roomId, `Sent image ${file?.name} to ${user.realName}`);
         } else {
-          logger.log(LogType.PrivateChatFile, roomState.roomId, `sent file ${file.name} to ${user.realName}`);
+          logger.log(LogType.PrivateChatFile, roomState.roomId, `Sent file ${file.name} to ${user.realName}`);
         }
       }
     }
