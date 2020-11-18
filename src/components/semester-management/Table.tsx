@@ -14,12 +14,21 @@ const theme = createMuiTheme({
   palette: {
     type: "dark",
     primary: {
+      main: "#4ecca3",
+      contrastText: "#36393f"
+    },
+    background: {
+      paper: "#36393f"
+    },
+    secondary: {
       main: "#4ecca3"
     }
   },
-  typography: {
-    allVariants: {
-      color: "#fff"
+  overrides: {
+    MuiInputBase: {
+      root: {
+        height: "2em"
+      }
     }
   }
 });
@@ -34,15 +43,29 @@ export interface TableProps {
   onRowDelete: (oldData: any) => Promise<void>;
   onBulkUpdate: (changes: any[]) => Promise<void>;
   onBulkDelete: (data: any[]) => void;
+  isLoading?: boolean;
 }
 
 const Table = (props: TableProps) => {
-  const { title, columns, data, onRowAdd, onRowUpdate, onRowDelete, onBulkUpdate, onBulkDelete } = props;
+  const {
+    title,
+    columns,
+    data,
+    onRowAdd,
+    onRowUpdate,
+    onRowDelete,
+    onBulkUpdate,
+    onBulkDelete,
+    onRowClick,
+    isLoading
+  } = props;
+
   return (
-    <StyledDiv style={{ margin: 8 }}>
+    <StyledDiv>
       <MuiThemeProvider theme={theme}>
         <MaterialTable
           title={title}
+          isLoading={isLoading}
           columns={[
             {
               title: "No",
@@ -57,12 +80,21 @@ const Table = (props: TableProps) => {
           ]}
           data={data}
           options={{
-            actionsColumnIndex: -1,
-            rowStyle: { color: "#fff" },
+            rowStyle: {
+              color: "white",
+              fontSize: "16px"
+            },
+            minBodyHeight: "70vh",
+            maxBodyHeight: "70vh",
+            selection: true,
+            selectionProps: () => ({
+              color: "primary"
+            }),
+            pageSize: 10,
             filtering: true,
-            selection: true
+            actionsColumnIndex: -1
           }}
-          onRowClick={() => console.log("A")}
+          onRowClick={(e, rowData) => onRowClick(rowData)}
           editable={{
             onRowAdd: onRowAdd,
             onRowUpdate: onRowUpdate,

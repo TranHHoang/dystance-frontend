@@ -9838,10 +9838,10 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
-react-rainbow-components@^1.18.1:
-  version "1.18.1"
-  resolved "https://registry.yarnpkg.com/react-rainbow-components/-/react-rainbow-components-1.18.1.tgz#1d72bf5d0df6049cbc70d15c0253208eab1d237e"
-  integrity sha512-v9ExztiPX8VMCkXRPFCAAFWKNFRAqprVEknoWvsWnCOK9JBos86bDFYJlHhpXVRCds66BOYzP4LlEXFi+x7DIQ==
+react-rainbow-components@^1.19.0:
+  version "1.19.0"
+  resolved "https://registry.yarnpkg.com/react-rainbow-components/-/react-rainbow-components-1.19.0.tgz#8a0c7f3286d6067bf26f4640cda336301168b84f"
+  integrity sha512-aeQotrW/+iqTGvQzw7ceasBQONg9WxRNksMRYVANvTYbaa58qTfUHV/VkkK7taCAOlYcSMKzvIJP1jrV6UiuaA==
   dependencies:
     "@rainbow-modules/hooks" "^0.1.2"
     autosize "^4.0.2"

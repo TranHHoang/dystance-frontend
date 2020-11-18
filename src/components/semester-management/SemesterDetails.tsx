@@ -1,11 +1,9 @@
-import StudentList from "../../lists/student-list/StudentList";
-import TeacherList from "../../lists/teacher-list/TeacherList";
-import React, { useEffect } from "react";
+import StudentList from "./student/StudentList";
+import TeacherList from "./teacher/TeacherList";
+import React, { useState } from "react";
 import { Tabset, Tab } from "react-rainbow-components";
-import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
-import { RootState } from "~app/rootReducer";
-import { setSemesterDetailsTabsetValue } from "./semesterDetailsSlice";
+import ScheduleList from "./schedule/ScheduleList";
 
 const Title = styled.h1`
   font-size: 2.5em;
@@ -24,18 +22,14 @@ const StyledTab = styled(Tab)`
   }
 `;
 
-const SemesterDetails = () => {
-  const semesterPageState = useSelector((state: RootState) => state.semesterDetailsState);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(setSemesterDetailsTabsetValue("students"));
-  }, []);
+const SemesterDetails = (props: { semesterId: string }) => {
+  const { semesterId } = props;
+  const [tabsetValue, setTabsetValue] = useState("students");
 
   function getTabContent() {
-    switch (semesterPageState.tabsetValue) {
+    switch (tabsetValue) {
       case "schedule":
-        return;
+        return <ScheduleList semesterId={semesterId} />;
       case "classes":
         return;
       case "students":
@@ -51,9 +45,9 @@ const SemesterDetails = () => {
       </div>
       <Container>
         <Tabset
-          activeTabName={semesterPageState.tabsetValue}
+          activeTabName={tabsetValue}
           onSelect={(_, selected) => {
-            dispatch(setSemesterDetailsTabsetValue(selected));
+            setTabsetValue(selected);
           }}
         >
           <StyledTab label="Schedule" name="schedule" />

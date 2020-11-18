@@ -21,7 +21,7 @@ import moment from "moment";
 import { createNotification, NotificationType } from "~utils/notification";
 import { getAllDeadlines } from "../components/room/deadline/deadlineListSlice";
 import SemesterManagement from "../components/semester-management/SemesterManagement";
-import ScheduleManagement from "../components/semester-management/schedule/ScheduleManagement";
+import ScheduleManagement from "../components/semester-management/schedule/ScheduleList";
 
 export const socket = new HubConnectionBuilder().withUrl(`${hostName}/socket`).build();
 
@@ -66,7 +66,7 @@ export default hot(module)(function App() {
   return (
     <HashRouter>
       <Switch>
-        <Route exact path="/" component={SemesterManagement} />
+        <Route exact path="/" component={LoginForm} />
         <Route exact path="/homepage" component={HomePage} />
         <Route exact path="/register" component={RegisterForm} />
         <Route exact path="/googleUpdateInfo" component={GoogleUpdateInfoForm} />

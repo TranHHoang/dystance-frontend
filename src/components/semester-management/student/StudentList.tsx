@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { RootState } from "~app/rootReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { resetStudentList, showStudentList } from "./StudentListSlice";
-import StudentTeacherTableComponent from "../StudentTeacherTableComponent";
+import StudentTeacherTableComponent from "../StudentTeacherTable";
 
 const StudentList = () => {
   const studentListState = useSelector((state: RootState) => state.studentListState);
@@ -10,6 +10,7 @@ const StudentList = () => {
   const studentData = studentListState.students.map((student) => ({
     ...student
   }));
+
   useEffect(() => {
     setTimeout(() => {
       dispatch(showStudentList());

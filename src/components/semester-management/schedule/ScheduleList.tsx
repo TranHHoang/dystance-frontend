@@ -1,10 +1,8 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/display-name */
 import React, { useEffect } from "react";
-import MaterialTable, { Column } from "material-table";
-import { createMuiTheme, MuiThemeProvider } from "@material-ui/core";
+import { Column } from "material-table";
 import { useDispatch, useSelector } from "react-redux";
-import styled from "styled-components";
 import {
   addNewSchedule,
   deleteExistingSchedules,
@@ -16,12 +14,6 @@ import { TimePicker } from "react-rainbow-components";
 import _ from "lodash";
 import { RootState } from "~app/rootReducer";
 import Table from "../Table";
-
-const StyledDiv = styled.div`
-  div::before {
-    display: initial;
-  }
-`;
 
 const columns: Column<object>[] = [
   {
@@ -49,21 +41,8 @@ const columns: Column<object>[] = [
   }
 ];
 
-const theme = createMuiTheme({
-  palette: {
-    type: "dark",
-    primary: {
-      main: "#4ecca3"
-    }
-  },
-  typography: {
-    allVariants: {
-      color: "#fff"
-    }
-  }
-});
-
-const ScheduleManagement = () => {
+const ScheduleList = (props: { semesterId: string }) => {
+  const { semesterId } = props;
   const scheduleState = useSelector((root: RootState) => root.scheduleState);
   const dispatch = useDispatch();
   const schedules = scheduleState.map((s) => ({ ...s }));
@@ -98,4 +77,4 @@ const ScheduleManagement = () => {
   );
 };
 
-export default ScheduleManagement;
+export default ScheduleList;
