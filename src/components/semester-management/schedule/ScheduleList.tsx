@@ -14,6 +14,7 @@ import { TimePicker } from "react-rainbow-components";
 import _ from "lodash";
 import { RootState } from "~app/rootReducer";
 import Table from "../Table";
+import moment from "moment";
 
 const columns: Column<object>[] = [
   {
@@ -45,10 +46,17 @@ const ScheduleList = (props: { semesterId: string }) => {
   const { semesterId } = props;
   const scheduleState = useSelector((root: RootState) => root.scheduleState);
   const dispatch = useDispatch();
-  const schedules = scheduleState.map((s) => ({ ...s }));
+  const schedules = scheduleState.map(
+    (s) =>
+      ({
+        ...s,
+        startTime: moment(s.startTime, "HH:mm:ss").format("HH:mm"),
+        endTime: moment(s.endTime, "HH:mm:ss").format("HH:mm")
+      } as Schedule)
+  );
 
   useEffect(() => {
-    dispatch(fetchAllSchedule());
+    dispatch(fetchAllSchedule(semesterId));
   }, []);
 
   return (
@@ -57,11 +65,11 @@ const ScheduleList = (props: { semesterId: string }) => {
       data={schedules}
       columns={columns}
       onRowAdd={(newData: Schedule) => {
-        dispatch(addNewSchedule(newData));
+        dispatch(addNewSchedule(semesterId, newData));
         return Promise.resolve();
       }}
       onRowUpdate={(newData: Schedule) => {
-        dispatch(updateExistingSchedules([newData]));
+        dispatch(updateExistingSchedules(semesterId, [newData]));
         return Promise.resolve();
       }}
       onRowDelete={(oldData: { id: string }) => {
@@ -69,7 +77,7 @@ const ScheduleList = (props: { semesterId: string }) => {
         return Promise.resolve();
       }}
       onBulkUpdate={(changes) => {
-        dispatch(updateExistingSchedules(changes as Schedule[]));
+        dispatch(updateExistingSchedules(semesterId, changes as Schedule[]));
         return Promise.resolve();
       }}
       onBulkDelete={(data) => dispatch(deleteExistingSchedules(_.map(data, "id")))}

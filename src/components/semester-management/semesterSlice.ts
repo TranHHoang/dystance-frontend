@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
-import { get, post } from "~utils/axiosUtils";
+import { get, postForm, postJson } from "~utils/axiosUtils";
 
 export interface Semester {
   id: string;
@@ -39,15 +39,15 @@ const { setSemesters, addSemester, updateSemesters, removeSemesters } = semester
 export function fetchAllSemesters(): AppThunk {
   return async (dispatch) => {
     try {
-      // const data = (await get("/semester/get")).data;
-      const data = [
-        { id: "1", name: "Test", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
-        { id: "2", name: "Test2", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
-        { id: "3", name: "Test3", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
-        { id: "4", name: "Test4", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
-        { id: "5", name: "Test5", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
-        { id: "6", name: "Test6", lastUpdated: "02/02/2020 at 13:20", file: "1234" }
-      ];
+      const data = (await get("/semesters")).data;
+      // const data = [
+      //   { id: "1", name: "Test", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
+      //   { id: "2", name: "Test2", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
+      //   { id: "3", name: "Test3", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
+      //   { id: "4", name: "Test4", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
+      //   { id: "5", name: "Test5", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
+      //   { id: "6", name: "Test6", lastUpdated: "02/02/2020 at 13:20", file: "1234" }
+      // ];
       dispatch(setSemesters(data));
     } catch (ex) {
       // TODO Replace with notification
@@ -59,12 +59,12 @@ export function fetchAllSemesters(): AppThunk {
 export function addNewSemester(name: string, file: File): AppThunk {
   return async (dispatch) => {
     try {
-      // const form = new FormData();
-      // form.append("name", name);
-      // form.append("file", file);
+      const form = new FormData();
+      form.append("name", name);
+      form.append("file", file);
 
-      // const data = (await post("/semester/add", form)).data;
-      const data: Semester = { id: "123", name, file: "Test.xls", lastUpdated: "2020-02-02 " };
+      const data = (await postForm("/semesters/add", form)).data;
+      // const data: Semester = { id: "123", name, file: "Test.xls", lastUpdated: "2020-02-02 " };
       dispatch(addSemester(data));
     } catch (ex) {
       // TODO Replace with notification
@@ -76,8 +76,8 @@ export function addNewSemester(name: string, file: File): AppThunk {
 export function updateExistingSemesters(semesters: Semester[]): AppThunk {
   return async (dispatch) => {
     try {
-      // const data = (await post("/semester/update", semesters)).data;
-      const data = semesters;
+      const data = (await postJson("/semesters/update", semesters)).data;
+      // const data = semesters;
       dispatch(updateSemesters(data));
     } catch (ex) {
       // TODO Replace with notification
@@ -89,7 +89,7 @@ export function updateExistingSemesters(semesters: Semester[]): AppThunk {
 export function deleteExistingSemesters(ids: string[]): AppThunk {
   return async (dispatch) => {
     try {
-      // await post("/semester/delete", ids);
+      await postJson("/semesters/delete", ids);
       dispatch(removeSemesters(ids));
     } catch (ex) {
       // TODO Replace with notification
