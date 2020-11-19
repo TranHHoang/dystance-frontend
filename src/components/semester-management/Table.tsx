@@ -29,6 +29,11 @@ const theme = createMuiTheme({
       root: {
         height: "2em"
       }
+    },
+    MuiTableCell: {
+      root: {
+        color: "#fff !important"
+      }
     }
   }
 });
