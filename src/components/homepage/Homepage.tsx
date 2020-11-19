@@ -12,6 +12,7 @@ import { setSidebarValue } from "../sidebar/sidebarSlice";
 import { AllRooms } from "./all-rooms/AllRooms";
 import { fetchAllUsers } from "./showRoomsSlice";
 import { resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
+import RoomList from "../../components/activity-logs/room-list/RoomList";
 
 const CreateRoomDiv = styled.div`
   display: flex;
@@ -63,7 +64,7 @@ export const HomePage = () => {
   function getCurrentSidebarValue() {
     switch (sidebarState.sidebarValue) {
       case "Homepage":
-        return <HomePageDisplay />;
+        return <RoomList />;
       case "Profile":
         return <ProfilePage />;
       case "Timetable":

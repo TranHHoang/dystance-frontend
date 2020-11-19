@@ -199,6 +199,7 @@
   },
   "dependencies": {
     "jitsi-meet-electron-utils": "github:jitsi/jitsi-meet-electron-utils#v2.0.10",
+    "material-table": "^1.69.2",
     "robotjs": "github:octalmage/robotjs"
   }
 }

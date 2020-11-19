@@ -1,4 +1,5 @@
 import NodeCache from "node-cache";
+import { StringLocale } from "yup";
 import Axios from "./fakeAPI";
 import { hostName } from "./hostUtils";
 
@@ -20,13 +21,7 @@ export enum LoginLocalStorageKey {
 export interface Room {
   roomId: string;
   roomName: string;
-  creatorId: string;
-  image: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  repeatOccurrence: string;
-  roomTimes: string;
+  teacherId: string;
 }
 
 export interface ErrorResponse {
@@ -109,3 +104,16 @@ export interface RoomTimes {
 }
 
 export const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
+
+export interface Semester {
+  id: string;
+  name: string;
+}
+
+export interface ActivityLog {
+  dateTime: string;
+  logType: string;
+  roomId: string;
+  userId: string;
+  description: string;
+}

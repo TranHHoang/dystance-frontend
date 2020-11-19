@@ -112,7 +112,6 @@ export function createDeadline({
 
       await Axios.post(`${hostName}/api/rooms/deadline/create`, fd, config);
       dispatch(deadlineCreationSuccess());
-      logger.log(LogType.DeadlineCreate, roomId, `Created a new deadline`);
       dispatch(resetDeadlines());
       dispatch(showDeadlines(roomId));
     } catch (ex) {
