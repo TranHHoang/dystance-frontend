@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
-import { AllUsersInfo, Room, RoomTimes, User } from "~utils/types";
+import { Room, RoomTimes } from "~utils/types";
 import InviteForm from "../../room/invite/InviteForm";
 import { setInviteModalOpen } from "../../room/invite/inviteSlice";
 import { deleteRoom, resetState, setConfirmDeleteModalOpen, setUpdateModalOpen } from "./singleRoomSlice";
@@ -38,6 +38,7 @@ import {
 } from "./styles";
 import { setCreatorProfileOpen } from "../../profile-page/people-profile/peopleProfileSlice";
 import PeopleProfilePage from "../../profile-page/people-profile/PeopleProfilePage";
+import { getUser } from "~utils/utility";
 
 export const SingleRoom = (props: any) => {
   const {
@@ -66,10 +67,9 @@ export const SingleRoom = (props: any) => {
     repeatOccurrence: repeatOccurrence,
     roomTimes: roomTimes
   };
-  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
   const repeatDays = _.map(JSON.parse(roomTimes) as RoomTimes[], (value) => value.dayOfWeek);
   const times = JSON.parse(roomTimes) as RoomTimes[];
-  const creatorInfo = _.find(allUsers, { id: creatorId });
+  const creatorInfo = getUser(creatorId);
 
   function formatTime(time: string): string {
     const parts = time.split(":");

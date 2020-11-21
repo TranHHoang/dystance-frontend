@@ -6,7 +6,7 @@ import { Picklist, Option, Notification } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { AllUsersInfo, User } from "~utils/types";
+import { getUser } from "~utils/utility";
 import { AttendanceReport, fetchAttendanceReports, resetAttendanceError } from "./attendanceReportSlice";
 import Table from "./Table";
 
@@ -54,8 +54,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const StudentAttendanceReport = () => {
   const semesterState = useSelector((root: RootState) => root.semesterState);
   const attendanceReportState = useSelector((root: RootState) => root.attendanceReportState);
-  const attendanceByClass = _.groupBy(attendanceReportState.reports, (report) => `${report.subject}.${report.class}`);
-  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
+  const attendanceByClass = _.groupBy(attendanceReportState, (report) => `${report.subject}.${report.class}`);
   const [tab, setTab] = useState(0);
   const [selectedSemester, setSelectedSemester] = useState<{ id: string; label: string }>();
   const dispatch = useDispatch();
@@ -110,7 +109,7 @@ const StudentAttendanceReport = () => {
             <Table
               data={_.values(attendanceByClass)[tab]?.map((x) => ({
                 ...x,
-                teacher: _.find(allUsers, { id: x.teacher }).userName
+                teacher: getUser(x.teacher).userName
               }))}
               options={{
                 toolbar: false,

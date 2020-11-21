@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
-import { AllUsersInfo, getCurrentRole, getUserInfo, User, UserInfo } from "~utils/types";
+import { AllUsersInfo, getCurrentRole, User } from "~utils/types";
 import { broadcastMessage, ChatType, fetchAllMessages } from "../../components/chat/chatSlice";
 import { fetchAllPreview } from "./chatPreviewSlice";
 import { getLoginData } from "~utils/tokenStorage";
@@ -16,6 +16,7 @@ import * as Yup from "yup";
 import { Field, Form, Formik, FormikProps } from "formik";
 import { LookupValue } from "react-rainbow-components/components/types";
 import _ from "lodash";
+import { getUser } from "~utils/utility";
 
 declare module "react-rainbow-components/components/types" {
   interface LookupValue {
@@ -84,7 +85,6 @@ const schema = Yup.object({
 
 const ChatPreview = (props: any) => {
   const { inRoom } = props;
-  const [usersInfo, setUsersInfo] = useState<{ [key: string]: UserInfo }>({});
   const previews = useSelector((root: RootState) => root.chatPreviewState.chatPreview);
   const [selectedUserId, setSelectedUserId] = useState<string>();
   const [showNewMessageModal, setShowNewMessageModal] = useState(false);
@@ -95,24 +95,6 @@ const ChatPreview = (props: any) => {
   useEffect(() => {
     dispatch(fetchAllPreview(getLoginData().id));
   }, []);
-
-  useEffect(() => {
-    const fetchUsersInfo = async () => {
-      const userDict: { [key: string]: UserInfo } = {};
-      const usersInfoPromise = previews.map(async (chat) => {
-        if (chat.senderId !== getLoginData().id) {
-          const info = await getUserInfo(chat.senderId);
-          userDict[chat.senderId] = info; // { 1: { avatar: "", }}
-        } else {
-          const info = await getUserInfo(chat.receiverId);
-          userDict[chat.receiverId] = info; // { 1: { avatar: "", }}
-        }
-      });
-      await Promise.all(usersInfoPromise);
-      setUsersInfo(userDict);
-    };
-    fetchUsersInfo();
-  }, [previews]);
 
   useEffect(() => {
     if (selectedUserId) {
@@ -171,14 +153,11 @@ const ChatPreview = (props: any) => {
                 <TimelineMarker
                   label={
                     <b>
-                      {usersInfo[id]?.realName} ({usersInfo[id]?.userName})
+                      {getUser(id)?.realName} ({getUser(id)?.userName})
                     </b>
                   }
                   icon={
-                    <StyledAvatar
-                      src={usersInfo[id]?.avatar ? `${hostName}/${usersInfo[id]?.avatar}` : ""}
-                      alt="avatar"
-                    />
+                    <StyledAvatar src={getUser(id)?.avatar ? `${hostName}/${getUser(id)?.avatar}` : ""} alt="avatar" />
                   }
                   datetime={moment.utc(preview.date).local().calendar()}
                   description={
@@ -258,7 +237,7 @@ const ChatPreview = (props: any) => {
             />
             <span>
               <b>
-                {usersInfo[selectedUserId]?.realName} ({usersInfo[selectedUserId]?.userName})
+                {getUser(selectedUserId)?.realName} ({getUser(selectedUserId)?.userName})
               </b>
             </span>
           </StyledHeader>

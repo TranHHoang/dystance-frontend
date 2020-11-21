@@ -3,7 +3,8 @@ import { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
 import { get, post } from "~utils/axiosUtils";
-import { AllUsersInfo, ErrorResponse, User } from "~utils/types";
+import { ErrorResponse, User } from "~utils/types";
+import { getUser } from "~utils/utility";
 
 interface InviteState {
   roomId: string;
@@ -85,9 +86,8 @@ export function startInvite(roomId: string, emails: string[], message: string): 
 export function showInvitedUsers(roomId: string): AppThunk {
   return async (dispatch) => {
     try {
-      const allUsersInfo = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
       const response = await get(`/rooms/getUsers?id=${roomId}`);
-      dispatch(getUsersInRoomSuccess(_.map(response.data, (id) => _.find(allUsersInfo, { id }))));
+      dispatch(getUsersInRoomSuccess(_.map(response.data, (id) => getUser(id))));
     } catch (ex) {
       const e = ex as AxiosError;
 

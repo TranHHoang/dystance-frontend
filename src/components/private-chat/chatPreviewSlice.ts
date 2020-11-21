@@ -3,10 +3,10 @@ import { fetchLatestMessage } from "../../components/chat/chatSlice";
 import { socket } from "~app/App";
 import { AppThunk } from "~app/store";
 import { getLoginData } from "~utils/tokenStorage";
-import { AllUsersInfo, PrivateMessage, User } from "~utils/types";
+import { PrivateMessage } from "~utils/types";
 import { createNotification, NotificationType } from "~utils/notification";
-import _ from "lodash";
 import { get } from "~utils/axiosUtils";
+import { getUser } from "~utils/utility";
 
 interface ChatPreview {
   id: string;
@@ -59,10 +59,9 @@ export function fetchAllPreview(userId: string): AppThunk {
 
 export function initPrivateChatSocket(): AppThunk {
   return (dispatch) => {
-    const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
     socket.on(PrivateMessage, (data) => {
       const senderId = JSON.parse(data).senderId;
-      const user = _.find(allUsers, { id: senderId });
+      const user = getUser(senderId);
       dispatch(incrementPrivateChatBadge());
       dispatch(fetchLatestMessage(undefined, { id1: getLoginData().id, id2: senderId }));
       dispatch(fetchAllPreview(getLoginData().id));

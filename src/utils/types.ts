@@ -1,7 +1,4 @@
 import _ from "lodash";
-import NodeCache from "node-cache";
-import { get } from "./axiosUtils";
-import { hostName } from "./hostUtils";
 import { getLoginData } from "./tokenStorage";
 
 export const AllUsersInfo = "allUsersInfo"; // For autocomplete function
@@ -45,32 +42,8 @@ export interface User {
   role: Role;
 }
 
-export interface UserTableInfo {
-  id?: string;
+export interface UserTableInfo extends User {
   code: string;
-  email: string;
-  realName: string;
-  dob: string;
-}
-export interface UserInfo {
-  userName: string;
-  realName: string;
-  avatar: string;
-  id: string;
-}
-
-const nodeCache = new NodeCache();
-export async function getUserInfo(userId: string): Promise<UserInfo> {
-  try {
-    if (nodeCache.get(userId)) {
-      return nodeCache.get(userId) as UserInfo;
-    }
-    const response = await get(`${hostName}/api/users/info?id=${userId}`);
-    nodeCache.set(userId, response.data);
-    return response.data as UserInfo;
-  } catch (ex) {
-    console.log(ex);
-  }
 }
 
 export function getCurrentRole(): Role {
