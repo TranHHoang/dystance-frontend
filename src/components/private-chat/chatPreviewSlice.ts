@@ -2,12 +2,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { fetchLatestMessage } from "../../components/chat/chatSlice";
 import { socket } from "~app/App";
 import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { AllUsersInfo, PrivateMessage, User } from "~utils/types";
 import { createNotification, NotificationType } from "~utils/notification";
 import _ from "lodash";
+import { get } from "~utils/axiosUtils";
 
 interface ChatPreview {
   id: string;
@@ -50,7 +49,7 @@ export function fetchAllPreview(userId: string): AppThunk {
   return async (dispatch) => {
     try {
       console.log("Fetch all previews");
-      const response = await Axios.get(`${hostName}/api/users/chat/preview?id=${userId}`);
+      const response = await get(`/users/chat/preview?id=${userId}`);
       dispatch(initPreview(response.data));
     } catch (ex) {
       console.log(ex);

@@ -1,6 +1,6 @@
 import _ from "lodash";
 import NodeCache from "node-cache";
-import Axios from "./fakeAPI";
+import { get } from "./axiosUtils";
 import { hostName } from "./hostUtils";
 import { getLoginData } from "./tokenStorage";
 
@@ -65,7 +65,7 @@ export async function getUserInfo(userId: string): Promise<UserInfo> {
     if (nodeCache.get(userId)) {
       return nodeCache.get(userId) as UserInfo;
     }
-    const response = await Axios.get(`${hostName}/api/users/info?id=${userId}`);
+    const response = await get(`${hostName}/api/users/info?id=${userId}`);
     nodeCache.set(userId, response.data);
     return response.data as UserInfo;
   } catch (ex) {

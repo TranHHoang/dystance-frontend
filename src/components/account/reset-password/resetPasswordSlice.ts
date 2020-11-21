@@ -2,8 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError, AxiosResponse } from "axios";
 import { createHashHistory } from "history";
 import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
+import { post } from "~utils/axiosUtils";
 import { ErrorResponse } from "~utils/types";
 
 interface ResetPasswordState {
@@ -86,13 +85,7 @@ export function startSendEmail(email: string): AppThunk {
       const form = new FormData();
       form.append("email", email);
 
-      const response: AxiosResponse<SendEmailResponse> = await Axios.post(
-        `${hostName}/api/users/resetPassword/send`,
-        form,
-        {
-          headers: { "Content-Type": "multipart/form-data" }
-        }
-      );
+      const response: AxiosResponse<SendEmailResponse> = await post(`/users/resetPassword/send`, form);
 
       dispatch(requestSuccess());
       dispatch(addEmail(response.data.email));
@@ -112,9 +105,7 @@ export function startVerifyCode(email: string, code: string): AppThunk {
       form.append("email", email);
       form.append("token", code);
 
-      await Axios.post(`${hostName}/api/users/resetPassword/verify`, form, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
+      await post(`/users/resetPassword/verify`, form);
 
       dispatch(requestSuccess());
     } catch (ex) {
@@ -132,9 +123,7 @@ export function startChangePasword(email: string, newPassword: string): AppThunk
       form.append("email", email);
       form.append("newPassword", newPassword);
 
-      await Axios.post(`${hostName}/api/users/resetPassword/update`, form, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
+      await post(`/users/resetPassword/update`, form);
 
       dispatch(requestSuccess());
       createHashHistory().replace("/");

@@ -2,8 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
+import { get, post } from "~utils/axiosUtils";
 import { AllUsersInfo, ErrorResponse, User } from "~utils/types";
 
 interface InviteState {
@@ -74,11 +73,7 @@ export function startInvite(roomId: string, emails: string[], message: string): 
       form.append("emailList", emails.join(","));
       form.append("message", message ?? "");
 
-      await Axios.post(`${hostName}/api/rooms/invite`, form, {
-        headers: {
-          "Content-Type": "multipart/formdata"
-        }
-      });
+      await post(`rooms/invite`, form);
 
       dispatch(inviteSuccess());
     } catch (ex) {
@@ -91,7 +86,7 @@ export function showInvitedUsers(roomId: string): AppThunk {
   return async (dispatch) => {
     try {
       const allUsersInfo = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
-      const response = await Axios.get(`${hostName}/api/rooms/getUsers?id=${roomId}`);
+      const response = await get(`/rooms/getUsers?id=${roomId}`);
       dispatch(getUsersInRoomSuccess(_.map(response.data, (id) => _.find(allUsersInfo, { id }))));
     } catch (ex) {
       const e = ex as AxiosError;

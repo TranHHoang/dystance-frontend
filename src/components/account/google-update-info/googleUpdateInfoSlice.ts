@@ -3,8 +3,7 @@ import { AxiosError } from "axios";
 import { createHashHistory } from "history";
 import moment from "moment";
 import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
+import { post } from "~utils/axiosUtils";
 import { saveLoginData } from "~utils/tokenStorage";
 import { ErrorResponse, LoginLocalStorageKey } from "~utils/types";
 import { OkResponse } from "../login/loginSlice";
@@ -66,9 +65,7 @@ export function startGoogleUpdateInfo({ userName, realName, dob }: GoogleUpdateI
     form.append("dob", moment(dob).format("YYYY-MM-DD"));
 
     try {
-      const response = await Axios.post(`${hostName}/api/users/google/updateInfo`, form, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
+      const response = await post(`/users/google/updateInfo`, form);
 
       dispatch(updateInfoSuccess());
 

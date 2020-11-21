@@ -2,13 +2,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import moment from "moment";
 import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { ErrorResponse } from "~utils/types";
 import { showRoom } from "../../homepage/showRoomsSlice";
 import { CreateRoomFormValues } from "./CreateRoomForm";
 import _ from "lodash";
+import { post } from "~utils/axiosUtils";
 
 interface CreateRoomState {
   isLoading: boolean;
@@ -84,11 +83,6 @@ export function createRoom({
 
     try {
       const fd = new FormData();
-      const config = {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      };
       fd.append("name", classroomName);
       fd.append("creatorId", getLoginData().id);
       fd.append("description", description);
@@ -97,7 +91,7 @@ export function createRoom({
       fd.append("roomTimes", JSON.stringify(roomTimes));
       fd.append("endDate", moment(endDate).format("YYYY-MM-DD"));
 
-      await Axios.post(`${hostName}/api/rooms/create`, fd, config);
+      await post(`/rooms/create`, fd);
       dispatch(createRoomSuccess());
       dispatch(showRoom());
     } catch (ex) {

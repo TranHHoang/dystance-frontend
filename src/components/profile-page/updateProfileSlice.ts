@@ -3,11 +3,10 @@ import { AxiosError } from "axios";
 import { fetchAllUsers } from "../../components/homepage/showRoomsSlice";
 import moment from "moment";
 import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
 import { ErrorResponse, User } from "~utils/types";
 import { UpdateProfileFormValues } from "./ProfilePage";
 import { setProfileInfo } from "./showProfileInfoSlice";
+import { post } from "~utils/axiosUtils";
 
 interface UpdateProfileState {
   isLoading: boolean;
@@ -68,18 +67,13 @@ export function updateProfile({ realName, dob, newAvatar, password, newPassword 
 
     try {
       const fd = new FormData();
-      const config = {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
-      };
       fd.append("realName", realName.trim());
       fd.append("dob", moment(dob).format("YYYY-MM-DD"));
       fd.append("avatar", newAvatar);
       fd.append("currentPassword", password.trim());
       fd.append("newPassword", newPassword.trim());
 
-      const response = await Axios.post(`${hostName}/api/users/updateProfile`, fd, config);
+      const response = await post(`/users/updateProfile`, fd);
       const data = response.data as User;
 
       localStorage.setItem("profile", JSON.stringify(response.data));

@@ -3,6 +3,7 @@ import { AxiosError } from "axios";
 import _ from "lodash";
 import moment from "moment";
 import { AppThunk } from "~app/store";
+import { post } from "~utils/axiosUtils";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
@@ -135,11 +136,6 @@ export function updateRoom({
 
     try {
       const fd = new FormData();
-      const config = {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      };
       fd.append("roomId", roomId);
       fd.append("name", classroomName);
       fd.append("creatorId", getLoginData().id);
@@ -150,7 +146,7 @@ export function updateRoom({
       fd.append("roomImage", roomImage);
       fd.append("roomTimes", JSON.stringify(roomTimes));
 
-      await Axios.post(`${hostName}/api/rooms/update`, fd, config);
+      await post(`/rooms/update`, fd);
       dispatch(updateRoomSuccess());
       dispatch(resetState());
       dispatch(showRoom());

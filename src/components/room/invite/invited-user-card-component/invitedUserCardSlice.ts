@@ -2,9 +2,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import { AppThunk } from "~app/store";
 import { ErrorResponse } from "~utils/types";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
 import { showInvitedUsers } from "../inviteSlice";
+import { get } from "~utils/axiosUtils";
 
 interface InvitedUserCardState {
   roomId: string;
@@ -70,7 +69,7 @@ export function kickInvitedUser(roomId: string, userId: string): AppThunk {
       console.log(roomId);
       console.log(userId);
       dispatch(kickUserStart());
-      await Axios.get(`${hostName}/api/rooms/kick?roomId=${roomId}&userId=${userId}`);
+      await get(`/rooms/kick?roomId=${roomId}&userId=${userId}`);
       dispatch(kickSuccess());
       dispatch(resetInvitedUserState());
       dispatch(showInvitedUsers(roomId));

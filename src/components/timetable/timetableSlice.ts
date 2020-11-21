@@ -1,10 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppThunk } from "~app/store";
 import { ErrorResponse, TimetableEvent } from "~utils/types";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
 import { AxiosError } from "axios";
 import moment from "moment";
+import { get } from "~utils/axiosUtils";
 
 interface TimetableState {
   events: TimetableEvent[];
@@ -39,7 +38,7 @@ export function showTimetableEvents(week: Date, endOfWeek: Date): AppThunk {
     try {
       const startDate = moment(week).format("YYYY-MM-DD");
       const endDate = moment(endOfWeek).format("YYYY-MM-DD");
-      const response = await Axios.get(`${hostName}/api/users/timetable?startDate=${startDate}&endDate=${endDate}`);
+      const response = await get(`/users/timetable?startDate=${startDate}&endDate=${endDate}`);
       const data = response.data as TimetableEvent[];
       dispatch(fetchTimetableSuccess(data));
     } catch (e) {

@@ -1,7 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { AllUsersInfo, ErrorResponse, RoomAction, RoomActionType, User } from "~utils/types";
 import { fetchLatestMessage } from "../../chat/chatSlice";
@@ -12,6 +10,7 @@ import { socket } from "~app/App";
 import { fetchAllGroups } from "../group/groupSlice";
 import { createNotification, NotificationType } from "~utils/notification";
 import _ from "lodash";
+import { get } from "~utils/axiosUtils";
 
 export interface BreakoutGroup {
   id: string;
@@ -102,7 +101,7 @@ export function initSocket(roomId: string): AppThunk {
         case RoomActionType.Leave:
           const userInfoList: UserInfo[] = [];
           for (const id of response.payload) {
-            const response = await Axios.get(`${hostName}/api/users/info?id=${id}`);
+            const response = await get(`/users/info?id=${id}`);
             const data = response.data as UserInfo;
             userInfoList.push(data);
           }

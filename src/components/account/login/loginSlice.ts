@@ -2,8 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError, AxiosResponse } from "axios";
 import { createHashHistory } from "history";
 import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
+import { post } from "~utils/axiosUtils";
 import { saveLoginData } from "~utils/tokenStorage";
 import { ErrorResponse, UserLoginData } from "~utils/types";
 
@@ -71,12 +70,6 @@ export const {
   resetLoginState
 } = loginSlice.actions;
 
-function postForm(url: string, form: FormData): Promise<AxiosResponse<any>> {
-  return Axios.post(url, form, {
-    headers: { "Content-Type": "multipart/form-data" }
-  });
-}
-
 function getAxiosError(e: AxiosError) {
   return loginFailed(
     e.response?.data ? (e.response.data as ErrorResponse) : { type: LoginError.Other, message: "Something went wrong" }
@@ -94,7 +87,7 @@ export function startLogin(email?: string, userName?: string, password?: string,
         const form = new FormData();
         form.append("tokenId", googleTokenId);
 
-        response = await postForm(`${hostName}/api/users/google`, form);
+        response = await post(`/users/google`, form);
       } else {
         // normal login
         const form = new FormData();
@@ -102,7 +95,7 @@ export function startLogin(email?: string, userName?: string, password?: string,
         email && form.append("email", email);
         password && form.append("password", password);
 
-        response = await postForm(`${hostName}/api/users/login`, form);
+        response = await post(`/users/login`, form);
       }
 
       const data = response.data as OkResponse;
@@ -137,7 +130,7 @@ export function resendEmail(userName?: string, email?: string): AppThunk {
       userName && form.append("userName", userName);
       email && form.append("email", email);
 
-      await postForm(`${hostName}/api/users/resendEmail`, form);
+      await post(`/users/resendEmail`, form);
 
       dispatch(resendEmailSuccess());
     } catch (ex) {

@@ -3,8 +3,7 @@ import { AxiosError } from "axios";
 import { createHashHistory } from "history";
 import moment from "moment";
 import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
+import { post } from "~utils/axiosUtils";
 import { ErrorResponse } from "~utils/types";
 import { RegisterFormValues } from "./RegisterForm";
 
@@ -56,9 +55,7 @@ export function startRegister({ email, userName, password, realName, dob }: Regi
       form.append("realName", realName);
       form.append("dob", moment(dob).format("YYYY-MM-DD"));
 
-      await Axios.post(`${hostName}/api/users/register`, form, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
+      await post(`/users/register`, form);
 
       dispatch(registerSuccess());
       createHashHistory().replace("/");

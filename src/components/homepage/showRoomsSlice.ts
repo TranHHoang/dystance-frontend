@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
+import { get } from "~utils/axiosUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { AllUsersInfo, Room } from "~utils/types";
 
@@ -51,7 +50,7 @@ export function showRoom(): AppThunk {
   return async (dispatch) => {
     try {
       const id = getLoginData().id;
-      const response = await Axios.get(`${hostName}/api/Rooms/getByUserId?id=${id}`);
+      const response = await get(`/rooms/getByUserId?id=${id}`);
       const data = response.data as Room[];
 
       dispatch(fetchRoomSuccess(data));
@@ -81,7 +80,7 @@ export function showRoom(): AppThunk {
 
 export async function fetchAllUsers() {
   try {
-    const response = await Axios.get(`${hostName}/api/users/getAll`);
+    const response = await get(`/users/getAll`);
     sessionStorage.setItem(AllUsersInfo, JSON.stringify(response.data));
   } catch (ex) {
     console.log(ex);
