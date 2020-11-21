@@ -1,10 +1,11 @@
 /* eslint-disable react/prop-types */
+import { fetchAllSemesters } from "../../semester-management/semesterSlice";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Checkbox, FormControlLabel } from "@material-ui/core";
 import _ from "lodash";
 import React, { useEffect, useState } from "react";
-import { ButtonIcon } from "react-rainbow-components";
+import { ButtonIcon, Picklist, Option } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
@@ -45,14 +46,26 @@ const StyledHeader = styled.header`
 `;
 
 const AttendanceManagement = () => {
+  const semesterState = useSelector((root: RootState) => root.semesterState);
   const attendanceReportState = useSelector((root: RootState) => root.attendanceReportState);
   const [selectedReport, setSelectedReport] = useState<AttendanceReport>();
   const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
+  const [selectedSemester, setSelectedSemester] = useState<{ id: string; label: string }>();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchAttendanceReports());
+    dispatch(fetchAllSemesters());
   }, []);
+
+  useEffect(() => {
+    setSelectedSemester({ id: _.last(semesterState)?.id, label: _.last(semesterState)?.name });
+  }, [semesterState]);
+
+  useEffect(() => {
+    if (selectedSemester) {
+      dispatch(fetchAttendanceReports(selectedSemester.id));
+    }
+  }, [selectedSemester]);
 
   useEffect(() => {
     if (selectedReport) {
@@ -68,6 +81,19 @@ const AttendanceManagement = () => {
       <div style={{ padding: "20px 10px 20px 20px" }}>
         <Title>Attendance Management</Title>
       </div>
+      <Box marginX={3} marginBottom={3} width="15%">
+        <Picklist
+          value={{ label: selectedSemester?.label }}
+          onChange={(value) => {
+            setSelectedSemester({ id: value.name.toString(), label: value.label });
+          }}
+          label="Select semester"
+        >
+          {_.map(semesterState, (semester) => (
+            <Option key={semester.id} name={semester.id} label={semester.name} />
+          ))}
+        </Picklist>
+      </Box>
       <Box m={2}>
         <Table
           title="Sessions"

@@ -39,10 +39,10 @@ const attendanceReportSlice = createSlice({
 export default attendanceReportSlice.reducer;
 const { setAttendanceReports, updateStudentsStatus } = attendanceReportSlice.actions;
 
-export function fetchAttendanceReports(): AppThunk {
+export function fetchAttendanceReports(semesterId: string): AppThunk {
   return async (dispatch) => {
     try {
-      // const data = (await get(`/users/reports/attendance?id=${id}`)).data;
+      // const data = (await get(`/users/reports/attendance?id=${getLoginData().id}&semesterId=${semesterId}`)).data;
       const data = [
         {
           id: "1",
