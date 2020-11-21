@@ -22,6 +22,8 @@ import { AllUsersInfo, getCurrentRole } from "~utils/types";
 import { Spinner } from "react-rainbow-components";
 import { socket } from "~app/App";
 import Timetable from "../../components/timetable/Timetable";
+import StudentAttendanceReport from "../attendance-reports/student-report/StudentAttendanceReport";
+import AttendanceManagement from "../attendance-reports/student-report/AttendanceManagement";
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;

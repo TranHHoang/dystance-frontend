@@ -1,0 +1,220 @@
+/* eslint-disable react/prop-types */
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Box, Checkbox, FormControlLabel } from "@material-ui/core";
+import _ from "lodash";
+import React, { useEffect, useState } from "react";
+import { ButtonIcon } from "react-rainbow-components";
+import { useDispatch, useSelector } from "react-redux";
+import styled from "styled-components";
+import { RootState } from "~app/rootReducer";
+import { AllUsersInfo, User } from "~utils/types";
+import {
+  AttendanceReport,
+  AttendanceReportStudent,
+  fetchAttendanceReports,
+  updateAttendances
+} from "./attendanceReportSlice";
+import Table from "./Table";
+
+const Title = styled.h1`
+  font-size: 2.5em;
+  font-weight: 500;
+  color: white;
+  padding-right: 20px;
+`;
+
+interface Student {
+  id: string;
+  code: string;
+  realName: string;
+  email: string;
+  status: "present" | "absent";
+}
+
+const StyledHeader = styled.header`
+  background-color: ${(props) => props.theme.rainbow.palette.background.main};
+  z-index: 1;
+  display: flex;
+  padding: 5 0 5 0;
+  span {
+    align-self: center;
+    font-size: 16px;
+    color: white;
+  }
+`;
+
+const AttendanceManagement = () => {
+  const attendanceReportState = useSelector((root: RootState) => root.attendanceReportState);
+  const [selectedReport, setSelectedReport] = useState<AttendanceReport>();
+  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchAttendanceReports());
+  }, []);
+
+  useEffect(() => {
+    if (selectedReport) {
+      setSelectedReport({
+        ...selectedReport,
+        students: _.find(attendanceReportState, { id: selectedReport.id }).students
+      });
+    }
+  }, [attendanceReportState]);
+
+  return !selectedReport ? (
+    <div>
+      <div style={{ padding: "20px 10px 20px 20px" }}>
+        <Title>Attendance Management</Title>
+      </div>
+      <Box m={2}>
+        <Table
+          title="Sessions"
+          data={_.map(attendanceReportState, (v) => ({
+            ...v,
+            teacher: _.find(allUsers, { id: v.teacher }).userName,
+            room: `${v.subject}.${v.class}`
+          }))}
+          options={{
+            draggable: false
+          }}
+          columns={[
+            {
+              title: "Date",
+              field: "date"
+            },
+            {
+              title: "Start Time",
+              field: "startTime"
+            },
+            {
+              title: "End Time",
+              field: "endTime"
+            },
+            {
+              title: "Room",
+              field: "room"
+            },
+            {
+              title: "Teacher",
+              field: "teacher"
+            }
+          ]}
+          actions={[
+            {
+              icon: "groups",
+              onClick: (e, data: AttendanceReport) => setSelectedReport(data),
+              tooltip: "View attendance report"
+            }
+          ]}
+        />
+      </Box>
+    </div>
+  ) : (
+    <div>
+      <div style={{ padding: "20px 10px 20px 20px" }}>
+        <Title>View attendance report</Title>
+      </div>
+      <Box m={2}>
+        <StyledHeader>
+          <ButtonIcon
+            icon={<FontAwesomeIcon icon={faArrowLeft} />}
+            onClick={() => setSelectedReport(undefined)}
+            size="medium"
+          />
+          <span>Back to Attendance Management</span>
+        </StyledHeader>
+        <Table
+          title={`${selectedReport.subject}.${selectedReport.class}`}
+          data={_.map(selectedReport.students, (student) => {
+            const studentInfo = _.find(allUsers, { id: student.id });
+            return {
+              id: student.id,
+              code: studentInfo.userName,
+              realName: studentInfo.realName,
+              email: studentInfo.email,
+              status: student.status
+            } as Student;
+          })}
+          options={{
+            draggable: false
+          }}
+          columns={[
+            {
+              title: "Student Code",
+              field: "code",
+              editable: "never"
+            },
+            {
+              title: "Real Name",
+              field: "realName",
+              editable: "never"
+            },
+            {
+              title: "Email",
+              field: "email",
+              editable: "never"
+            },
+            {
+              title: "Status",
+              field: "status",
+              // eslint-disable-next-line react/display-name
+              editComponent: (props) => (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={props.value === "present"}
+                      onChange={(e, checked) => props.onChange(checked ? "present" : "absent")}
+                    />
+                  }
+                  label="Attended?"
+                />
+              ),
+              // eslint-disable-next-line react/display-name
+              render: (rowData: AttendanceReportStudent) => {
+                switch (rowData.status) {
+                  case "present":
+                    return <b style={{ color: "#4ecca3" }}>Present</b>;
+                  case "absent":
+                    return <b style={{ color: "#fe4849" }}>Absent</b>;
+                  default:
+                    return <p>Future</p>;
+                }
+              }
+            }
+          ]}
+          editable={{
+            onRowUpdate: (newData: Student) => {
+              console.log(newData);
+              dispatch(
+                updateAttendances("", {
+                  id: selectedReport.id,
+                  students: [
+                    {
+                      id: newData.id,
+                      status: newData.status
+                    }
+                  ]
+                })
+              );
+              return Promise.resolve();
+            },
+            onBulkUpdate: (changes) => {
+              const newData = _.map(changes, "newData") as Student[];
+              dispatch(
+                updateAttendances("", {
+                  id: selectedReport.id,
+                  students: _.map(newData, (student) => ({ id: student.id, status: student.status }))
+                })
+              );
+              return Promise.resolve();
+            }
+          }}
+        />
+      </Box>
+    </div>
+  );
+};
+
+export default AttendanceManagement;

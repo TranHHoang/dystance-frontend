@@ -32,6 +32,7 @@ import teacherListReducer from "../components/management/teacher/teacherListSlic
 import studentTeacherManagementReducer from "../components/management/studentTeacherManagementSlice";
 import classListReducer from "../components/management/class/classListSlice";
 import accountListReducer from "../components/management/account/accountListSlice";
+import attendanceReportReducer from "../components/attendance-reports/student-report/attendanceReportSlice";
 
 const appReducer = combineReducers({
   roomCreation: createRoomReducer,
@@ -65,7 +66,8 @@ const appReducer = combineReducers({
   classListState: classListReducer,
   roomListState: roomListReducer,
   activityLogState: activityLogReducer,
-  accountListState: accountListReducer
+  accountListState: accountListReducer,
+  attendanceReportState: attendanceReportReducer
 });
 
 const rootReducer = (state: any, action: AnyAction) => {
