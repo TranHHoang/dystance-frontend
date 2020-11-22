@@ -9,12 +9,13 @@ import { ErrorResponse, UserTableInfo } from "~utils/types";
 interface TeacherListState {
   teachers: UserTableInfo[];
   isLoading: boolean;
-  error?: ErrorResponse;
+  errors?: ErrorResponse[];
 }
 
 const initialState: TeacherListState = {
   isLoading: true,
-  teachers: []
+  teachers: [],
+  errors: []
 };
 
 const teacherListSlice = createSlice({
@@ -27,13 +28,13 @@ const teacherListSlice = createSlice({
     },
     fetchTeacherListFailed(state, action: PayloadAction<ErrorResponse>) {
       state.isLoading = false;
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     addTeacherToList(state, action: PayloadAction<UserTableInfo>) {
       state.teachers.push(action.payload);
     },
     addTeacherToListFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     updateTeacherList(state, action: PayloadAction<UserTableInfo[]>) {
       _.forEach(action.payload, (change: UserTableInfo) => {
@@ -42,7 +43,7 @@ const teacherListSlice = createSlice({
       });
     },
     updateTeacherListFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     removeTeachersFromList(state, action: PayloadAction<string[]>) {
       _.forEach(current(state.teachers), (teacher: UserTableInfo) => {
@@ -52,10 +53,13 @@ const teacherListSlice = createSlice({
       });
     },
     removeTeacherListFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     resetTeacherList() {
       return initialState;
+    },
+    resetTeacherError(state) {
+      state.errors = [];
     }
   }
 });
@@ -70,30 +74,14 @@ export const {
   removeTeachersFromList,
   addTeacherToListFailed,
   updateTeacherListFailed,
-  removeTeacherListFailed
+  removeTeacherListFailed,
+  resetTeacherError
 } = teacherListSlice.actions;
 
 export function showTeacherList(semesterId: string): AppThunk {
   return async (dispatch) => {
     try {
-      const data = (await get(`/semesters/teachers/get?id=${semesterId}`)).data as UserTableInfo[];
-
-      // const data: UserTableInfo[] = [
-      //   {
-      //     id: "1",
-      //     code: "he130268",
-      //     email: "chilp@fe.edu.vn",
-      //     realName: "Le Phuong Chi",
-      //     dob: "2020-12-12"
-      //   },
-      //   {
-      //     id: "2",
-      //     code: "he130268",
-      //     email: "sonnt5@fe.edu.vn",
-      //     realName: "Ngo Tung Son",
-      //     dob: "2020-12-12"
-      //   }
-      // ];
+      const data = (await get(`/semesters/teachers?semesterId=${semesterId}`)).data as UserTableInfo[];
       dispatch(fetchTeacherListSuccess(data));
     } catch (e) {
       const ex = e as AxiosError;
@@ -104,14 +92,14 @@ export function showTeacherList(semesterId: string): AppThunk {
         dispatch(
           fetchTeacherListFailed({
             message: "Something Went Wrong",
-            type: 1
+            type: 3
           })
         );
       } else {
         dispatch(
           fetchTeacherListFailed({
             message: ex.message,
-            type: 2
+            type: 4
           })
         );
       }
@@ -136,14 +124,14 @@ export function addTeacher(semesterId: string, teacher: UserTableInfo): AppThunk
         dispatch(
           addTeacherToListFailed({
             message: "Something Went Wrong",
-            type: 1
+            type: 3
           })
         );
       } else {
         dispatch(
           addTeacherToListFailed({
             message: ex.message,
-            type: 2
+            type: 4
           })
         );
       }
@@ -158,6 +146,15 @@ export function updateTeachers(semesterId: string, teachers: UserTableInfo[]): A
 
       const data = (await postJson(`/semesters/teachers/update?semesterId=${semesterId}`, teacherFormat)).data;
       dispatch(updateTeacherList(data));
+      if (data.success.length > 0) {
+        dispatch(updateTeacherList(data.success));
+      }
+      if (data.failed.length > 0) {
+        _.forEach(data.failed, (error: ErrorResponse) => {
+          dispatch(updateTeacherListFailed(error));
+        });
+        dispatch(showTeacherList(semesterId));
+      }
     } catch (e) {
       const ex = e as AxiosError;
 
@@ -167,14 +164,14 @@ export function updateTeachers(semesterId: string, teachers: UserTableInfo[]): A
         dispatch(
           updateTeacherListFailed({
             message: "Something Went Wrong",
-            type: 1
+            type: 3
           })
         );
       } else {
         dispatch(
           updateTeacherListFailed({
             message: ex.message,
-            type: 2
+            type: 4
           })
         );
       }
@@ -196,14 +193,14 @@ export function deleteTeachers(userIds: string[]): AppThunk {
         dispatch(
           removeTeacherListFailed({
             message: "Something Went Wrong",
-            type: 1
+            type: 3
           })
         );
       } else {
         dispatch(
           removeTeacherListFailed({
             message: ex.message,
-            type: 2
+            type: 4
           })
         );
       }

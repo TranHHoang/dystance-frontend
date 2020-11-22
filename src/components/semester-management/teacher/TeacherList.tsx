@@ -25,6 +25,7 @@ const TeacherList = (props: any) => {
       isStudent={false}
       isLoading={teacherListState.isLoading}
       semesterId={semesterId}
+      teacherError={teacherListState.errors}
     />
   );
 };

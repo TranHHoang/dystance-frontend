@@ -38,17 +38,9 @@ export function fetchAllSemesters(): AppThunk {
   return async (dispatch) => {
     try {
       const data = (await get("/semesters")).data;
-      // const data = [
-      //   { id: "1", name: "Test", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
-      //   { id: "2", name: "Test2", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
-      //   { id: "3", name: "Test3", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
-      //   { id: "4", name: "Test4", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
-      //   { id: "5", name: "Test5", lastUpdated: "02/02/2020 at 13:20", file: "1234" },
-      //   { id: "6", name: "Test6", lastUpdated: "02/02/2020 at 13:20", file: "1234" }
-      // ];
       dispatch(setSemesters(data));
     } catch (ex) {
-      // TODO Replace with notification
+      //TODO: Replace with notification
       console.log(ex);
     }
   };
@@ -62,10 +54,9 @@ export function addNewSemester(name: string, file: File): AppThunk {
       form.append("file", file);
 
       const data = (await postForm("/semesters/add", form)).data;
-      // const data: Semester = { id: "123", name, file: "Test.xls", lastUpdated: "2020-02-02 " };
       dispatch(addSemester(data));
     } catch (ex) {
-      // TODO Replace with notification
+      //TODO: Replace with notification
       console.log(ex);
     }
   };
@@ -84,7 +75,7 @@ export function updateExistingSemester(semester: Semester): AppThunk {
       console.log(data);
       dispatch(updateSemester(data));
     } catch (ex) {
-      // TODO Replace with notification
+      //TODO: Replace with notification
       console.log(ex);
     }
   };
@@ -96,7 +87,7 @@ export function deleteExistingSemesters(ids: string[]): AppThunk {
       await postJson("/semesters/delete", ids);
       dispatch(removeSemesters(ids));
     } catch (ex) {
-      // TODO Replace with notification
+      //TODO: Replace with notification
       console.log(ex);
     }
   };

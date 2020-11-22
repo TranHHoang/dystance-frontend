@@ -43,16 +43,9 @@ export function fetchAllSchedule(semesterId: string): AppThunk {
   return async (dispatch) => {
     try {
       const data = (await get(`/semesters/schedules?semesterId=${semesterId}`)).data;
-      // const data: Schedule[] = [
-      //   { id: "1", date: "2020-12-12", startTime: "12:04", endTime: "15:00", subject: "SWD301", class: "IS1301" },
-      //   { id: "2", date: "2020-12-12", startTime: "12:04", endTime: "15:00", subject: "SWD301", class: "IS1301" },
-      //   { id: "3", date: "2020-12-12", startTime: "12:04", endTime: "15:00", subject: "SWD301", class: "IS1301" },
-      //   { id: "4", date: "2020-12-12", startTime: "12:04", endTime: "15:00", subject: "SWD301", class: "IS1301" },
-      //   { id: "5", date: "2020-12-12", startTime: "12:04", endTime: "15:00", subject: "SWD301", class: "IS1301" }
-      // ];
       dispatch(setSchedules(data));
     } catch (ex) {
-      // TODO Replace with notification
+      //TODO: Replace with notification
       console.log(ex);
     }
   };
@@ -69,7 +62,7 @@ export function addNewSchedule(semesterId: string, schedule: Schedule): AppThunk
       const data = (await postJson(`/semesters/schedules/add?semesterId=${semesterId}`, scheduleFormat)).data;
       dispatch(addSchedule(data));
     } catch (ex) {
-      // TODO Replace with notification
+      //TODO: Replace with notification
       console.log(ex);
     }
   };
@@ -83,7 +76,7 @@ export function updateExistingSchedules(semesterId: string, schedules: Schedule[
       const data = (await postJson(`/semesters/schedules/update?semesterId=${semesterId}`, scheduleFormat)).data;
       dispatch(updateSchedules(data));
     } catch (ex) {
-      // TODO Replace with notification
+      //TODO: Replace with notification
       console.log(ex);
     }
   };
@@ -95,7 +88,7 @@ export function deleteExistingSchedules(ids: string[]): AppThunk {
       await postJson("/semesters/schedules/delete", ids);
       dispatch(removeSchedules(ids));
     } catch (ex) {
-      // TODO Replace with notification
+      //TODO: Replace with notification
       console.log(ex);
     }
   };

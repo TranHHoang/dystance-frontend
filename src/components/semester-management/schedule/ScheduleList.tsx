@@ -168,6 +168,22 @@ const ScheduleList = (props: { semesterId: string }) => {
           icon="error"
         />
       ) : null}
+      {timeError ? (
+        <StyledNotifications
+          title="Error"
+          onRequestClose={() => setTimeError(false)}
+          description="End time cannot be smaller than start time"
+          icon="error"
+        />
+      ) : null}
+      {timeError ? (
+        <StyledNotifications
+          title="Error"
+          onRequestClose={() => setTimeError(false)}
+          description="End time cannot be smaller than start time"
+          icon="error"
+        />
+      ) : null}
     </>
   );
 };
