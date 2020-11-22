@@ -33,14 +33,14 @@ const SemesterDetails = (props: { semesterId: string }) => {
       case "classes":
         return;
       case "students":
-        return <StudentList />;
+        return <StudentList semesterId={semesterId} />;
       case "teachers":
-        return <TeacherList />;
+        return <TeacherList semesterId={semesterId} />;
     }
   }
   return (
     <>
-      <div style={{ padding: "20px 0 10px 20px" }}>
+      <div style={{ padding: "10px 0 10px 20px" }}>
         <Title>Semester Details</Title>
       </div>
       <Container>

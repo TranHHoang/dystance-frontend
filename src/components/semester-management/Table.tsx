@@ -41,7 +41,7 @@ export interface TableProps {
   onRowAdd: (newData: any) => Promise<void>;
   onRowUpdate: (newData: any) => Promise<void>;
   onRowDelete: (oldData: any) => Promise<void>;
-  onBulkUpdate: (changes: any[]) => Promise<void>;
+  onBulkUpdate?: (changes: any[]) => Promise<void>;
   onBulkDelete: (data: any[]) => void;
   isLoading?: boolean;
 }
@@ -74,7 +74,8 @@ const Table = (props: TableProps) => {
               width: 8,
               render: (row: any) => row.tableData.id + 1,
               filtering: false,
-              sorting: false
+              sorting: false,
+              export: false
             },
             ...columns
           ]}
@@ -84,8 +85,8 @@ const Table = (props: TableProps) => {
               color: "white",
               fontSize: "16px"
             },
-            minBodyHeight: "70vh",
-            maxBodyHeight: "70vh",
+            minBodyHeight: "68vh",
+            maxBodyHeight: "68vh",
             selection: true,
             selectionProps: () => ({
               color: "primary"
@@ -99,7 +100,7 @@ const Table = (props: TableProps) => {
             onRowAdd: onRowAdd,
             onRowUpdate: onRowUpdate,
             onRowDelete: onRowDelete,
-            onBulkUpdate: (changes) => onBulkUpdate(_.map(changes, "newData"))
+            onBulkUpdate: onBulkUpdate && ((changes) => onBulkUpdate(_.map(changes, "newData")))
           }}
           actions={[
             {

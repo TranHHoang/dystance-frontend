@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import _ from "lodash";
+import moment from "moment";
 import { AppThunk } from "~app/store";
 import { get, postJson } from "~utils/axiosUtils";
 
@@ -41,7 +42,7 @@ const { setSchedules, addSchedule, updateSchedules, removeSchedules } = schedule
 export function fetchAllSchedule(semesterId: string): AppThunk {
   return async (dispatch) => {
     try {
-      const data = (await get(`/semesters/schedules/get?semesterId=${semesterId}`)).data;
+      const data = (await get(`/semesters/schedules?semesterId=${semesterId}`)).data;
       // const data: Schedule[] = [
       //   { id: "1", date: "2020-12-12", startTime: "12:04", endTime: "15:00", subject: "SWD301", class: "IS1301" },
       //   { id: "2", date: "2020-12-12", startTime: "12:04", endTime: "15:00", subject: "SWD301", class: "IS1301" },
@@ -60,8 +61,12 @@ export function fetchAllSchedule(semesterId: string): AppThunk {
 export function addNewSchedule(semesterId: string, schedule: Schedule): AppThunk {
   return async (dispatch) => {
     try {
-      const data = (await postJson(`/semesters/schedules/add?semesterId=${semesterId}`, schedule)).data;
-      // const data = { ...schedule, id: "10", date: moment(schedule.date).format("YYYY-MM-DD") };
+      const scheduleFormat = {
+        ...schedule,
+        date: moment(schedule.date).format("YYYY-MM-DD")
+      };
+      console.log(scheduleFormat);
+      const data = (await postJson(`/semesters/schedules/add?semesterId=${semesterId}`, scheduleFormat)).data;
       dispatch(addSchedule(data));
     } catch (ex) {
       // TODO Replace with notification
@@ -73,8 +78,9 @@ export function addNewSchedule(semesterId: string, schedule: Schedule): AppThunk
 export function updateExistingSchedules(semesterId: string, schedules: Schedule[]): AppThunk {
   return async (dispatch) => {
     try {
-      const data = (await postJson(`/semesters/schedules/update?semesterId=${semesterId}`, schedules)).data;
-      // const data = schedules.map((s) => ({ ...s, date: moment(s.date).format("YYYY-MM-DD") }));
+      const scheduleFormat = schedules.map((s) => ({ ...s, date: moment(s.date).format("YYYY-MM-DD") }));
+      console.log(scheduleFormat);
+      const data = (await postJson(`/semesters/schedules/update?semesterId=${semesterId}`, scheduleFormat)).data;
       dispatch(updateSchedules(data));
     } catch (ex) {
       // TODO Replace with notification

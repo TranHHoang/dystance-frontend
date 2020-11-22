@@ -20,11 +20,9 @@ const semesterSlice = createSlice({
     addSemester(state, action: PayloadAction<Semester>) {
       state.push(action.payload);
     },
-    updateSemesters(state, action: PayloadAction<Semester[]>) {
-      _.each(action.payload, (semester) => {
-        const index = _.findIndex(state, { id: semester.id });
-        state.splice(index, 1, semester);
-      });
+    updateSemester(state, action: PayloadAction<Semester>) {
+      const index = _.findIndex(state, { id: action.payload.id });
+      state.splice(index, 1, action.payload);
     },
     removeSemesters(state, action: PayloadAction<string[]>) {
       return _.reject(state, ({ id }) => action.payload.includes(id));
@@ -34,7 +32,7 @@ const semesterSlice = createSlice({
 
 export default semesterSlice.reducer;
 
-const { setSemesters, addSemester, updateSemesters, removeSemesters } = semesterSlice.actions;
+const { setSemesters, addSemester, updateSemester, removeSemesters } = semesterSlice.actions;
 
 export function fetchAllSemesters(): AppThunk {
   return async (dispatch) => {
@@ -73,12 +71,18 @@ export function addNewSemester(name: string, file: File): AppThunk {
   };
 }
 
-export function updateExistingSemesters(semesters: Semester[]): AppThunk {
+export function updateExistingSemester(semester: Semester): AppThunk {
   return async (dispatch) => {
     try {
-      const data = (await postJson("/semesters/update", semesters)).data;
-      // const data = semesters;
-      dispatch(updateSemesters(data));
+      console.log(semester.file);
+      const fd = new FormData();
+
+      fd.append("id", semester.id);
+      fd.append("name", semester.name);
+      fd.append("file", semester.file);
+      const data = (await postForm("/semesters/update", fd)).data;
+      console.log(data);
+      dispatch(updateSemester(data));
     } catch (ex) {
       // TODO Replace with notification
       console.log(ex);

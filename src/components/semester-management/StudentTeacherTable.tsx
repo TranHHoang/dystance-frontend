@@ -9,20 +9,12 @@ import { addStudent, updateStudents, deleteStudents } from "./student/StudentLis
 import { addTeacher, updateTeachers, deleteTeachers } from "./teacher/teacherListSlice";
 
 const StudentTeacherTableComponent = (props: any) => {
-  const { data, title, isStudent, isLoading } = props;
+  const { data, title, isStudent, isLoading, semesterId } = props;
   const dispatch = useDispatch();
   return (
     <Table
       isLoading={isLoading}
       columns={[
-        {
-          title: "No",
-          field: "tableData",
-          render: (rowData: any) => rowData.tableData.id + 1,
-          filtering: false,
-          width: 10,
-          editable: "never"
-        },
         {
           title: isStudent ? "Student Code" : "Employee Code",
           field: "code",
@@ -50,7 +42,6 @@ const StudentTeacherTableComponent = (props: any) => {
         }
       ]}
       data={data}
-      // isLoading={isLoading}
       onRowAdd={(newData: UserTableInfo) => {
         const format = {
           code: newData.code,
@@ -58,29 +49,32 @@ const StudentTeacherTableComponent = (props: any) => {
           realName: newData.realName,
           dob: moment(newData.dob).format("YYYY-MM-DD")
         };
-        console.log(format);
-        console.log(_.some(format, _.isEmpty));
-        console.log(!Yup.string().email().isValidSync(format.email));
         if (_.some(format, _.isEmpty) || !Yup.string().email().isValidSync(format.email)) {
           return Promise.reject();
         } else if (isStudent) {
-          dispatch(addStudent(newData));
+          dispatch(addStudent(semesterId, newData));
           return Promise.resolve();
         } else {
-          dispatch(addTeacher(newData));
+          dispatch(addTeacher(semesterId, newData));
           return Promise.resolve();
         }
       }}
       onRowUpdate={(newData: UserTableInfo) => {
         console.log(newData);
         console.log(_.some(newData, _.isEmpty));
-        if (_.some(newData, _.isEmpty) || !Yup.string().email().isValidSync(newData.email)) {
+        const format = {
+          code: newData.code,
+          email: newData.email,
+          realName: newData.realName,
+          dob: moment(newData.dob).format("YYYY-MM-DD")
+        };
+        if (_.some(format, _.isEmpty) || !Yup.string().email().isValidSync(format.email)) {
           return Promise.reject();
         } else if (isStudent) {
-          dispatch(updateStudents([newData]));
+          dispatch(updateStudents(semesterId, [newData]));
           return Promise.resolve();
         } else {
-          dispatch(updateTeachers([newData]));
+          dispatch(updateTeachers(semesterId, [newData]));
           return Promise.resolve();
         }
       }}
@@ -95,15 +89,21 @@ const StudentTeacherTableComponent = (props: any) => {
       onBulkUpdate={(changes) =>
         new Promise((resolve, reject) => {
           _.forEach(changes, (change) => {
-            if (_.some(change, _.isEmpty) || !Yup.string().email().isValidSync(change.email)) {
+            const format = {
+              code: change.code,
+              email: change.email,
+              realName: change.realName,
+              dob: moment(change.dob).format("YYYY-MM-DD")
+            };
+            if (_.some(format, _.isEmpty) || !Yup.string().email().isValidSync(format.email)) {
               reject();
             }
           });
           if (isStudent) {
-            dispatch(updateStudents(changes));
+            dispatch(updateStudents(semesterId, changes));
             resolve();
           } else {
-            dispatch(updateTeachers(changes));
+            dispatch(updateTeachers(semesterId, changes));
             resolve();
           }
         })

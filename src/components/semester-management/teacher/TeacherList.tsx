@@ -4,16 +4,15 @@ import { useDispatch, useSelector } from "react-redux";
 import StudentTeacherTable from "../StudentTeacherTable";
 import { resetTeacherList, showTeacherList } from "./teacherListSlice";
 
-const TeacherList = () => {
+const TeacherList = (props: any) => {
+  const { semesterId } = props;
   const teacherListState = useSelector((state: RootState) => state.teacherListState);
   const dispatch = useDispatch();
   const teacherData = teacherListState.teachers.map((teacher) => ({
     ...teacher
   }));
   useEffect(() => {
-    setTimeout(() => {
-      dispatch(showTeacherList());
-    }, 2000);
+    dispatch(showTeacherList(semesterId));
     return () => {
       dispatch(resetTeacherList());
     };
@@ -25,6 +24,7 @@ const TeacherList = () => {
       title="Teacher List"
       isStudent={false}
       isLoading={teacherListState.isLoading}
+      semesterId={semesterId}
     />
   );
 };

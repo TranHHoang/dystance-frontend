@@ -2,13 +2,13 @@
 /* eslint-disable react/display-name */
 import React, { useEffect, useState } from "react";
 import { Column } from "material-table";
-import { ButtonIcon, FileSelector } from "react-rainbow-components";
+import { ButtonIcon, FileSelector, Notification } from "react-rainbow-components";
 import {
   addNewSemester,
   deleteExistingSemesters,
   fetchAllSemesters,
   Semester,
-  updateExistingSemesters
+  updateExistingSemester
 } from "./semesterSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Table from "./Table";
@@ -18,6 +18,8 @@ import SemesterDetails from "./SemesterDetails";
 import styled from "styled-components";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import * as Yup from "yup";
+import moment from "moment";
 
 const Title = styled.h1`
   font-size: 2.5em;
@@ -38,26 +40,50 @@ const StyledHeader = styled.header`
   }
 `;
 
-const columns: Column<object>[] = [
-  { title: "Name", field: "name" },
-  {
-    title: "Schedule File",
-    field: "file",
-    editComponent: (props) => <FileSelector value={props.value} onChange={(e) => props.onChange(e.item(0))} />
-  },
-  { title: "Last Updated", field: "lastUpdated", editable: "never", width: "20%" }
-];
+const StyledNotifications = styled(Notification)`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  p {
+    font-size: 16px;
+  }
+  h1 {
+    font-size: 20px;
+  }
+`;
 
 const SemesterManagement = () => {
   const semesterState = useSelector((root: RootState) => root.semesterState);
   const dispatch = useDispatch();
-  const semesters = semesterState.map((s) => ({ ...s }));
+  const semesters = semesterState.map((s) => ({ ...s, lastUpdate: moment(s.lastUpdated).format("YYYY-MM-DD HH:mm") }));
   const [selectedSemesterId, setSelectedSemesterId] = useState("");
+  const [rejectFile, setRejectFile] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
 
   useEffect(() => {
     dispatch(fetchAllSemesters());
   }, []);
 
+  const columns: Column<object>[] = [
+    {
+      title: "Name",
+      field: "name",
+      validate: (rowData: Semester) => Yup.string().required().isValidSync(rowData.name)
+    },
+    {
+      title: "Schedule File",
+      field: "file",
+      editComponent: (props) => (
+        <FileSelector
+          value={props.value}
+          onChange={(e) => {
+            props.onChange(e[0]);
+          }}
+        />
+      )
+    },
+    { title: "Last Updated", field: "lastUpdate", editable: "never", width: "20%" }
+  ];
   return !selectedSemesterId ? (
     <>
       <div style={{ padding: "20px 0 10px 20px" }}>
@@ -69,27 +95,55 @@ const SemesterManagement = () => {
           columns={columns}
           data={semesters}
           onRowAdd={(newData: Semester) => {
-            dispatch(addNewSemester(newData.name, newData.file as File));
-            return Promise.resolve();
+            const format = {
+              name: newData.name,
+              file: newData.file?.toString()
+            };
+            if (_.some(format, _.isEmpty)) {
+              return Promise.reject();
+            } else {
+              dispatch(addNewSemester(newData.name, newData.file as File));
+              return Promise.resolve();
+            }
           }}
           onRowUpdate={(newData: Semester) => {
-            dispatch(
-              updateExistingSemesters([
-                {
+            const format = {
+              name: newData.name,
+              file: newData.file?.toString()
+            };
+            console.log(newData?.file);
+            if (_.some(format, _.isEmpty)) {
+              return Promise.reject();
+            } else if (newData.file instanceof File) {
+              console.log(/(xlsx|xls)$/i.test(newData?.file.name));
+              if (/(xlsx|xls)$/i.test(newData?.file.name)) {
+                setRejectFile(false);
+                dispatch(
+                  updateExistingSemester({
+                    id: newData.id,
+                    name: newData.name,
+                    file: typeof newData.file === "string" ? undefined : newData.file
+                  })
+                );
+                return Promise.resolve();
+              } else {
+                setRejectFile(true);
+                setRejectReason("File type not supported");
+                return Promise.reject();
+              }
+            } else {
+              dispatch(
+                updateExistingSemester({
                   id: newData.id,
                   name: newData.name,
                   file: typeof newData.file === "string" ? undefined : newData.file
-                }
-              ])
-            );
-            return Promise.resolve();
+                })
+              );
+              return Promise.resolve();
+            }
           }}
           onRowDelete={(oldData: { id: string }) => {
             dispatch(deleteExistingSemesters([oldData.id]));
-            return Promise.resolve();
-          }}
-          onBulkUpdate={(changes) => {
-            dispatch(updateExistingSemesters(changes as Semester[]));
             return Promise.resolve();
           }}
           onBulkDelete={(data) => dispatch(deleteExistingSemesters(_.map(data, "id")))}
@@ -99,6 +153,14 @@ const SemesterManagement = () => {
           }}
         />
       </div>
+      {rejectFile ? (
+        <StyledNotifications
+          title="Error"
+          onRequestClose={() => setRejectFile(false)}
+          description={rejectReason}
+          icon="error"
+        />
+      ) : null}
     </>
   ) : (
     <>
