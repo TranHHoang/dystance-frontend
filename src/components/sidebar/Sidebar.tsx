@@ -1,5 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
-import { faCalendarAlt, faCog, faComment, faHome, faPencilAlt, faPowerOff } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCalendarAlt,
+  faChalkboardTeacher,
+  faClipboardList,
+  faComment,
+  faHome,
+  faPencilAlt,
+  faPowerOff,
+  faTasks
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { useGoogleLogout } from "react-google-login";
@@ -13,6 +22,7 @@ import { signOut } from "../account/signout/signOut";
 import { setSidebarValue } from "./sidebarSlice";
 // @ts-ignore
 import logo from "./logo.png";
+import { getCurrentRole } from "~utils/types";
 
 const StyledSidebar = styled(Sidebar)`
   background: ${(props) => props.theme.rainbow.palette.background.main};
@@ -74,6 +84,7 @@ const SideNavigationBar = () => {
   const sidebarState = useSelector((state: RootState) => state.sidebarState);
   const showProfileUser = useSelector((state: RootState) => state.showProfileState.user);
   const chatPreviewState = useSelector((state: RootState) => state.chatPreviewState);
+  const role = getCurrentRole();
   const dispatch = useDispatch();
 
   const googleLogout = useGoogleLogout({
@@ -89,26 +100,49 @@ const SideNavigationBar = () => {
     >
       <SidebarItemContainer>
         <Logo src={logo} alt="logo "></Logo>
+        {role === "am" && (
+          <StyledSidebarItem icon={<StyledIcon icon={faTasks} size="2x" />} name="Semesters" label="Semesters" />
+        )}
+
+        {["admin", "am"].includes(role) && (
+          <StyledSidebarItem icon={<StyledIcon icon={faTasks} size="2x" />} name="Accounts" label="Accounts" />
+        )}
+
         <StyledSidebarItem icon={<StyledIcon icon={faHome} size="2x" />} name="Homepage" label="Homepage" />
-        <StyledSidebarItem icon={<StyledIcon icon={faCalendarAlt} size="2x" />} name="Timetable" label="Timetable" />
+
+        {["teacher", "student"].includes(role) && (
+          <StyledSidebarItem icon={<StyledIcon icon={faCalendarAlt} size="2x" />} name="Timetable" label="Timetable" />
+        )}
+
+        {role === "qa" && (
+          <StyledSidebarItem icon={<StyledIcon icon={faChalkboardTeacher} size="2x" />} name="Rooms" label="Rooms" />
+        )}
+
         <StyledSidebarItem
-          icon={
-            chatPreviewState.privateChatBadge > 0 ? (
-              <BadgeOverlay
-                className="rainbow-m-around_medium"
-                variant="brand"
-                value={chatPreviewState.privateChatBadge}
-              >
-                <StyledIcon icon={faComment} size="2x" />
-              </BadgeOverlay>
-            ) : (
-              <StyledIcon icon={faComment} size="2x" />
-            )
-          }
-          name="Chat"
-          label="Chat"
+          icon={<StyledIcon icon={faClipboardList} size="2x" />}
+          name="Reports"
+          label="Attendance Reports"
         />
-        <StyledSidebarItem icon={<StyledIcon icon={faPencilAlt} size="2x" />} name="logs" label="Logs" />
+
+        {["teacher", "student"].includes(role) && (
+          <StyledSidebarItem
+            icon={
+              chatPreviewState.privateChatBadge > 0 ? (
+                <BadgeOverlay
+                  className="rainbow-m-around_medium"
+                  variant="brand"
+                  value={chatPreviewState.privateChatBadge}
+                >
+                  <StyledIcon icon={faComment} size="2x" />
+                </BadgeOverlay>
+              ) : (
+                <StyledIcon icon={faComment} size="2x" />
+              )
+            }
+            name="Chat"
+            label="Chat"
+          />
+        )}
       </SidebarItemContainer>
 
       <StyledAvatarMenu

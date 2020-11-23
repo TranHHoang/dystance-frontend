@@ -1,5 +1,5 @@
 import ChatPreview from "../private-chat/ChatPreview";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
@@ -17,20 +17,46 @@ import { getLoginData } from "~utils/tokenStorage";
 import { Logger } from "~utils/logger";
 import _ from "lodash";
 import AccountList from "../management/account/AccountList";
+import { AllUsersInfo, getCurrentRole } from "~utils/types";
+import { Spinner } from "react-rainbow-components";
+import SemesterManagement from "../../components/management/semester/SemesterManagement";
+
+const StyledSpinner = styled(Spinner)`
+  position: absolute;
+  top: 50vh;
+  left: 50vw;
+`;
 
 const Container = styled.div`
   display: flex;
   height: auto;
 `;
 
+function getDefaultPage() {
+  switch (getCurrentRole()) {
+    case "admin":
+      return "Accounts";
+    case "am":
+      return "Semesters";
+    case "qa":
+      return "Rooms";
+    case "student":
+    case "teacher":
+      return "Timetable";
+    default:
+      return "Homepage";
+  }
+}
+
 export const HomePage = () => {
   const sidebarState = useSelector((state: RootState) => state.sidebarState);
   const logger = Logger.getInstance();
   const dispatch = useDispatch();
+  const [ready, setReady] = useState(AllUsersInfo in sessionStorage);
+
   useEffect(() => {
     dispatch(setSidebarValue("Homepage"));
     dispatch(showProfile());
-    dispatch(fetchAllUsers());
     if (!fs.existsSync(`./logs/${getLoginData().id}/${moment().format("YYYY-MM-DD")}.txt`)) {
       fs.writeFile(
         `./logs/${getLoginData().id}/${moment().format("YYYY-MM-DD")}.txt`,
@@ -55,13 +81,28 @@ export const HomePage = () => {
           });
         }
       });
+      if (!(AllUsersInfo in sessionStorage)) {
+        fetchAllUsers().then(() => setReady(true));
+      }
     }
   }, []);
+
+  useEffect(() => {
+    if (ready) {
+      dispatch(setSidebarValue(getDefaultPage()));
+      dispatch(showProfile());
+    }
+  }, [ready]);
 
   function getCurrentSidebarValue() {
     switch (sidebarState.sidebarValue) {
       case "Homepage":
         return <AccountList />;
+      case "Accounts":
+        if (getCurrentRole() === "admin") return <AccountList />;
+        else return <div />;
+      case "Semesters":
+        return <SemesterManagement />;
       case "Profile":
         return <ProfilePage />;
       case "Timetable":
@@ -69,12 +110,16 @@ export const HomePage = () => {
       case "Chat":
         dispatch(resetPrivateChatBadge());
         return <ChatPreview />;
+      case "Rooms":
+      case "Reports":
+        return <div />;
     }
   }
   return (
     <Container>
       <SideNavigationBar />
-      <div style={{ marginLeft: "110px", width: "100%" }}>{getCurrentSidebarValue()}</div>
+      {!ready && <StyledSpinner />}
+      {ready && <div style={{ marginLeft: "110px", width: "100%" }}>{getCurrentSidebarValue()}</div>}
     </Container>
   );
 };
