@@ -8,7 +8,9 @@ import {
   deleteExistingSchedules,
   fetchAllSchedule,
   Schedule,
-  updateExistingSchedules
+  updateExistingSchedules,
+  resetErrorState,
+  resetScheduleState
 } from "./scheduleSlice";
 import { TimePicker, Notification } from "react-rainbow-components";
 import _ from "lodash";
@@ -36,7 +38,7 @@ const ScheduleList = (props: { semesterId: string }) => {
   const scheduleState = useSelector((root: RootState) => root.scheduleState);
   const [timeError, setTimeError] = useState(false);
   const dispatch = useDispatch();
-  const schedules = scheduleState.map(
+  const schedules = scheduleState.schedules?.map(
     (s) =>
       ({
         ...s,
@@ -79,6 +81,9 @@ const ScheduleList = (props: { semesterId: string }) => {
   ];
   useEffect(() => {
     dispatch(fetchAllSchedule(semesterId));
+    return () => {
+      dispatch(resetScheduleState());
+    };
   }, []);
 
   return (
@@ -168,19 +173,11 @@ const ScheduleList = (props: { semesterId: string }) => {
           icon="error"
         />
       ) : null}
-      {timeError ? (
+      {scheduleState.error ? (
         <StyledNotifications
           title="Error"
-          onRequestClose={() => setTimeError(false)}
-          description="End time cannot be smaller than start time"
-          icon="error"
-        />
-      ) : null}
-      {timeError ? (
-        <StyledNotifications
-          title="Error"
-          onRequestClose={() => setTimeError(false)}
-          description="End time cannot be smaller than start time"
+          onRequestClose={() => dispatch(resetErrorState())}
+          description={scheduleState.error?.message}
           icon="error"
         />
       ) : null}
