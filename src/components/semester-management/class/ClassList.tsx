@@ -5,14 +5,23 @@ import { useDispatch, useSelector } from "react-redux";
 import _ from "lodash";
 import { RootState } from "~app/rootReducer";
 import Table from "../Table";
-import { ButtonIcon } from "react-rainbow-components";
+import { ButtonIcon, Notification } from "react-rainbow-components";
 import { AllUsersInfo, User } from "~utils/types";
-import { addNewClass, Class, deleteExistingClasses, fetchAllClasses, updateExistingClasses } from "./classListSlice";
+import {
+  addNewClass,
+  Class,
+  deleteExistingClasses,
+  fetchAllClasses,
+  resetClassError,
+  resetClassState,
+  updateExistingClasses
+} from "./classListSlice";
 import styled from "styled-components";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { TextField } from "@material-ui/core";
+import * as Yup from "yup";
 
 const StyledHeader = styled.header`
   background-color: ${(props) => props.theme.rainbow.palette.background.main};
@@ -32,6 +41,18 @@ const StyledTextField = styled(TextField)`
   }
 `;
 
+const StyledNotifications = styled(Notification)`
+  position: absolute;
+  top: 50px;
+  right: 20px;
+  p {
+    font-size: 16px;
+  }
+  h1 {
+    font-size: 20px;
+  }
+  width: 30%;
+`;
 interface StudentValue {
   id: string;
   code: string;
@@ -47,7 +68,12 @@ const ClassList = (props: { semesterId: string }) => {
   const dispatch = useDispatch();
 
   const allUsersInfo = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
-  const classes = classState.map((s) => ({ ...s, teacher: _.find(allUsersInfo, { id: s.teacher })?.userName }));
+  const teachers = _.filter(allUsersInfo, { role: "teacher" });
+  const students = _.filter(allUsersInfo, { role: "student" });
+  const classes = classState.classes?.map((s) => ({
+    ...s,
+    teacher: _.find(allUsersInfo, { id: s.teacher })?.userName
+  }));
 
   function toSendableObj(data: Class): Class {
     return { ...data, teacher: _.find(allUsersInfo, { userName: data.teacher }).id };
@@ -55,59 +81,100 @@ const ClassList = (props: { semesterId: string }) => {
 
   useEffect(() => {
     dispatch(fetchAllClasses(semesterId));
+    return () => {
+      dispatch(resetClassState());
+    };
   }, []);
 
   useEffect(() => {
     if (selectedClass) {
-      setSelectedClass({ ...selectedClass, students: _.find(classState, { id: selectedClass.id }).students });
+      setSelectedClass({ ...selectedClass, students: _.find(classState.classes, { id: selectedClass.id }).students });
     }
-  }, [classState]);
+  }, [classState.classes]);
 
   return !selectedClass ? (
-    <Table
-      title="Classes"
-      data={classes}
-      columns={[
-        {
-          title: "Subject",
-          field: "subject"
-        },
-        {
-          title: "Class",
-          field: "class"
-        },
-        {
-          title: "Teacher",
-          field: "teacher",
-          editComponent: (props) => (
-            <Autocomplete
-              options={allUsersInfo}
-              getOptionLabel={(user) => user.userName}
-              onChange={(_, value: User) => props.onChange(value.id)}
-              renderInput={(params) => <StyledTextField {...params} label="Teacher Code" />}
-            />
-          )
+    <>
+      <Table
+        title="Classes"
+        data={classes}
+        columns={[
+          {
+            title: "Subject",
+            field: "subject",
+            validate: (rowData: Class) => Yup.string().required().isValidSync(rowData.subject)
+          },
+          {
+            title: "Class",
+            field: "class",
+            validate: (rowData: Class) => Yup.string().required().isValidSync(rowData.class)
+          },
+          {
+            title: "Teacher",
+            field: "teacher",
+            editComponent: (props) => (
+              <Autocomplete
+                options={teachers}
+                getOptionLabel={(user: User) => user.userName}
+                onChange={(_, value: User) => props.onChange(value.id)}
+                renderInput={(params) => <StyledTextField {...params} label="Teacher Code" />}
+              />
+            )
+          }
+        ]}
+        onRowAdd={(newData: Class) => {
+          dispatch(resetClassError());
+          console.log(newData);
+          const format = {
+            subject: newData.subject,
+            class: newData.class,
+            teacher: newData.teacher
+          };
+          if (_.some(format, _.isEmpty)) {
+            return Promise.reject();
+          } else {
+            dispatch(addNewClass(semesterId, newData));
+            return Promise.resolve();
+          }
+        }}
+        onRowUpdate={(newData: Class) => {
+          console.log(newData);
+          dispatch(resetClassError());
+          if (_.some(newData, _.isEmpty)) {
+            return Promise.reject();
+          } else {
+            dispatch(updateExistingClasses(semesterId, [newData]));
+            return Promise.resolve();
+          }
+        }}
+        onRowDelete={(oldData: { id: string }) => {
+          dispatch(resetClassError());
+          dispatch(deleteExistingClasses([oldData.id]));
+          return Promise.resolve();
+        }}
+        onBulkUpdate={(changes) =>
+          new Promise((resolve, reject) => {
+            dispatch(resetClassError());
+            _.forEach(changes, (change) => {
+              if (_.some(change, _.isEmpty)) {
+                reject();
+              }
+            });
+            dispatch(updateExistingClasses(semesterId, changes as Class[]));
+            resolve();
+          })
         }
-      ]}
-      onRowAdd={(newData: Class) => {
-        dispatch(addNewClass(semesterId, newData));
-        return Promise.resolve();
-      }}
-      onRowUpdate={(newData: Class) => {
-        dispatch(updateExistingClasses(semesterId, [newData]));
-        return Promise.resolve();
-      }}
-      onRowDelete={(oldData: { id: string }) => {
-        dispatch(deleteExistingClasses([oldData.id]));
-        return Promise.resolve();
-      }}
-      onBulkUpdate={(changes) => {
-        dispatch(updateExistingClasses(semesterId, changes as Class[]));
-        return Promise.resolve();
-      }}
-      onBulkDelete={(data) => dispatch(deleteExistingClasses(_.map(data, "id")))}
-      onRowClick={(rowData) => setSelectedClass(rowData)}
-    />
+        onBulkDelete={(data) => dispatch(deleteExistingClasses(_.map(data, "id")))}
+        onRowClick={(rowData) => setSelectedClass(rowData)}
+      />
+      {classState.error ? (
+        <StyledNotifications
+          title="Error"
+          onRequestClose={() => dispatch(resetClassError())}
+          description={classState.error?.message}
+          icon="error"
+        />
+      ) : null}
+    </>
   ) : (
     <>
       <StyledHeader>
@@ -150,8 +217,8 @@ const ClassList = (props: { semesterId: string }) => {
 
               return (
                 <Autocomplete
-                  options={_.reject(allUsersInfo, (user) => selectedClass.students.includes(user.id))}
-                  getOptionLabel={(user) => user.userName}
+                  options={_.reject(students, (user: User) => selectedClass.students.includes(user.id))}
+                  getOptionLabel={(user: User) => user.userName}
                   onChange={(_, value) => onSelected(value as User)}
                   renderInput={(params) => <StyledTextField {...params} label="Student Code" />}
                 />

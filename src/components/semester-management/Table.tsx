@@ -44,7 +44,7 @@ export interface TableProps extends MaterialTableProps<object> {
   data: any[];
   onRowClick?: (rowData: any) => void;
   onRowAdd: (newData: any) => Promise<void>;
-  onRowUpdate: (newData: any, oldData?: any) => Promise<void>;
+  onRowUpdate?: (newData: any) => Promise<void>;
   onRowDelete: (oldData: any) => Promise<void>;
   onBulkUpdate?: (changes: any[]) => Promise<void>;
   onBulkDelete: (data: any[]) => void;
