@@ -8,7 +8,6 @@ import moment from "moment";
 import { resetTimetable, showTimetableEvents } from "./timetableSlice";
 import { setDrawerOpen, setEvent, showTeacherInfo } from "./event-details/eventDetailsSlice";
 import EventDetailsDrawer from "./event-details/EventDetails";
-import { TimetableEventType } from "~utils/types";
 
 export const Container = styled.div`
   padding: 20px;
@@ -25,6 +24,22 @@ const Title = styled.h1`
   color: white;
   padding-right: 20px;
 `;
+
+export enum TimetableEventType {
+  Schedule,
+  Deadline
+}
+
+export interface TimetableEvent {
+  id: string;
+  eventType: TimetableEventType;
+  roomId: string;
+  title: string;
+  teacherId: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+}
 
 const Timetable = () => {
   const [currentWeek, setCurrentWeek] = useState(new Date());

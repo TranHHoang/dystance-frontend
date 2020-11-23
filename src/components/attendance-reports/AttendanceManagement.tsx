@@ -9,8 +9,7 @@ import { ButtonIcon, Picklist, Option, Notification } from "react-rainbow-compon
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { getCurrentRole } from "~utils/types";
-import { getUser } from "~utils/utility";
+import { getCurrentRole, getUser } from "~utils/index";
 import {
   AttendanceReport,
   AttendanceReportStudent,

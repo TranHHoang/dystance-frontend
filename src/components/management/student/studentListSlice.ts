@@ -3,8 +3,8 @@ import { AxiosError } from "axios";
 import _ from "lodash";
 import moment from "moment";
 import { AppThunk } from "~app/store";
-import { get, postJson } from "~utils/axiosUtils";
-import { ErrorResponse, UserTableInfo } from "~utils/types";
+import { ErrorResponse, post, get } from "~utils/index";
+import { UserTableInfo } from "../StudentTeacherTable";
 
 interface StudentListState {
   students: UserTableInfo[];
@@ -115,7 +115,7 @@ export function addStudent(student: UserTableInfo): AppThunk {
         ...student,
         dob: moment(student.dob).format("YYYY-MM-DD")
       };
-      const data = (await postJson(`/users/students/add`, studentFormat)).data;
+      const data = (await post(`/users/students/add`, studentFormat)).data;
       console.log(data);
       dispatch(addStudentToList(data));
     } catch (e) {
@@ -145,7 +145,7 @@ export function deleteStudents(userIds: string[]): AppThunk {
   return async (dispatch) => {
     try {
       console.log(userIds);
-      await postJson("/users/students/delete", userIds);
+      await post("/users/students/delete", userIds);
       dispatch(removeStudentsFromList(userIds));
     } catch (e) {
       const ex = e as AxiosError;
@@ -176,7 +176,7 @@ export function updateStudents(students: UserTableInfo[]): AppThunk {
     try {
       const studentFormat = students.map((s) => ({ ...s, dob: moment(s.dob).format("YYYY-MM-DD") }));
 
-      const data = (await postJson(`/users/students/update`, studentFormat)).data;
+      const data = (await post(`/users/students/update`, studentFormat)).data;
       console.log(data);
       if (data.success.length > 0) {
         dispatch(updateStudentList(data.success));

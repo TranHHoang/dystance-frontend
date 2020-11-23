@@ -2,8 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError, AxiosResponse } from "axios";
 import { createHashHistory } from "history";
 import { AppThunk } from "~app/store";
-import { post } from "~utils/axiosUtils";
-import { ErrorResponse } from "~utils/types";
+import { ErrorResponse, post } from "~utils/index";
 
 interface ResetPasswordState {
   isLoading: boolean;

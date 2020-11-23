@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { socket } from "~app/App";
 import { AppThunk } from "~app/store";
-import { RoomAction, RoomActionType } from "~utils/types";
+import { RoomAction, RoomActionType } from "~utils/index";
 
 interface ErrorResponse {
   message: string;

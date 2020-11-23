@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const StudentAttendanceReport = () => {
   const semesterState = useSelector((root: RootState) => root.semesterState);
   const attendanceReportState = useSelector((root: RootState) => root.attendanceReportState);
-  const attendanceByClass = _.groupBy(attendanceReportState, (report) => `${report.subject}.${report.class}`);
+  const attendanceByClass = _.groupBy(attendanceReportState.reports, (report) => `${report.subject}.${report.class}`);
   const [tab, setTab] = useState(0);
   const [selectedSemester, setSelectedSemester] = useState<{ id: string; label: string }>();
   const dispatch = useDispatch();

@@ -7,10 +7,9 @@ import { Card, TimelineMarker } from "react-rainbow-components";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { hostName } from "~utils/hostUtils";
 import { ChatType, isPrivateMessage, PrivateMessage, RoomMessage } from "./chatSlice";
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from "react-virtualized";
-import { getUser } from "~utils/utility";
+import { getUser, hostName } from "~utils/index";
 
 const StyledTimeline = styled.div`
   overflow: hidden;

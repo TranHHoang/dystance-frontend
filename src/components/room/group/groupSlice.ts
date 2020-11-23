@@ -1,13 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
-import { post, get } from "~utils/axiosUtils";
 import _ from "lodash";
 import moment from "moment";
 import { socket } from "~app/App";
-import { all, RoomAction, RoomActionType } from "~utils/types";
-import { getLoginData } from "~utils/tokenStorage";
+import { all, RoomAction, RoomActionType, getLoginData, get, hostName, post, Axios } from "~utils/index";
 
 export interface BreakoutGroup {
   groupId?: string;

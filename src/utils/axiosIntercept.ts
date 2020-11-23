@@ -1,5 +1,5 @@
 import Axios from "axios";
-import { getLoginData, saveLoginData } from "./tokenStorage";
+import { getLoginData, saveLoginData } from "./index";
 import { post } from "./axiosUtils";
 
 Axios.interceptors.request.use(

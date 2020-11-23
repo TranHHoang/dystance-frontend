@@ -5,10 +5,10 @@ import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { setDrawerOpen } from "./eventDetailsSlice";
 import moment from "moment";
-import { TimetableEventType } from "~utils/types";
 import { faClock, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { StyledButton, StyledLink } from "../../homepage/single-room/styles";
+import { TimetableEventType } from "../Timetable";
 
 const StyledIcon = styled.span`
   width: 50px;

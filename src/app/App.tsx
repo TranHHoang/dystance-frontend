@@ -11,7 +11,6 @@ import RoomComponent from "../components/room/room-component/RoomComponent";
 import ProfilePage from "../components/profile-page/ProfilePage";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import { hostName } from "~utils/hostUtils";
-import _ from "lodash";
 
 export const socket = new HubConnectionBuilder().withUrl(`${hostName}/socket`).build();
 

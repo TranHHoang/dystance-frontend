@@ -1,9 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import { AppThunk } from "~app/store";
-import { get } from "~utils/axiosUtils";
-import { getLoginData } from "~utils/tokenStorage";
-import { ErrorResponse, User } from "~utils/types";
+import { User, ErrorResponse, getLoginData, get } from "~utils/index";
 
 interface ShowProfileState {
   isLoading: boolean;

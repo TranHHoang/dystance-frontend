@@ -2,8 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
-import { get } from "~utils/axiosUtils";
-import { ErrorResponse, Room, Semester } from "~utils/types";
+import { ErrorResponse, get, Room, Semester } from "~utils/index";
 
 interface RoomListState {
   semesters: Semester[];

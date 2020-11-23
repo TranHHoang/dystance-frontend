@@ -19,7 +19,7 @@ import styled from "styled-components";
 import * as Yup from "yup";
 import { Button, FileSelector, Notification } from "react-rainbow-components";
 import moment from "moment";
-import { ErrorResponse } from "~utils/types";
+import { ErrorResponse } from "~utils/index";
 
 const Title = styled.h1`
   font-size: 2.5em;

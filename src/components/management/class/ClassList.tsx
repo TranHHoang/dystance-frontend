@@ -1,13 +1,12 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/display-name */
 import React, { useEffect, useState } from "react";
-import { Column } from "material-table";
 import { useDispatch, useSelector } from "react-redux";
 import _ from "lodash";
 import { RootState } from "~app/rootReducer";
 import Table from "../Table";
 import { ButtonIcon, Notification } from "react-rainbow-components";
-import { AllUsersInfo, User } from "~utils/types";
+import { getAllUsers, getUser, User } from "~utils/index";
 import {
   addNewClass,
   Class,
@@ -68,16 +67,15 @@ const ClassList = (props: { semesterId: string }) => {
   const [selectedClass, setSelectedClass] = useState<Class>();
   const dispatch = useDispatch();
 
-  const allUsersInfo = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
-  const teachers = _.filter(allUsersInfo, { role: "teacher" });
-  const students = _.filter(allUsersInfo, { role: "student" });
+  const teachers = _.filter(getAllUsers(), { role: "teacher" });
+  const students = _.filter(getAllUsers(), { role: "student" });
   const classes = classState.classes?.map((s) => ({
     ...s,
-    teacher: _.find(allUsersInfo, { id: s.teacher })?.userName
+    teacher: getUser(s.teacher)?.userName
   }));
 
   function toSendableObj(data: Class): Class {
-    return { ...data, teacher: _.find(allUsersInfo, { userName: data.teacher })?.id };
+    return { ...data, teacher: _.find(getAllUsers(), { userName: data.teacher })?.id };
   }
 
   useEffect(() => {
@@ -189,7 +187,7 @@ const ClassList = (props: { semesterId: string }) => {
       <Table
         title={`Students of class ${selectedClass.subject}.${selectedClass.class}`}
         data={_.map(selectedClass.students, (studentId) => {
-          const studentInfo = _.find(allUsersInfo, { id: studentId });
+          const studentInfo = getUser(studentId);
           return {
             id: studentId,
             code: studentInfo?.userName,

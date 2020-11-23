@@ -2,11 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { fetchLatestMessage } from "../../components/chat/chatSlice";
 import { socket } from "~app/App";
 import { AppThunk } from "~app/store";
-import { getLoginData } from "~utils/tokenStorage";
-import { PrivateMessage } from "~utils/types";
-import { createNotification, NotificationType } from "~utils/notification";
-import { get } from "~utils/axiosUtils";
-import { getUser } from "~utils/utility";
+import { get, PrivateMessage, getUser, getLoginData, createNotification, NotificationType } from "~utils/index";
 
 interface ChatPreview {
   id: string;

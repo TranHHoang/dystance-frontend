@@ -3,10 +3,9 @@ import { AxiosError } from "axios";
 import { fetchAllUsers } from "../../components/homepage/showRoomsSlice";
 import moment from "moment";
 import { AppThunk } from "~app/store";
-import { ErrorResponse, User } from "~utils/types";
 import { UpdateProfileFormValues } from "./ProfilePage";
+import { ErrorResponse, post, User } from "~utils/index";
 import { setProfileInfo } from "./showProfileInfoSlice";
-import { post } from "~utils/axiosUtils";
 
 interface UpdateProfileState {
   isLoading: boolean;

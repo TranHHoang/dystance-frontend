@@ -1,15 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AxiosError } from "axios";
+import Axios, { AxiosError } from "axios";
 import _ from "lodash";
 import moment from "moment";
 import { AppThunk } from "~app/store";
-import { post } from "~utils/axiosUtils";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
-import { getLoginData } from "~utils/tokenStorage";
-import { ErrorResponse, Room } from "~utils/types";
+import { ErrorResponse, hostName, getLoginData, post } from "~utils/index";
 import { showRoom } from "../showRoomsSlice";
-import { UpdateRoomFormValues } from "./SingleRoomUpdateForm";
+import { Room, UpdateRoomFormValues } from "./SingleRoomUpdateForm";
+
 interface SingleRoomState {
   roomId: string;
   isLoading: boolean;

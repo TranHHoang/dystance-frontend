@@ -3,7 +3,6 @@ import {
   faCalendarAlt,
   faChalkboardTeacher,
   faClipboardList,
-  faComment,
   faPencilAlt,
   faPowerOff,
   faTasks,
@@ -11,18 +10,15 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-import { useGoogleLogout } from "react-google-login";
-import { AvatarMenu, BadgeOverlay, MenuItem, Sidebar, SidebarItem } from "react-rainbow-components";
+import { AvatarMenu, MenuItem, Sidebar, SidebarItem } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { hostName } from "~utils/hostUtils";
-import config from "../account/login/googleConfigs.json";
 import { signOut } from "../account/signout/signOut";
 import { setSidebarValue } from "./sidebarSlice";
 // @ts-ignore
 import logo from "./logo.png";
-import { getCurrentRole } from "~utils/types";
+import { hostName, getCurrentRole } from "~utils/index";
 
 const StyledSidebar = styled(Sidebar)`
   background: ${(props) => props.theme.rainbow.palette.background.main};

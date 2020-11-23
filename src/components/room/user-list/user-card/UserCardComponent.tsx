@@ -5,7 +5,7 @@ import * as React from "react";
 import { Card, ButtonMenu, MenuItem } from "react-rainbow-components";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
-import { getLoginData } from "~utils/tokenStorage";
+import { getLoginData, getUser } from "~utils/index";
 import {
   setKickModalOpen,
   setMuteModalOpen,
@@ -13,9 +13,7 @@ import {
   toggleWhiteboardUsage
 } from "./userCardSlice";
 import { Logger, LogType } from "~utils/logger";
-import { setUserId } from "../../../../components/room/remote-control/remoteControlSlice";
-import { AllUsersInfo, getCurrentRole, User } from "~utils/types";
-import _ from "lodash";
+import { setUserId } from "../../../room/remote-control/remoteControlSlice";
 
 const StyledCard = styled(Card)`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
@@ -23,8 +21,7 @@ const StyledCard = styled(Card)`
 
 const UserCardComponent = (props: any) => {
   const { userId, icon, title, teacherId, roomId } = props;
-  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
-  const user = _.find(allUsers, { id: userId });
+  const user = getUser(userId);
   const dispatch = useDispatch();
   const logger = Logger.getInstance();
   return (

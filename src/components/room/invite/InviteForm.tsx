@@ -5,18 +5,16 @@ import { RootState } from "~app/rootReducer";
 import { StyledNotification } from "../../account/styles";
 import { setInviteModalOpen, showInvitedUsers, startInvite } from "./inviteSlice";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import { AllUsersInfo, User } from "~utils/types";
 import { TextField, Dialog, createMuiTheme, MuiThemeProvider } from "@material-ui/core";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import { hostName } from "~utils/hostUtils";
 import styled from "styled-components";
 import _ from "lodash";
-import { getLoginData } from "~utils/tokenStorage";
 import InvitedUserCardComponent from "./invited-user-card-component/InvitedUserCardComponent";
 import { kickInvitedUser, setKickModalOpen } from "./invited-user-card-component/invitedUserCardSlice";
 import { StyledText } from "../..//homepage/single-room/styles";
+import { getAllUsers, getLoginData, hostName, User } from "~utils/index";
 
 export const theme = createMuiTheme({
   palette: {
@@ -71,8 +69,6 @@ const StyledUserAvatar = styled(Avatar)`
 `;
 const InviteForm = (props: any) => {
   const inviteState = useSelector((root: RootState) => root.inviteState);
-  const allUsersInfo = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
-  const [] = useState<User[]>();
   const invitedUserCardState = useSelector((state: RootState) => state.invitedUserCardState);
   const dispatch = useDispatch();
   const { roomId } = props;
@@ -117,7 +113,7 @@ const InviteForm = (props: any) => {
           <DialogContent>
             <Autocomplete
               multiple
-              options={_.differenceWith(allUsersInfo, inviteState.usersInRoom, (a, b) => a.id === b.id)}
+              options={_.differenceWith(getAllUsers(), inviteState.usersInRoom, (a, b) => a.id === b.id)}
               getOptionLabel={(option) => `${option.realName} (${option.userName})`}
               filterOptions={(options, state) => {
                 return options.filter((option) => {

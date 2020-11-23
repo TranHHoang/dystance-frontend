@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import SimplePeer from "simple-peer";
 import { Instance } from "simple-peer";
-import { getLoginData } from "~utils/tokenStorage";
+import { createNotification, getLoginData, NotificationType } from "~utils/index";
 import { socket } from "~app/App";
 // @ts-ignore
 import wrtc from "wrtc";
@@ -11,7 +11,6 @@ import robot from "robotjs";
 import styled from "styled-components";
 import { setRemoteControlWaitingModalOpen } from "../user-list/user-card/userCardSlice";
 import { useDispatch } from "react-redux";
-import { createNotification, NotificationType } from "~utils/notification";
 
 const StyledVideo = styled.video`
   width: 100%;

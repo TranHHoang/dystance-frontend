@@ -2,9 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError, AxiosResponse } from "axios";
 import { createHashHistory } from "history";
 import { AppThunk } from "~app/store";
-import { post } from "~utils/axiosUtils";
-import { saveLoginData } from "~utils/tokenStorage";
-import { ErrorResponse, UserLoginData } from "~utils/types";
+import { ErrorResponse, post, saveLoginData, UserLoginData } from "~utils/index";
 
 export enum LoginError {
   NameEmailPasswordIncorrect,
@@ -109,6 +107,7 @@ export function startLogin(email?: string, userName?: string, password?: string,
       });
       createHashHistory().push("/homepage");
     } catch (ex) {
+      console.log(ex);
       const e = ex as AxiosError;
       // Google login first time
       if (googleTokenId && e.response?.status === 404) {

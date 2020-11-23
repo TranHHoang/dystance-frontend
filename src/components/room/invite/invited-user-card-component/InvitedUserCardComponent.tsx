@@ -2,7 +2,7 @@ import React from "react";
 import { Card, Button } from "react-rainbow-components";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
-import { getLoginData } from "~utils/tokenStorage";
+import { getLoginData } from "~utils/index";
 import { setKickModalOpen } from "./invitedUserCardSlice";
 
 const StyledCard = styled(Card)`

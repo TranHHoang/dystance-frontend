@@ -2,9 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
-import { get, post } from "~utils/axiosUtils";
-import { ErrorResponse, User } from "~utils/types";
-import { getUser } from "~utils/utility";
+import { ErrorResponse, User, getUser, get, post } from "~utils/index";
 
 interface InviteState {
   roomId: string;

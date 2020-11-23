@@ -7,7 +7,6 @@ import {
   weekDayConvert
 } from "../../room-management/create-room/CreateRoomForm";
 import { useDispatch } from "react-redux";
-import { Room, RoomTimes } from "~utils/types";
 import moment from "moment";
 import styled from "styled-components";
 import {
@@ -22,8 +21,8 @@ import {
 } from "react-rainbow-components";
 import { WeekDayPickerProps } from "react-rainbow-components/components/WeekDayPicker";
 import { updateRoom } from "./singleRoomSlice";
-import { hostName } from "~utils/hostUtils";
 import _ from "lodash";
+import { RoomTimes, hostName } from "~utils/index";
 
 const StyledPicklist = styled(Picklist)`
   width: fit-content;
@@ -63,6 +62,18 @@ const RepeatTimeContainer = styled.div`
 export interface UpdateRoomFormValues extends CreateRoomFormValues {
   roomId: string;
   roomImage: File;
+}
+
+export interface Room {
+  roomId: string;
+  roomName: string;
+  creatorId: string;
+  image: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  repeatOccurrence: string;
+  roomTimes: string;
 }
 
 const SingleRoomUpdateForm = (props: any) => {

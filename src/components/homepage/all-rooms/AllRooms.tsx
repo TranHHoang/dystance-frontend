@@ -8,7 +8,7 @@ import { resetRoom, showRoom } from "../showRoomsSlice";
 import { SingleRoom } from "../single-room/SingleRoom";
 import { faSyncAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getLoginData } from "~utils/tokenStorage";
+import { getLoginData } from "~utils/index";
 
 const BackgroundContainer = styled.div`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};

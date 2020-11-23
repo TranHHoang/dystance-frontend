@@ -2,8 +2,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
-import { get, postForm, postJson } from "~utils/axiosUtils";
-import { ErrorResponse } from "~utils/types";
+import { get, post, ErrorResponse } from "~utils/index";
+
 export interface Semester {
   id: string;
   name: string;
@@ -108,7 +108,7 @@ export function addNewSemester(name: string, file: File): AppThunk {
       form.append("name", name);
       form.append("file", file);
 
-      const data = (await postForm("/semesters/add", form)).data;
+      const data = (await post("/semesters/add", form)).data;
       dispatch(addSemester(data));
     } catch (e) {
       const ex = e as AxiosError;
@@ -143,7 +143,7 @@ export function updateExistingSemester(semester: Semester): AppThunk {
       fd.append("id", semester.id);
       fd.append("name", semester.name);
       fd.append("file", semester.file);
-      const data = (await postForm("/semesters/update", fd)).data;
+      const data = (await post("/semesters/update", fd)).data;
       console.log(data);
       dispatch(updateSemester(data));
     } catch (e) {
@@ -173,7 +173,7 @@ export function updateExistingSemester(semester: Semester): AppThunk {
 export function deleteExistingSemesters(ids: string[]): AppThunk {
   return async (dispatch) => {
     try {
-      await postJson("/semesters/delete", ids);
+      await post("/semesters/delete", ids);
       dispatch(removeSemesters(ids));
     } catch (e) {
       const ex = e as AxiosError;

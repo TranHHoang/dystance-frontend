@@ -1,16 +1,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppThunk } from "~app/store";
-import { getLoginData } from "~utils/tokenStorage";
-import { ErrorResponse, RoomAction, RoomActionType, User } from "~utils/types";
 import { fetchLatestMessage } from "../../chat/chatSlice";
-import { setUserInfoList } from "../user-list/userListSlice";
 import { toggleWhiteboard, setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
 import { socket } from "~app/App";
+import {
+  ErrorResponse,
+  RoomAction,
+  RoomActionType,
+  getLoginData,
+  getUser,
+  createNotification,
+  NotificationType,
+  User,
+  get
+} from "~utils/index";
 import { fetchAllGroups } from "../group/groupSlice";
-import { createNotification, NotificationType } from "~utils/notification";
-import _ from "lodash";
-import { get } from "~utils/axiosUtils";
-import { getUser } from "~utils/utility";
+import { setUserInfoList } from "../user-list/userListSlice";
 
 export interface BreakoutGroup {
   id: string;

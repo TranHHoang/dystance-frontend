@@ -8,13 +8,10 @@ import { Button, MenuItem, WeekDayPicker, Accordion, AccordionSection, Modal } f
 import { WeekDayPickerProps } from "react-rainbow-components/components/WeekDayPicker";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
-import { hostName } from "~utils/hostUtils";
-import { getLoginData } from "~utils/tokenStorage";
-import { Room, RoomTimes } from "~utils/types";
 import InviteForm from "../../room/invite/InviteForm";
 import { setInviteModalOpen } from "../../room/invite/inviteSlice";
 import { deleteRoom, resetState, setConfirmDeleteModalOpen, setUpdateModalOpen } from "./singleRoomSlice";
-import SingleRoomUpdateForm from "./SingleRoomUpdateForm";
+import SingleRoomUpdateForm, { Room } from "./SingleRoomUpdateForm";
 import {
   Description,
   FlexRowContainer,
@@ -38,7 +35,7 @@ import {
 } from "./styles";
 import { setCreatorProfileOpen } from "../../profile-page/people-profile/peopleProfileSlice";
 import PeopleProfilePage from "../../profile-page/people-profile/PeopleProfilePage";
-import { getUser } from "~utils/utility";
+import { RoomTimes, getUser, hostName, getLoginData } from "~utils/index";
 
 export const SingleRoom = (props: any) => {
   const {

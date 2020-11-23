@@ -9,10 +9,8 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { broadcastMessage } from "./chatSlice";
 import { resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
-import { Logger, LogType } from "~utils/logger";
-import { AllUsersInfo, User } from "~utils/types";
-import _ from "lodash";
 import { RootState } from "~app/rootReducer";
+import { getUser, Logger, LogType } from "~utils/index";
 
 const StyledChatBox = styled.div`
   display: flex;
@@ -75,8 +73,7 @@ const ChatBox = ({
   const messageInput = useRef<HTMLInputElement>();
   const fileInput = useRef<HTMLInputElement>();
   const logger = Logger.getInstance();
-  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
-  const user = _.find(allUsers, { id: receiverId });
+  const user = getUser(receiverId);
   const roomState = useSelector((state: RootState) => state.roomState);
 
   function addEmoji(emoji: any) {

@@ -10,8 +10,6 @@ import {
   Badge
 } from "react-rainbow-components";
 import _ from "lodash";
-import { User } from "~utils/types";
-import { hostName } from "~utils/hostUtils";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
@@ -28,15 +26,12 @@ import {
 } from "./groupSlice";
 import { withRouter } from "react-router-dom";
 import { switchToGroup } from "../room-component/roomSlice";
-import { get } from "~utils/axiosUtils";
-import { getLoginData } from "~utils/tokenStorage";
 import { faSignInAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
-import { Logger, LogType } from "~utils/logger";
-import { getUser } from "~utils/utility";
+import { Logger, LogType, User, getLoginData, getUser, hostName, get } from "~utils/index";
 
-declare module "~utils/types" {
+declare module "~utils/interfaces" {
   interface User {
     selected: boolean;
   }

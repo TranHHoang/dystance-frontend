@@ -6,17 +6,14 @@ import { ButtonIcon, TimelineMarker, Textarea, Button, Modal, Lookup } from "rea
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { hostName } from "~utils/hostUtils";
-import { AllUsersInfo, getCurrentRole, User } from "~utils/types";
 import { broadcastMessage, ChatType, fetchAllMessages } from "../../components/chat/chatSlice";
 import { fetchAllPreview } from "./chatPreviewSlice";
-import { getLoginData } from "~utils/tokenStorage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as Yup from "yup";
 import { Field, Form, Formik, FormikProps } from "formik";
 import { LookupValue } from "react-rainbow-components/components/types";
 import _ from "lodash";
-import { getUser } from "~utils/utility";
+import { getLoginData, getAllUsers, hostName, getUser, getCurrentRole } from "~utils/index";
 
 declare module "react-rainbow-components/components/types" {
   interface LookupValue {
@@ -110,8 +107,7 @@ const ChatPreview = (props: any) => {
     }
   }
 
-  const allUsersInfo = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
-  const options: LookupValue[] = allUsersInfo
+  const options: LookupValue[] = getAllUsers()
     .filter((userInfo) => userInfo.role === (getCurrentRole() === "teacher" ? "student" : "teacher"))
     .map((userInfo) => ({
       id: userInfo.id,

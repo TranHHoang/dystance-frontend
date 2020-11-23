@@ -3,9 +3,8 @@ import { AxiosError } from "axios";
 import { createHashHistory } from "history";
 import moment from "moment";
 import { AppThunk } from "~app/store";
-import { post } from "~utils/axiosUtils";
-import { saveLoginData } from "~utils/tokenStorage";
-import { ErrorResponse, LoginLocalStorageKey } from "~utils/types";
+import { post, saveLoginData } from "~utils/index";
+import { ErrorResponse, LoginLocalStorageKey } from "~utils/interfaces";
 import { OkResponse } from "../login/loginSlice";
 import { GoogleUpdateInfoFormValues } from "./GoogleUpdateInfo";
 

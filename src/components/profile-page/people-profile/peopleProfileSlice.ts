@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import { AppThunk } from "~app/store";
-import { get } from "~utils/axiosUtils";
-import { ErrorResponse, User } from "~utils/types";
+import { ErrorResponse, User, get } from "~utils/index";
 
 interface PeopleProfileState {
   userId: string;

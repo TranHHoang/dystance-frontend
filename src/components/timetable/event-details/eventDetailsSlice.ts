@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppThunk } from "~app/store";
-import { ErrorResponse, TimetableEvent, User } from "~utils/types";
+import { ErrorResponse, User, get } from "~utils/index";
 import { AxiosError } from "axios";
-import { get } from "~utils/axiosUtils";
+import { TimetableEvent } from "../Timetable";
 
 interface EventDetailsState {
   isDrawerOpen: boolean;

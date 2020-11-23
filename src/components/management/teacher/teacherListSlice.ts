@@ -3,8 +3,8 @@ import { AxiosError } from "axios";
 import _ from "lodash";
 import moment from "moment";
 import { AppThunk } from "~app/store";
-import { get, postJson } from "~utils/axiosUtils";
-import { ErrorResponse, UserTableInfo } from "~utils/types";
+import { get, ErrorResponse, post } from "~utils/index";
+import { UserTableInfo } from "../StudentTeacherTable";
 
 interface TeacherListState {
   teachers: UserTableInfo[];
@@ -114,7 +114,7 @@ export function addTeacher(teacher: UserTableInfo): AppThunk {
         ...teacher,
         dob: moment(teacher.dob).format("YYYY-MM-DD")
       };
-      const data = (await postJson(`/users/teachers/add`, teacherFormat)).data;
+      const data = (await post(`/users/teachers/add`, teacherFormat)).data;
       dispatch(addTeacherToList(data));
     } catch (e) {
       const ex = e as AxiosError;
@@ -144,7 +144,7 @@ export function updateTeachers(teachers: UserTableInfo[]): AppThunk {
     try {
       const teacherFormat = teachers.map((teacher) => ({ ...teacher, dob: moment(teacher.dob).format("YYYY-MM-DD") }));
 
-      const data = (await postJson(`/users/teachers/update`, teacherFormat)).data;
+      const data = (await post(`/users/teachers/update`, teacherFormat)).data;
       dispatch(updateTeacherList(data));
       if (data.success.length > 0) {
         dispatch(updateTeacherList(data.success));
@@ -182,7 +182,7 @@ export function updateTeachers(teachers: UserTableInfo[]): AppThunk {
 export function deleteTeachers(userIds: string[]): AppThunk {
   return async (dispatch) => {
     try {
-      await postJson("/users/teachers/delete", userIds);
+      await post("/users/teachers/delete", userIds);
       dispatch(removeTeachersFromList(userIds));
     } catch (e) {
       const ex = e as AxiosError;

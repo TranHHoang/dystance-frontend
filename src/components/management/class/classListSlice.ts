@@ -2,8 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
-import { get, postJson } from "~utils/axiosUtils";
-import { ErrorResponse } from "~utils/types";
+import { get, post, ErrorResponse } from "~utils/index";
 
 export interface Class {
   id: string;
@@ -108,7 +107,7 @@ export function fetchAllClasses(semesterId: string): AppThunk {
 export function addNewClass(semesterId: string, classObj: Class): AppThunk {
   return async (dispatch) => {
     try {
-      const data = (await postJson(`/semesters/classes/add?semesterId=${semesterId}`, classObj)).data;
+      const data = (await post(`/semesters/classes/add?semesterId=${semesterId}`, classObj)).data;
       dispatch(addClass(data));
     } catch (e) {
       const ex = e as AxiosError;
@@ -137,7 +136,7 @@ export function addNewClass(semesterId: string, classObj: Class): AppThunk {
 export function updateExistingClasses(semesterId: string, classes: Class[]): AppThunk {
   return async (dispatch) => {
     try {
-      const data = (await postJson(`/semesters/classes/update?semesterId=${semesterId}`, classes)).data;
+      const data = (await post(`/semesters/classes/update?semesterId=${semesterId}`, classes)).data;
       if (data.success.length > 0) {
         dispatch(updateClasses(data.success));
       }
@@ -177,7 +176,7 @@ export function updateExistingClasses(semesterId: string, classes: Class[]): App
 export function deleteExistingClasses(ids: string[]): AppThunk {
   return async (dispatch) => {
     try {
-      await postJson(`/semesters/classes/delete`, ids);
+      await post(`/semesters/classes/delete`, ids);
       dispatch(removeClasses(ids));
     } catch (e) {
       const ex = e as AxiosError;

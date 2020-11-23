@@ -1,10 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppThunk } from "~app/store";
-import { getLoginData } from "~utils/tokenStorage";
-import { PrivateMessage, RoomAction, RoomActionType } from "~utils/types";
 import { socket } from "~app/App";
 import { fetchAllPreview } from "../../components/private-chat/chatPreviewSlice";
-import { get, post } from "~utils/axiosUtils";
+import { getLoginData, RoomAction, RoomActionType, PrivateMessage, get, post } from "~utils/index";
 
 export enum ChatType {
   Text,
@@ -70,7 +68,7 @@ export function fetchAllMessages(roomId: string, privateChat: { id1: string; id2
       console.log("Start fetching all...");
       const messages = (
         await get(
-          roomId ? `rooms/chat/get?id=${roomId}` : `users/chat/get?id1=${privateChat.id1}&id2=${privateChat.id2}`
+          roomId ? `/rooms/chat/get?id=${roomId}` : `/users/chat/get?id1=${privateChat.id1}&id2=${privateChat.id2}`
         )
       ).data as RoomMessage[] | PrivateMessage[];
 

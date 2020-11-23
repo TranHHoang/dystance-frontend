@@ -1,5 +1,5 @@
 import moment from "moment";
-import { getLoginData } from "./tokenStorage";
+import { getLoginData } from "./utility";
 
 export enum LogType {
   AttendanceJoin = "ATTENDANCE_JOIN",

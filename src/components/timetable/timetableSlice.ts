@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppThunk } from "~app/store";
-import { ErrorResponse, TimetableEvent } from "~utils/types";
+import { ErrorResponse, get } from "~utils/index";
 import { AxiosError } from "axios";
 import moment from "moment";
-import { get } from "~utils/axiosUtils";
+import { TimetableEvent } from "./Timetable";
 
 interface TimetableState {
   events: TimetableEvent[];

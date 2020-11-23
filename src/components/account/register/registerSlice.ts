@@ -3,8 +3,7 @@ import { AxiosError } from "axios";
 import { createHashHistory } from "history";
 import moment from "moment";
 import { AppThunk } from "~app/store";
-import { post } from "~utils/axiosUtils";
-import { ErrorResponse } from "~utils/types";
+import { ErrorResponse, post } from "~utils/index";
 import { RegisterFormValues } from "./RegisterForm";
 
 export enum RegisterError {
