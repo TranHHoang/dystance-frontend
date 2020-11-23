@@ -78,10 +78,10 @@ export const {
   resetTeacherError
 } = teacherListSlice.actions;
 
-export function showTeacherList(semesterId: string): AppThunk {
+export function showTeacherList(): AppThunk {
   return async (dispatch) => {
     try {
-      const data = (await get(`/semesters/teachers?semesterId=${semesterId}`)).data as UserTableInfo[];
+      const data = (await get(`/users/teachers`)).data as UserTableInfo[];
       dispatch(fetchTeacherListSuccess(data));
     } catch (e) {
       const ex = e as AxiosError;
@@ -107,14 +107,14 @@ export function showTeacherList(semesterId: string): AppThunk {
   };
 }
 
-export function addTeacher(semesterId: string, teacher: UserTableInfo): AppThunk {
+export function addTeacher(teacher: UserTableInfo): AppThunk {
   return async (dispatch) => {
     try {
       const teacherFormat: UserTableInfo = {
         ...teacher,
         dob: moment(teacher.dob).format("YYYY-MM-DD")
       };
-      const data = (await postJson(`/semesters/teachers/add?semesterId=${semesterId}`, teacherFormat)).data;
+      const data = (await postJson(`/users/teachers/add`, teacherFormat)).data;
       dispatch(addTeacherToList(data));
     } catch (e) {
       const ex = e as AxiosError;
@@ -139,12 +139,12 @@ export function addTeacher(semesterId: string, teacher: UserTableInfo): AppThunk
   };
 }
 
-export function updateTeachers(semesterId: string, teachers: UserTableInfo[]): AppThunk {
+export function updateTeachers(teachers: UserTableInfo[]): AppThunk {
   return async (dispatch) => {
     try {
       const teacherFormat = teachers.map((teacher) => ({ ...teacher, dob: moment(teacher.dob).format("YYYY-MM-DD") }));
 
-      const data = (await postJson(`/semesters/teachers/update?semesterId=${semesterId}`, teacherFormat)).data;
+      const data = (await postJson(`/users/teachers/update`, teacherFormat)).data;
       dispatch(updateTeacherList(data));
       if (data.success.length > 0) {
         dispatch(updateTeacherList(data.success));
@@ -153,7 +153,7 @@ export function updateTeachers(semesterId: string, teachers: UserTableInfo[]): A
         _.forEach(data.failed, (error: ErrorResponse) => {
           dispatch(updateTeacherListFailed(error));
         });
-        dispatch(showTeacherList(semesterId));
+        dispatch(showTeacherList());
       }
     } catch (e) {
       const ex = e as AxiosError;
@@ -182,7 +182,7 @@ export function updateTeachers(semesterId: string, teachers: UserTableInfo[]): A
 export function deleteTeachers(userIds: string[]): AppThunk {
   return async (dispatch) => {
     try {
-      await postJson("/semesters/teachers/delete", userIds);
+      await postJson("/users/teachers/delete", userIds);
       dispatch(removeTeachersFromList(userIds));
     } catch (e) {
       const ex = e as AxiosError;

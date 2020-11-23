@@ -1,5 +1,5 @@
-import StudentList from "./student/StudentList";
-import TeacherList from "./teacher/TeacherList";
+import StudentList from "../student-teacher-management/student/StudentList";
+import TeacherList from "../student-teacher-management/teacher/TeacherList";
 import React, { useState } from "react";
 import { Tabset, Tab } from "react-rainbow-components";
 import styled from "styled-components";
@@ -24,7 +24,7 @@ const StyledTab = styled(Tab)`
 
 const SemesterDetails = (props: { semesterId: string }) => {
   const { semesterId } = props;
-  const [tabsetValue, setTabsetValue] = useState("students");
+  const [tabsetValue, setTabsetValue] = useState("schedule");
 
   function getTabContent() {
     switch (tabsetValue) {
@@ -32,10 +32,6 @@ const SemesterDetails = (props: { semesterId: string }) => {
         return <ScheduleList semesterId={semesterId} />;
       case "classes":
         return;
-      case "students":
-        return <StudentList semesterId={semesterId} />;
-      case "teachers":
-        return <TeacherList semesterId={semesterId} />;
     }
   }
   return (
@@ -52,8 +48,6 @@ const SemesterDetails = (props: { semesterId: string }) => {
         >
           <StyledTab label="Schedule" name="schedule" />
           <StyledTab label="Classes" name="classes" />
-          <StyledTab label="Students" name="students" />
-          <StyledTab label="Teachers" name="teachers" />
         </Tabset>
         {getTabContent()}
       </Container>

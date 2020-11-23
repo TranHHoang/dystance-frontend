@@ -27,8 +27,9 @@ import invitedUserCardReducer from "../components/room/invite/invited-user-card-
 import groupReducer from "../components/room/group/groupSlice";
 import semesterReducer from "../components/semester-management/semesterSlice";
 import scheduleReducer from "../components/semester-management/schedule/scheduleSlice";
-import studentListReducer from "../components/semester-management/student/StudentListSlice";
-import teacherListReducer from "../components/semester-management/teacher/teacherListSlice";
+import studentListReducer from "../components/student-teacher-management/student/StudentListSlice";
+import teacherListReducer from "../components/student-teacher-management/teacher/teacherListSlice";
+import studentTeacherManagementReducer from "../components/student-teacher-management/studentTeacherManagementSlice";
 
 const appReducer = combineReducers({
   roomCreation: createRoomReducer,
@@ -59,7 +60,8 @@ const appReducer = combineReducers({
   semesterState: semesterReducer,
   scheduleState: scheduleReducer,
   studentListState: studentListReducer,
-  teacherListState: teacherListReducer
+  teacherListState: teacherListReducer,
+  studentTeacherManagementState: studentTeacherManagementReducer
 });
 
 const rootReducer = (state: any, action: AnyAction) => {

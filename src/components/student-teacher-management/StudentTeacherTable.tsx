@@ -1,10 +1,10 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { ErrorResponse, UserTableInfo } from "~utils/types";
-import _, { indexOf } from "lodash";
+import _ from "lodash";
 import * as Yup from "yup";
 import moment from "moment";
-import Table from "./Table";
+import Table from "../semester-management/Table";
 import { addStudent, updateStudents, deleteStudents, resetStudentError } from "./student/StudentListSlice";
 import { addTeacher, updateTeachers, deleteTeachers, resetTeacherError } from "./teacher/teacherListSlice";
 import styled from "styled-components";
@@ -24,7 +24,7 @@ const StyledNotifications = styled(Notification)`
   width: 30%;
 `;
 const StudentTeacherTableComponent = (props: any) => {
-  const { data, title, isStudent, isLoading, semesterId, studentError, teacherError } = props;
+  const { data, title, isStudent, isLoading, studentError, teacherError } = props;
   const dispatch = useDispatch();
   return (
     <>
@@ -70,10 +70,10 @@ const StudentTeacherTableComponent = (props: any) => {
           if (_.some(format, _.isEmpty) || !Yup.string().email().isValidSync(format.email)) {
             return Promise.reject();
           } else if (isStudent) {
-            dispatch(addStudent(semesterId, newData));
+            dispatch(addStudent(newData));
             return Promise.resolve();
           } else {
-            dispatch(addTeacher(semesterId, newData));
+            dispatch(addTeacher(newData));
             return Promise.resolve();
           }
         }}
@@ -91,10 +91,10 @@ const StudentTeacherTableComponent = (props: any) => {
           if (_.some(format, _.isEmpty) || !Yup.string().email().isValidSync(format.email)) {
             return Promise.reject();
           } else if (isStudent) {
-            dispatch(updateStudents(semesterId, [newData]));
+            dispatch(updateStudents([newData]));
             return Promise.resolve();
           } else {
-            dispatch(updateTeachers(semesterId, [newData]));
+            dispatch(updateTeachers([newData]));
             return Promise.resolve();
           }
         }}
@@ -124,10 +124,10 @@ const StudentTeacherTableComponent = (props: any) => {
               }
             });
             if (isStudent) {
-              dispatch(updateStudents(semesterId, changes));
+              dispatch(updateStudents(changes));
               resolve();
             } else {
-              dispatch(updateTeachers(semesterId, changes));
+              dispatch(updateTeachers(changes));
               resolve();
             }
           })

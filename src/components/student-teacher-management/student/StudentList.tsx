@@ -5,7 +5,6 @@ import { resetStudentList, showStudentList } from "./StudentListSlice";
 import StudentTeacherTableComponent from "../StudentTeacherTable";
 
 const StudentList = (props: any) => {
-  const { semesterId } = props;
   const studentListState = useSelector((state: RootState) => state.studentListState);
   const dispatch = useDispatch();
   const studentData = studentListState.students.map((student) => ({
@@ -13,7 +12,7 @@ const StudentList = (props: any) => {
   }));
 
   useEffect(() => {
-    dispatch(showStudentList(semesterId));
+    dispatch(showStudentList());
     return () => {
       dispatch(resetStudentList());
     };
@@ -25,7 +24,6 @@ const StudentList = (props: any) => {
       title="Student List"
       isStudent={true}
       isLoading={studentListState.isLoading}
-      semesterId={semesterId}
       studentError={studentListState.errors}
     />
   );

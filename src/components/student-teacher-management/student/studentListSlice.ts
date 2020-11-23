@@ -79,10 +79,10 @@ export const {
   resetStudentError
 } = studentListSlice.actions;
 
-export function showStudentList(semesterId: string): AppThunk {
+export function showStudentList(): AppThunk {
   return async (dispatch) => {
     try {
-      const data = (await get(`/semesters/students?semesterId=${semesterId}`)).data as UserTableInfo[];
+      const data = (await get(`/users/students`)).data as UserTableInfo[];
       dispatch(fetchStudentListSuccess(data));
     } catch (e) {
       const ex = e as AxiosError;
@@ -108,14 +108,14 @@ export function showStudentList(semesterId: string): AppThunk {
   };
 }
 
-export function addStudent(semesterId: string, student: UserTableInfo): AppThunk {
+export function addStudent(student: UserTableInfo): AppThunk {
   return async (dispatch) => {
     try {
       const studentFormat: UserTableInfo = {
         ...student,
         dob: moment(student.dob).format("YYYY-MM-DD")
       };
-      const data = (await postJson(`/semesters/students/add?semesterId=${semesterId}`, studentFormat)).data;
+      const data = (await postJson(`/users/students/add`, studentFormat)).data;
       console.log(data);
     } catch (e) {
       const ex = e as AxiosError;
@@ -144,7 +144,7 @@ export function deleteStudents(userIds: string[]): AppThunk {
   return async (dispatch) => {
     try {
       console.log(userIds);
-      await postJson("/semesters/students/delete", userIds);
+      await postJson("/users/students/delete", userIds);
       dispatch(removeStudentsFromList(userIds));
     } catch (e) {
       const ex = e as AxiosError;
@@ -170,12 +170,12 @@ export function deleteStudents(userIds: string[]): AppThunk {
   };
 }
 
-export function updateStudents(semesterId: string, students: UserTableInfo[]): AppThunk {
+export function updateStudents(students: UserTableInfo[]): AppThunk {
   return async (dispatch) => {
     try {
       const studentFormat = students.map((s) => ({ ...s, dob: moment(s.dob).format("YYYY-MM-DD") }));
 
-      const data = (await postJson(`/semesters/students/update?semesterId=${semesterId}`, studentFormat)).data;
+      const data = (await postJson(`/users/students/update`, studentFormat)).data;
       console.log(data);
       if (data.success.length > 0) {
         dispatch(updateStudentList(data.success));
@@ -185,7 +185,7 @@ export function updateStudents(semesterId: string, students: UserTableInfo[]): A
           console.log(error);
           dispatch(updateStudentListFailed(error));
         });
-        dispatch(showStudentList(semesterId));
+        dispatch(showStudentList());
       }
     } catch (e) {
       const ex = e as AxiosError;

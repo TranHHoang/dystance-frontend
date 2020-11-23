@@ -12,6 +12,7 @@ import { setSidebarValue } from "../sidebar/sidebarSlice";
 import { fetchAllUsers } from "./showRoomsSlice";
 import { resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
 import SemesterManagement from "../semester-management/SemesterManagement";
+import StudentTeacherManagement from "../../components/student-teacher-management/StudentTeacherManagement";
 
 const CreateRoomDiv = styled.div`
   display: flex;
@@ -50,7 +51,7 @@ export const HomePage = () => {
       case "Profile":
         return <ProfilePage />;
       case "Timetable":
-        return <Timetable />;
+        return <StudentTeacherManagement />;
       case "Chat":
         dispatch(resetPrivateChatBadge());
         return <ChatPreview />;

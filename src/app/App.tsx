@@ -20,8 +20,6 @@ import { RoomTimes } from "~utils/types";
 import moment from "moment";
 import { createNotification, NotificationType } from "~utils/notification";
 import { getAllDeadlines } from "../components/room/deadline/deadlineListSlice";
-import SemesterManagement from "../components/semester-management/SemesterManagement";
-import ScheduleManagement from "../components/semester-management/schedule/ScheduleList";
 
 export const socket = new HubConnectionBuilder().withUrl(`${hostName}/socket`).build();
 
