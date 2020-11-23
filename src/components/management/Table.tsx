@@ -100,7 +100,7 @@ const Table = (props: TableProps) => {
             filtering: true,
             actionsColumnIndex: -1
           }}
-          onRowClick={(e, rowData) => onRowClick(rowData)}
+          onRowClick={(e, rowData) => onRowClick?.call(rowData)}
           editable={{
             onRowAdd: onRowAdd,
             onRowUpdate: onRowUpdate,

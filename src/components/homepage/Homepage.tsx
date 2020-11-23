@@ -1,4 +1,3 @@
-import Timetable from "../timetable/Timetable";
 import ChatPreview from "../private-chat/ChatPreview";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,30 +5,14 @@ import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import ProfilePage from "../profile-page/ProfilePage";
 import { showProfile } from "../profile-page/showProfileInfoSlice";
-import CreateRoomForm from "../room-management/create-room/CreateRoomForm";
 import SideNavigationBar from "../sidebar/Sidebar";
 import { setSidebarValue } from "../sidebar/sidebarSlice";
 import { fetchAllUsers } from "./showRoomsSlice";
 import { resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
-import SemesterManagement from "../semester-management/SemesterManagement";
 import StudentTeacherManagement from "../../components/student-teacher-management/StudentTeacherManagement";
+import AccountList from "../management/account/AccountList";
 
-const CreateRoomDiv = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 10px 0 20px 20px;
-`;
-const Title = styled.h1`
-  font-size: 2.5em;
-  font-weight: 500;
-  color: white;
-  padding-right: 20px;
-`;
 
-const HomePageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
 const Container = styled.div`
   display: flex;
   height: auto;
@@ -47,7 +30,7 @@ export const HomePage = () => {
   function getCurrentSidebarValue() {
     switch (sidebarState.sidebarValue) {
       case "Homepage":
-        return <SemesterManagement />;
+        return <AccountList />;
       case "Profile":
         return <ProfilePage />;
       case "Timetable":

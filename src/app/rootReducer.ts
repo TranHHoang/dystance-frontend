@@ -1,14 +1,14 @@
 import { AnyAction, combineReducers } from "@reduxjs/toolkit";
-import loginReducer from "../components/account-management/login/loginSlice";
-import googleUpdateInfoReducer from "../components/account-management/google-update-info/googleUpdateInfoSlice";
-import registerReducer from "../components/account-management/register/registerSlice";
+import loginReducer from "../components/account/login/loginSlice";
+import googleUpdateInfoReducer from "../components/account/google-update-info/googleUpdateInfoSlice";
+import registerReducer from "../components/account/register/registerSlice";
 import createRoomReducer from "../components/room-management/create-room/createRoomSlice";
 import showRoomReducer from "../components/homepage/showRoomsSlice";
 import chatReducer from "../components/chat/chatSlice";
 import singleRoomReducer from "../components/homepage/single-room/singleRoomSlice";
-import resetPasswordReducer from "../components/account-management/reset-password/resetPasswordSlice";
+import resetPasswordReducer from "../components/account/reset-password/resetPasswordSlice";
 import inviteReducer from "../components/room/invite/inviteSlice";
-import { ResetStoreAction } from "../components/account-management/signout/signOut";
+import { ResetStoreAction } from "../components/account/signout/signOut";
 import showProfileReducer from "../components/profile-page/showProfileInfoSlice";
 import updateProfileReducer from "../components/profile-page/updateProfileSlice";
 import sidebarReducer from "../components/sidebar/sidebarSlice";
@@ -31,6 +31,7 @@ import studentListReducer from "../components/student-teacher-management/student
 import teacherListReducer from "../components/student-teacher-management/teacher/teacherListSlice";
 import studentTeacherManagementReducer from "../components/student-teacher-management/studentTeacherManagementSlice";
 import classListReducer from "../components/semester-management/class/classListSlice";
+import accountListReducer from "../components/management/account/accountListSlice";
 
 const appReducer = combineReducers({
   roomCreation: createRoomReducer,
@@ -63,7 +64,8 @@ const appReducer = combineReducers({
   studentListState: studentListReducer,
   teacherListState: teacherListReducer,
   studentTeacherManagementState: studentTeacherManagementReducer,
-  classListState: classListReducer
+  classListState: classListReducer,
+  accountListState: accountListReducer
 });
 
 const rootReducer = (state: any, action: AnyAction) => {

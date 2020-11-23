@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import { hot } from "react-hot-loader";
-import LoginForm from "../components/account-management/login/LoginForm";
-import GoogleUpdateInfoForm from "../components/account-management/google-update-info/GoogleUpdateInfo";
+import LoginForm from "../components/account/login/LoginForm";
+import GoogleUpdateInfoForm from "../components/account/google-update-info/GoogleUpdateInfo";
 import { HomePage } from "../components/homepage/Homepage";
 import { Route, Switch, HashRouter } from "react-router-dom";
-import RegisterForm from "../components/account-management/register/RegisterForm";
+import RegisterForm from "../components/account/register/RegisterForm";
 import ChatArea from "../components/chat/ChatArea";
-import ResetPasswordComponent from "../components/account-management/reset-password/ResetPasswordComponent";
+import ResetPasswordComponent from "../components/account/reset-password/ResetPasswordComponent";
 import RoomComponent from "../components/room/room-component/RoomComponent";
 import ProfilePage from "../components/profile-page/ProfilePage";
 import { HubConnectionBuilder } from "@microsoft/signalr";

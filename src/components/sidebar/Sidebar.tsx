@@ -8,8 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
-import config from "../account-management/login/googleConfigs.json";
-import { signOut } from "../account-management/signout/signOut";
+import config from "../account/login/googleConfigs.json";
+import { signOut } from "../account/signout/signOut";
 import { setSidebarValue } from "./sidebarSlice";
 // @ts-ignore
 import logo from "./logo.png";
