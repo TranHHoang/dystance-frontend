@@ -10,9 +10,13 @@ import {
   addNewAccount,
   deleteExistingAccounts,
   fetchAllAccounts,
+  resetAccountsError,
+  resetAccountState,
   updateExistingAccounts
 } from "./accountListSlice";
 import styled from "styled-components";
+import * as Yup from "yup";
+import { Notification } from "react-rainbow-components";
 
 const Title = styled.h1`
   font-size: 2.5em;
@@ -21,13 +25,29 @@ const Title = styled.h1`
   padding-right: 20px;
 `;
 
+const StyledNotifications = styled(Notification)`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  p {
+    font-size: 16px;
+  }
+  h1 {
+    font-size: 20px;
+  }
+  width: 30%;
+`;
+
 const AccountList = () => {
   const accountListState = useSelector((root: RootState) => root.accountListState);
   const dispatch = useDispatch();
-  const accounts = accountListState.map((s) => ({ ...s }));
+  const accounts = accountListState.accounts?.map((s) => ({ ...s }));
 
   useEffect(() => {
     dispatch(fetchAllAccounts());
+    return () => {
+      resetAccountState();
+    };
   }, []);
 
   return (
@@ -42,15 +62,18 @@ const AccountList = () => {
           columns={[
             {
               title: "Employee Code",
-              field: "code"
+              field: "code",
+              validate: (rowData: Account) => Yup.string().required().isValidSync(rowData.code)
             },
             {
               title: "Email",
-              field: "email"
+              field: "email",
+              validate: (rowData: Account) => Yup.string().email().required().isValidSync(rowData.email)
             },
             {
               title: "Real Name",
-              field: "realName"
+              field: "realName",
+              validate: (rowData: Account) => Yup.string().required().isValidSync(rowData.realName)
             },
             {
               title: "Role",
@@ -59,24 +82,64 @@ const AccountList = () => {
             }
           ]}
           onRowAdd={(newData: Account) => {
-            dispatch(addNewAccount(newData));
-            return Promise.resolve();
+            const format = {
+              code: newData.code,
+              email: newData.email,
+              realName: newData.realName,
+              role: newData.role
+            };
+            if (_.some(format, _.isEmpty) || !Yup.string().email().isValidSync(format.email)) {
+              return Promise.reject();
+            } else {
+              dispatch(resetAccountsError());
+              dispatch(addNewAccount(newData));
+              return Promise.resolve();
+            }
           }}
           onRowUpdate={(newData: Account) => {
-            dispatch(updateExistingAccounts([newData]));
-            return Promise.resolve();
+            if (_.some(newData, _.isEmpty) || !Yup.string().email().isValidSync(newData.email)) {
+              return Promise.reject();
+            } else {
+              dispatch(resetAccountsError());
+              dispatch(updateExistingAccounts([newData]));
+              return Promise.resolve();
+            }
           }}
           onRowDelete={(oldData: { id: string }) => {
+            dispatch(resetAccountsError());
             dispatch(deleteExistingAccounts([oldData.id]));
             return Promise.resolve();
           }}
-          onBulkUpdate={(changes: Account[]) => {
-            dispatch(updateExistingAccounts(changes));
-            return Promise.resolve();
+          onBulkUpdate={(changes: Account[]) =>
+            new Promise((resolve, reject) => {
+              const validated = _.every(changes, (change) => {
+                if (_.some(change, _.isEmpty) || !Yup.string().email().isValidSync(change.email)) {
+                  reject();
+                  return false;
+                }
+                return true;
+              });
+              if (validated) {
+                dispatch(resetAccountsError());
+                dispatch(updateExistingAccounts(changes));
+                resolve();
+              }
+            })
+          }
+          onBulkDelete={(data) => {
+            dispatch(resetAccountsError());
+            dispatch(deleteExistingAccounts(_.map(data, "id")));
           }}
-          onBulkDelete={(data) => dispatch(deleteExistingAccounts(_.map(data, "id")))}
         />
       </div>
+      {accountListState.error ? (
+        <StyledNotifications
+          title="Error"
+          onRequestClose={() => dispatch(resetAccountsError())}
+          description={accountListState.error?.message}
+          icon="error"
+        />
+      ) : null}
     </>
   );
 };
