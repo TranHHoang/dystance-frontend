@@ -89,7 +89,7 @@ export function startSendEmail(email: string): AppThunk {
       dispatch(requestSuccess());
       dispatch(addEmail(response.data.email));
     } catch (ex) {
-      console.log(ex as AxiosError);
+      console.log(ex);
       dispatch(getAxiosError(ex as AxiosError));
     }
   };

@@ -71,7 +71,6 @@ const GroupComponent = (props: any) => {
   useEffect(() => {
     dispatch(fetchAllGroups(roomId));
     get(`/rooms/getUsers?id=${roomId}`).then(({ data: userIds }) => {
-      console.log(userIds);
       setUsersInRoom(
         _(userIds)
           .reject((id) => id === getLoginData().id)
@@ -189,7 +188,6 @@ const GroupComponent = (props: any) => {
   }
 
   function joinGroup(groupId: number) {
-    console.log(groupId);
     const groupName = btoa(`${roomName} - Group #${groupId}`);
     dispatch(
       switchToGroup({

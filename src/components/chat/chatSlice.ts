@@ -65,7 +65,6 @@ export const { initChat, addChat } = chatSlice.actions;
 export function fetchAllMessages(roomId: string, privateChat: { id1: string; id2: string }): AppThunk {
   return async (dispatch) => {
     try {
-      console.log("Start fetching all...");
       const messages = (
         await get(
           roomId ? `/rooms/chat/get?id=${roomId}` : `/users/chat/get?id1=${privateChat.id1}&id2=${privateChat.id2}`
@@ -91,7 +90,7 @@ export function fetchLatestMessage(roomId: string, privateChat: { id1: string; i
       ).data as RoomMessage | PrivateMessage;
       dispatch(addChat({ type: roomId ? "room" : "private", content: message }));
     } catch (ex) {
-      console.log("Exception: " + ex);
+      console.log(ex);
     }
   };
 }
@@ -120,11 +119,8 @@ export function broadcastMessage(
       form.append("content", message);
       form.append("chatType", type.toString());
 
-      console.log("broadcasting...");
       await post(`/${roomId ? "rooms" : "users"}/chat/add`, form, {
         onUploadProgress: (progressEvent) => {
-          console.log(progressEvent);
-          console.log(onProgressEvent);
           onProgressEvent?.call(this, Math.round((progressEvent.loaded * 100) / progressEvent.total));
         }
       });

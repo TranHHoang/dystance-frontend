@@ -140,7 +140,6 @@ const ProfilePage = () => {
               variant="brand"
               type="submit"
               onClick={() => {
-                console.log(formRef.current);
                 formRef?.current.handleSubmit();
               }}
               disabled={updateProfileState.isLoading || rejectFile}

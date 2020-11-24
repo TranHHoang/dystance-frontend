@@ -78,7 +78,6 @@ const createWindow = () => {
     mainWindow.webContents.send("app-close");
   });
   // mainWindow.setMenu(null);
-  // console.log(__dirname);
 };
 // installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS])
 //   .then((name) => console.log(`Added Extension:  ${name}`))

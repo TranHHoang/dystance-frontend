@@ -62,7 +62,6 @@ export const {
 export function updateProfile({ realName, dob, newAvatar, password, newPassword }: UpdateProfileFormValues): AppThunk {
   return async (dispatch) => {
     dispatch(updateProfileStart());
-    console.log("Update Start");
 
     try {
       const fd = new FormData();

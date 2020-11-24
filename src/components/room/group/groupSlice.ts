@@ -116,7 +116,6 @@ export function fetchAllGroups(roomId: string): AppThunk {
   return async (dispatch) => {
     try {
       const response = await get(`/rooms/groups/get?roomId=${roomId}`);
-      console.log(response.data);
       dispatch(setBreakoutGroups(response.data as BreakoutGroup[]));
     } catch (ex) {
       console.log(ex);

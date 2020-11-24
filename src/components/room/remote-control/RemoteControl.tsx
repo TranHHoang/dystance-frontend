@@ -246,7 +246,6 @@ const RemoteControl = (props: any) => {
   useEffect(() => {
     socket.on(REMOTE_CONTROL_SIGNAL, async (data) => {
       const objData = JSON.parse(data) as RemoteControlSignal;
-      console.log(data);
 
       switch (objData.type) {
         case RemoteControlSignalType.Ping:
@@ -296,7 +295,6 @@ const RemoteControl = (props: any) => {
       });
 
       peer.current.on("data", (data) => {
-        console.log("Received", JSON.parse(data));
         syncWithRemote(JSON.parse(data) as MouseSignalData | KeyboardSignalData);
       });
 

@@ -44,7 +44,6 @@ export const { initPreview, incrementPrivateChatBadge, resetPrivateChatBadge } =
 export function fetchAllPreview(userId: string): AppThunk {
   return async (dispatch) => {
     try {
-      console.log("Fetch all previews");
       const response = await get(`/users/chat/preview?id=${userId}`);
       dispatch(initPreview(response.data));
     } catch (ex) {

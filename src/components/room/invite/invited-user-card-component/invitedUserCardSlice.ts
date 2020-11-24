@@ -65,8 +65,6 @@ export const {
 export function kickInvitedUser(roomId: string, userId: string): AppThunk {
   return async (dispatch) => {
     try {
-      console.log(roomId);
-      console.log(userId);
       dispatch(kickUserStart());
       await get(`/rooms/kick?roomId=${roomId}&userId=${userId}`);
       dispatch(kickSuccess());
