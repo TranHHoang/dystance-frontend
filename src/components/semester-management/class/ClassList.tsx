@@ -76,7 +76,7 @@ const ClassList = (props: { semesterId: string }) => {
   }));
 
   function toSendableObj(data: Class): Class {
-    return { ...data, teacher: _.find(allUsersInfo, { userName: data.teacher }).id };
+    return { ...data, teacher: _.find(allUsersInfo, { userName: data.teacher })?.id };
   }
 
   useEffect(() => {
@@ -115,15 +115,13 @@ const ClassList = (props: { semesterId: string }) => {
               <Autocomplete
                 options={teachers}
                 getOptionLabel={(user: User) => user.userName}
-                onChange={(_, value: User) => props.onChange(value.id)}
+                onChange={(_, value: User) => props.onChange(value?.userName)}
                 renderInput={(params) => <StyledTextField {...params} label="Teacher Code" />}
               />
             )
           }
         ]}
         onRowAdd={(newData: Class) => {
-          dispatch(resetClassError());
-          console.log(newData);
           const format = {
             subject: newData.subject,
             class: newData.class,
@@ -132,17 +130,17 @@ const ClassList = (props: { semesterId: string }) => {
           if (_.some(format, _.isEmpty)) {
             return Promise.reject();
           } else {
+            dispatch(resetClassError());
             dispatch(addNewClass(semesterId, newData));
             return Promise.resolve();
           }
         }}
         onRowUpdate={(newData: Class) => {
-          console.log(newData);
-          dispatch(resetClassError());
-          if (_.some(newData, _.isEmpty)) {
+          if (_.some(_.omit(newData, "students"), _.isEmpty)) {
             return Promise.reject();
           } else {
-            dispatch(updateExistingClasses(semesterId, [newData]));
+            dispatch(resetClassError());
+            dispatch(updateExistingClasses(semesterId, [toSendableObj(newData)]));
             return Promise.resolve();
           }
         }}
@@ -151,19 +149,21 @@ const ClassList = (props: { semesterId: string }) => {
           dispatch(deleteExistingClasses([oldData.id]));
           return Promise.resolve();
         }}
-        onBulkUpdate={(changes) =>
+        onBulkUpdate={(changes: Class[]) =>
           new Promise((resolve, reject) => {
-            dispatch(resetClassError());
-            _.forEach(changes, (change) => {
-              if (_.some(change, _.isEmpty)) {
-                reject();
-              }
-            });
-            dispatch(updateExistingClasses(semesterId, changes as Class[]));
-            resolve();
+            if (_.some(changes, (change) => _.some(_.omit(change, "students"), _.isEmpty))) {
+              reject();
+            } else {
+              dispatch(resetClassError());
+              dispatch(updateExistingClasses(semesterId, _.map(changes, toSendableObj)));
+              resolve();
+            }
           })
         }
-        onBulkDelete={(data) => dispatch(deleteExistingClasses(_.map(data, "id")))}
+        onBulkDelete={(data) => {
+          dispatch(resetClassError());
+          dispatch(deleteExistingClasses(_.map(data, "id")));
+        }}
         onRowClick={(rowData) => setSelectedClass(rowData)}
       />
       {classState.error ? (
@@ -191,9 +191,9 @@ const ClassList = (props: { semesterId: string }) => {
           const studentInfo = _.find(allUsersInfo, { id: studentId });
           return {
             id: studentId,
-            code: studentInfo.userName,
-            email: studentInfo.email,
-            realName: studentInfo.realName
+            code: studentInfo?.userName,
+            email: studentInfo?.email,
+            realName: studentInfo?.realName
           } as StudentValue;
         })}
         columns={[
@@ -218,7 +218,7 @@ const ClassList = (props: { semesterId: string }) => {
               return (
                 <Autocomplete
                   options={_.reject(students, (user: User) => selectedClass.students.includes(user.id))}
-                  getOptionLabel={(user: User) => user.userName}
+                  getOptionLabel={(user: User) => user?.userName}
                   onChange={(_, value) => onSelected(value as User)}
                   renderInput={(params) => <StyledTextField {...params} label="Student Code" />}
                 />
@@ -237,19 +237,27 @@ const ClassList = (props: { semesterId: string }) => {
           }
         ]}
         onRowAdd={(newData: StudentValue) => {
-          dispatch(
-            updateExistingClasses(semesterId, [
-              toSendableObj({
-                ...selectedClass,
-                students: _.uniq(selectedClass.students.concat(newData.id))
-              })
-            ])
-          );
-          return Promise.resolve();
+          console.log(newData);
+          const format = {
+            code: newData.code,
+            realName: newData.realName,
+            email: newData.email
+          };
+          if (_.some(format, _.isEmpty)) {
+            return Promise.reject();
+          } else {
+            dispatch(
+              updateExistingClasses(semesterId, [
+                toSendableObj({
+                  ...selectedClass,
+                  students: _.uniq(selectedClass.students.concat(newData.id))
+                })
+              ])
+            );
+            return Promise.resolve();
+          }
         }}
         onRowDelete={(oldData: StudentValue) => {
-          console.log(oldData.id);
-          console.log(selectedClass);
           dispatch(
             updateExistingClasses(semesterId, [
               toSendableObj({
