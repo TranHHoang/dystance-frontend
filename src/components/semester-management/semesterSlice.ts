@@ -1,7 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
 import { get, postForm, postJson } from "~utils/axiosUtils";
+import { ErrorResponse } from "~utils/types";
 
 export interface Semester {
   id: string;
@@ -9,39 +11,93 @@ export interface Semester {
   lastUpdated?: string;
   file: File | string;
 }
+interface SemesterState {
+  semesters: Semester[];
+  error?: ErrorResponse;
+}
+
+const initialState: SemesterState = {
+  semesters: []
+};
 
 const semesterSlice = createSlice({
   name: "semesterSlice",
-  initialState: [] as Semester[],
+  initialState,
   reducers: {
-    setSemesters(_, action: PayloadAction<Semester[]>) {
-      return action.payload;
+    setSemesters(state, action: PayloadAction<Semester[]>) {
+      state.semesters = action.payload;
     },
     addSemester(state, action: PayloadAction<Semester>) {
-      state.push(action.payload);
+      state.semesters.push(action.payload);
     },
     updateSemester(state, action: PayloadAction<Semester>) {
-      const index = _.findIndex(state, { id: action.payload.id });
-      state.splice(index, 1, action.payload);
+      const index = _.findIndex(state.semesters, { id: action.payload.id });
+      state.semesters.splice(index, 1, action.payload);
     },
     removeSemesters(state, action: PayloadAction<string[]>) {
-      return _.reject(state, ({ id }) => action.payload.includes(id));
+      state.semesters = _.reject(state.semesters, ({ id }) => action.payload.includes(id));
+    },
+    setSemestersFailed(state, action: PayloadAction<ErrorResponse>) {
+      state.error = action.payload;
+    },
+    addSemesterFailed(state, action: PayloadAction<ErrorResponse>) {
+      state.error = action.payload;
+    },
+    updateSemesterFailed(state, action: PayloadAction<ErrorResponse>) {
+      state.error = action.payload;
+    },
+    removeSemestersFailed(state, action: PayloadAction<ErrorResponse>) {
+      state.error = action.payload;
+    },
+    resetSemesterError(state) {
+      state.error = undefined;
+    },
+    resetSemesterState() {
+      return initialState;
     }
   }
 });
 
 export default semesterSlice.reducer;
 
-const { setSemesters, addSemester, updateSemester, removeSemesters } = semesterSlice.actions;
+export const {
+  setSemesters,
+  addSemester,
+  updateSemester,
+  removeSemesters,
+  setSemestersFailed,
+  addSemesterFailed,
+  removeSemestersFailed,
+  updateSemesterFailed,
+  resetSemesterError,
+  resetSemesterState
+} = semesterSlice.actions;
 
 export function fetchAllSemesters(): AppThunk {
   return async (dispatch) => {
     try {
       const data = (await get("/semesters")).data;
       dispatch(setSemesters(data));
-    } catch (ex) {
-      //TODO: Replace with notification
-      console.log(ex);
+    } catch (e) {
+      const ex = e as AxiosError;
+
+      if (ex.response?.data) {
+        dispatch(setSemestersFailed(e.response.data as ErrorResponse));
+      } else if (ex.request) {
+        dispatch(
+          setSemestersFailed({
+            message: "Something Went Wrong",
+            type: 3
+          })
+        );
+      } else {
+        dispatch(
+          setSemestersFailed({
+            message: ex.message,
+            type: 4
+          })
+        );
+      }
     }
   };
 }
@@ -55,9 +111,26 @@ export function addNewSemester(name: string, file: File): AppThunk {
 
       const data = (await postForm("/semesters/add", form)).data;
       dispatch(addSemester(data));
-    } catch (ex) {
-      //TODO: Replace with notification
-      console.log(ex);
+    } catch (e) {
+      const ex = e as AxiosError;
+
+      if (ex.response?.data) {
+        dispatch(addSemesterFailed(e.response.data as ErrorResponse));
+      } else if (ex.request) {
+        dispatch(
+          addSemesterFailed({
+            message: "Something Went Wrong",
+            type: 3
+          })
+        );
+      } else {
+        dispatch(
+          addSemesterFailed({
+            message: ex.message,
+            type: 4
+          })
+        );
+      }
     }
   };
 }
@@ -74,9 +147,26 @@ export function updateExistingSemester(semester: Semester): AppThunk {
       const data = (await postForm("/semesters/update", fd)).data;
       console.log(data);
       dispatch(updateSemester(data));
-    } catch (ex) {
-      //TODO: Replace with notification
-      console.log(ex);
+    } catch (e) {
+      const ex = e as AxiosError;
+
+      if (ex.response?.data) {
+        dispatch(updateSemesterFailed(e.response.data as ErrorResponse));
+      } else if (ex.request) {
+        dispatch(
+          updateSemesterFailed({
+            message: "Something Went Wrong",
+            type: 3
+          })
+        );
+      } else {
+        dispatch(
+          updateSemesterFailed({
+            message: ex.message,
+            type: 4
+          })
+        );
+      }
     }
   };
 }
@@ -86,9 +176,26 @@ export function deleteExistingSemesters(ids: string[]): AppThunk {
     try {
       await postJson("/semesters/delete", ids);
       dispatch(removeSemesters(ids));
-    } catch (ex) {
-      //TODO: Replace with notification
-      console.log(ex);
+    } catch (e) {
+      const ex = e as AxiosError;
+
+      if (ex.response?.data) {
+        dispatch(removeSemestersFailed(e.response.data as ErrorResponse));
+      } else if (ex.request) {
+        dispatch(
+          removeSemestersFailed({
+            message: "Something Went Wrong",
+            type: 3
+          })
+        );
+      } else {
+        dispatch(
+          removeSemestersFailed({
+            message: ex.message,
+            type: 4
+          })
+        );
+      }
     }
   };
 }

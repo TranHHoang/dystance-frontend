@@ -1,5 +1,3 @@
-import StudentList from "../student-teacher-management/student/StudentList";
-import TeacherList from "../student-teacher-management/teacher/TeacherList";
 import React, { useState } from "react";
 import { Tabset, Tab } from "react-rainbow-components";
 import styled from "styled-components";

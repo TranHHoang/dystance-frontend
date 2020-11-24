@@ -93,6 +93,7 @@ const ScheduleList = (props: { semesterId: string }) => {
         data={schedules}
         columns={columns}
         onRowAdd={(newData: Schedule) => {
+          dispatch(resetErrorState());
           const format = {
             date: moment(newData.date).format("YYYY-MM-DD"),
             startTime: newData.startTime,
@@ -112,7 +113,7 @@ const ScheduleList = (props: { semesterId: string }) => {
           }
         }}
         onRowUpdate={(newData: Schedule) => {
-          console.log(newData);
+          dispatch(resetErrorState());
           const format = {
             date: moment(newData.date).format("YYYY-MM-DD"),
             startTime: newData.startTime,
@@ -132,11 +133,13 @@ const ScheduleList = (props: { semesterId: string }) => {
           }
         }}
         onRowDelete={(oldData: { id: string }) => {
+          dispatch(resetErrorState());
           dispatch(deleteExistingSchedules([oldData.id]));
           return Promise.resolve();
         }}
         onBulkUpdate={(changes) =>
           new Promise((resolve, reject) => {
+            dispatch(resetErrorState());
             const validated = _.every(changes, (change) => {
               const format = {
                 date: moment(change.date).format("YYYY-MM-DD"),
@@ -163,7 +166,10 @@ const ScheduleList = (props: { semesterId: string }) => {
             }
           })
         }
-        onBulkDelete={(data) => dispatch(deleteExistingSchedules(_.map(data, "id")))}
+        onBulkDelete={(data) => {
+          dispatch(resetErrorState());
+          dispatch(deleteExistingSchedules(_.map(data, "id")));
+        }}
       />
       {timeError ? (
         <StyledNotifications

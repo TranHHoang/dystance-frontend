@@ -7,6 +7,8 @@ import {
   addNewSemester,
   deleteExistingSemesters,
   fetchAllSemesters,
+  resetSemesterError,
+  resetSemesterState,
   Semester,
   updateExistingSemester
 } from "./semesterSlice";
@@ -55,13 +57,19 @@ const StyledNotifications = styled(Notification)`
 const SemesterManagement = () => {
   const semesterState = useSelector((root: RootState) => root.semesterState);
   const dispatch = useDispatch();
-  const semesters = semesterState.map((s) => ({ ...s, lastUpdate: moment(s.lastUpdated).format("YYYY-MM-DD HH:mm") }));
+  const semesters = semesterState.semesters.map((s) => ({
+    ...s,
+    lastUpdate: moment(s.lastUpdated).format("YYYY-MM-DD HH:mm")
+  }));
   const [selectedSemesterId, setSelectedSemesterId] = useState("");
   const [rejectFile, setRejectFile] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
 
   useEffect(() => {
     dispatch(fetchAllSemesters());
+    return () => {
+      dispatch(resetSemesterState());
+    };
   }, []);
 
   const columns: Column<object>[] = [
@@ -95,27 +103,37 @@ const SemesterManagement = () => {
           columns={columns}
           data={semesters}
           onRowAdd={(newData: Semester) => {
+            dispatch(resetSemesterError());
             const format = {
               name: newData.name,
               file: newData.file?.toString()
             };
             if (_.some(format, _.isEmpty)) {
               return Promise.reject();
+            } else if (newData.file && newData.file instanceof File) {
+              if (/(xlsx|xls)$/i.test(newData?.file.name)) {
+                setRejectFile(false);
+                dispatch(addNewSemester(newData.name, newData.file as File));
+                return Promise.resolve();
+              } else {
+                setRejectFile(true);
+                setRejectReason("File type not supported");
+                return Promise.reject();
+              }
             } else {
               dispatch(addNewSemester(newData.name, newData.file as File));
               return Promise.resolve();
             }
           }}
           onRowUpdate={(newData: Semester) => {
+            dispatch(resetSemesterError());
             const format = {
               name: newData.name,
               file: newData.file?.toString()
             };
-            console.log(newData?.file);
             if (_.some(format, _.isEmpty)) {
               return Promise.reject();
             } else if (newData.file instanceof File) {
-              console.log(/(xlsx|xls)$/i.test(newData?.file.name));
               if (/(xlsx|xls)$/i.test(newData?.file.name)) {
                 setRejectFile(false);
                 dispatch(
@@ -143,13 +161,16 @@ const SemesterManagement = () => {
             }
           }}
           onRowDelete={(oldData: { id: string }) => {
+            dispatch(resetSemesterError());
             dispatch(deleteExistingSemesters([oldData.id]));
             return Promise.resolve();
           }}
-          onBulkDelete={(data) => dispatch(deleteExistingSemesters(_.map(data, "id")))}
+          onBulkDelete={(data) => {
+            dispatch(resetSemesterError());
+            dispatch(deleteExistingSemesters(_.map(data, "id")));
+          }}
           onRowClick={(rowData) => {
             setSelectedSemesterId(rowData.id);
-            console.log(rowData);
           }}
         />
       </div>
@@ -158,6 +179,14 @@ const SemesterManagement = () => {
           title="Error"
           onRequestClose={() => setRejectFile(false)}
           description={rejectReason}
+          icon="error"
+        />
+      ) : null}
+      {semesterState.error ? (
+        <StyledNotifications
+          title="Error"
+          onRequestClose={() => dispatch(resetSemesterError())}
+          description={semesterState.error.message}
           icon="error"
         />
       ) : null}
