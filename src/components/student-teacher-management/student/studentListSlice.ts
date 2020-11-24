@@ -117,6 +117,7 @@ export function addStudent(student: UserTableInfo): AppThunk {
       };
       const data = (await postJson(`/users/students/add`, studentFormat)).data;
       console.log(data);
+      dispatch(addStudentToList(data));
     } catch (e) {
       const ex = e as AxiosError;
 

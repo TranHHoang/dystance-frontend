@@ -59,8 +59,6 @@ const StudentTeacherTableComponent = (props: any) => {
         ]}
         data={data}
         onRowAdd={(newData: UserTableInfo) => {
-          dispatch(resetStudentError());
-          dispatch(resetTeacherError());
           const format = {
             code: newData.code,
             email: newData.email,
@@ -70,18 +68,16 @@ const StudentTeacherTableComponent = (props: any) => {
           if (_.some(format, _.isEmpty) || !Yup.string().email().isValidSync(format.email)) {
             return Promise.reject();
           } else if (isStudent) {
+            dispatch(resetStudentError());
             dispatch(addStudent(newData));
             return Promise.resolve();
           } else {
+            dispatch(resetTeacherError());
             dispatch(addTeacher(newData));
             return Promise.resolve();
           }
         }}
         onRowUpdate={(newData: UserTableInfo) => {
-          dispatch(resetStudentError());
-          dispatch(resetTeacherError());
-          console.log(newData);
-          console.log(_.some(newData, _.isEmpty));
           const format = {
             code: newData.code,
             email: newData.email,
@@ -91,28 +87,28 @@ const StudentTeacherTableComponent = (props: any) => {
           if (_.some(format, _.isEmpty) || !Yup.string().email().isValidSync(format.email)) {
             return Promise.reject();
           } else if (isStudent) {
+            dispatch(resetStudentError());
             dispatch(updateStudents([newData]));
             return Promise.resolve();
           } else {
+            dispatch(resetTeacherError());
             dispatch(updateTeachers([newData]));
             return Promise.resolve();
           }
         }}
         onRowDelete={(oldData: UserTableInfo) => {
-          dispatch(resetTeacherError());
-          dispatch(resetStudentError());
           if (isStudent) {
+            dispatch(resetStudentError());
             dispatch(deleteStudents([oldData.id]));
           } else {
+            dispatch(resetTeacherError());
             dispatch(deleteTeachers([oldData.id]));
           }
           return Promise.resolve();
         }}
         onBulkUpdate={(changes) =>
           new Promise((resolve, reject) => {
-            dispatch(resetTeacherError());
-            dispatch(resetStudentError());
-            _.forEach(changes, (change) => {
+            const validated = _.every(changes, (change) => {
               const format = {
                 code: change.code,
                 email: change.email,
@@ -121,23 +117,29 @@ const StudentTeacherTableComponent = (props: any) => {
               };
               if (_.some(format, _.isEmpty) || !Yup.string().email().isValidSync(format.email)) {
                 reject();
+                return false;
               }
+              return true;
             });
-            if (isStudent) {
-              dispatch(updateStudents(changes));
-              resolve();
-            } else {
-              dispatch(updateTeachers(changes));
-              resolve();
+            if (validated) {
+              if (isStudent) {
+                dispatch(resetStudentError());
+                dispatch(updateStudents(changes));
+                resolve();
+              } else {
+                dispatch(resetTeacherError());
+                dispatch(updateTeachers(changes));
+                resolve();
+              }
             }
           })
         }
         onBulkDelete={(data: UserTableInfo[]) => {
-          dispatch(resetTeacherError());
-          dispatch(resetStudentError());
           if (isStudent) {
+            dispatch(resetStudentError());
             dispatch(deleteStudents(_.map(data, "id")));
           } else {
+            dispatch(resetTeacherError());
             dispatch(deleteTeachers(_.map(data, "id")));
           }
         }}

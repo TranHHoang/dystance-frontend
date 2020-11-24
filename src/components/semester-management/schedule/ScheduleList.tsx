@@ -93,7 +93,6 @@ const ScheduleList = (props: { semesterId: string }) => {
         data={schedules}
         columns={columns}
         onRowAdd={(newData: Schedule) => {
-          dispatch(resetErrorState());
           const format = {
             date: moment(newData.date).format("YYYY-MM-DD"),
             startTime: newData.startTime,
@@ -108,12 +107,12 @@ const ScheduleList = (props: { semesterId: string }) => {
             return Promise.reject();
           } else {
             setTimeError(false);
+            dispatch(resetErrorState());
             dispatch(addNewSchedule(semesterId, newData));
             return Promise.resolve();
           }
         }}
         onRowUpdate={(newData: Schedule) => {
-          dispatch(resetErrorState());
           const format = {
             date: moment(newData.date).format("YYYY-MM-DD"),
             startTime: newData.startTime,
@@ -127,6 +126,7 @@ const ScheduleList = (props: { semesterId: string }) => {
             setTimeError(true);
             return Promise.reject();
           } else {
+            dispatch(resetErrorState());
             setTimeError(false);
             dispatch(updateExistingSchedules(semesterId, [newData]));
             return Promise.resolve();
@@ -139,7 +139,6 @@ const ScheduleList = (props: { semesterId: string }) => {
         }}
         onBulkUpdate={(changes) =>
           new Promise((resolve, reject) => {
-            dispatch(resetErrorState());
             const validated = _.every(changes, (change) => {
               const format = {
                 date: moment(change.date).format("YYYY-MM-DD"),
@@ -161,6 +160,7 @@ const ScheduleList = (props: { semesterId: string }) => {
               return true;
             });
             if (validated) {
+              dispatch(resetErrorState());
               dispatch(updateExistingSchedules(semesterId, changes as Schedule[]));
               resolve();
             }

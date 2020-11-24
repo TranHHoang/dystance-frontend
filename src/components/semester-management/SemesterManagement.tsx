@@ -103,7 +103,6 @@ const SemesterManagement = () => {
           columns={columns}
           data={semesters}
           onRowAdd={(newData: Semester) => {
-            dispatch(resetSemesterError());
             const format = {
               name: newData.name,
               file: newData.file?.toString()
@@ -113,6 +112,7 @@ const SemesterManagement = () => {
             } else if (newData.file && newData.file instanceof File) {
               if (/(xlsx|xls)$/i.test(newData?.file.name)) {
                 setRejectFile(false);
+                dispatch(resetSemesterError());
                 dispatch(addNewSemester(newData.name, newData.file as File));
                 return Promise.resolve();
               } else {
@@ -121,12 +121,12 @@ const SemesterManagement = () => {
                 return Promise.reject();
               }
             } else {
+              dispatch(resetSemesterError());
               dispatch(addNewSemester(newData.name, newData.file as File));
               return Promise.resolve();
             }
           }}
           onRowUpdate={(newData: Semester) => {
-            dispatch(resetSemesterError());
             const format = {
               name: newData.name,
               file: newData.file?.toString()
@@ -136,6 +136,7 @@ const SemesterManagement = () => {
             } else if (newData.file instanceof File) {
               if (/(xlsx|xls)$/i.test(newData?.file.name)) {
                 setRejectFile(false);
+                dispatch(resetSemesterError());
                 dispatch(
                   updateExistingSemester({
                     id: newData.id,
@@ -150,6 +151,7 @@ const SemesterManagement = () => {
                 return Promise.reject();
               }
             } else {
+              dispatch(resetSemesterError());
               dispatch(
                 updateExistingSemester({
                   id: newData.id,
