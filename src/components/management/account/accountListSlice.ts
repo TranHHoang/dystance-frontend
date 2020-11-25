@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
-import { get, postJson } from "~utils/axiosUtils";
+import { get, postForm, postJson } from "~utils/axiosUtils";
 import { ErrorResponse } from "~utils/types";
 
 export interface Account {
@@ -13,11 +13,13 @@ export interface Account {
   role: number;
 }
 interface AccountState {
+  isLoading: boolean;
   accounts: Account[];
   error?: ErrorResponse;
 }
 
 const initialState: AccountState = {
+  isLoading: false,
   accounts: []
 };
 
@@ -25,6 +27,9 @@ const accountSlice = createSlice({
   name: "accountSlice",
   initialState,
   reducers: {
+    setLoadingState(state, action: PayloadAction<boolean>) {
+      state.isLoading = action.payload;
+    },
     setAccounts(state, action: PayloadAction<Account[]>) {
       state.accounts = action.payload;
     },
@@ -40,16 +45,7 @@ const accountSlice = createSlice({
     removeAccounts(state, action: PayloadAction<string[]>) {
       state.accounts = _.reject(state.accounts, ({ id }) => action.payload.includes(id));
     },
-    setAccountsFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
-    },
-    updateAccountsFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
-    },
-    addAccountFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
-    },
-    removeAccountsFailed(state, action: PayloadAction<ErrorResponse>) {
+    setAccountsError(state, action: PayloadAction<ErrorResponse>) {
       state.error = action.payload;
     },
     resetAccountsError(state) {
@@ -68,12 +64,10 @@ export const {
   addAccount,
   removeAccounts,
   updateAccounts,
-  setAccountsFailed,
-  addAccountFailed,
-  removeAccountsFailed,
-  updateAccountsFailed,
   resetAccountState,
-  resetAccountsError
+  setAccountsError,
+  resetAccountsError,
+  setLoadingState
 } = accountSlice.actions;
 
 export function fetchAllAccounts(): AppThunk {
@@ -92,23 +86,39 @@ export function fetchAllAccounts(): AppThunk {
       const ex = e as AxiosError;
 
       if (ex.response?.data) {
-        dispatch(setAccountsFailed(e.response.data as ErrorResponse));
+        dispatch(setAccountsError(e.response.data as ErrorResponse));
       } else if (ex.request) {
         dispatch(
-          setAccountsFailed({
+          setAccountsError({
             message: "Something Went Wrong",
             type: 1
           })
         );
       } else {
         dispatch(
-          setAccountsFailed({
+          setAccountsError({
             message: ex.message,
             type: 2
           })
         );
       }
     }
+  };
+}
+
+export function importExcelFile(file: File): AppThunk {
+  return async (dispatch) => {
+    setLoadingState(true);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+
+      await postForm("/admin/accounts/import", form);
+      dispatch(fetchAllAccounts());
+    } catch (ex) {
+      setAccountsError(ex.data);
+    }
+    setLoadingState(false);
   };
 }
 
@@ -121,17 +131,17 @@ export function addNewAccount(account: Account): AppThunk {
       const ex = e as AxiosError;
 
       if (ex.response?.data) {
-        dispatch(addAccountFailed(e.response.data as ErrorResponse));
+        dispatch(setAccountsError(e.response.data as ErrorResponse));
       } else if (ex.request) {
         dispatch(
-          addAccountFailed({
+          setAccountsError({
             message: "Something Went Wrong",
             type: 1
           })
         );
       } else {
         dispatch(
-          addAccountFailed({
+          setAccountsError({
             message: ex.message,
             type: 2
           })
@@ -150,17 +160,17 @@ export function updateExistingAccounts(accounts: Account[]): AppThunk {
       const ex = e as AxiosError;
 
       if (ex.response?.data) {
-        dispatch(updateAccountsFailed(e.response.data as ErrorResponse));
+        dispatch(setAccountsError(e.response.data as ErrorResponse));
       } else if (ex.request) {
         dispatch(
-          updateAccountsFailed({
+          setAccountsError({
             message: "Something Went Wrong",
             type: 1
           })
         );
       } else {
         dispatch(
-          updateAccountsFailed({
+          setAccountsError({
             message: ex.message,
             type: 2
           })
@@ -179,17 +189,17 @@ export function deleteExistingAccounts(ids: string[]): AppThunk {
       const ex = e as AxiosError;
 
       if (ex.response?.data) {
-        dispatch(removeAccountsFailed(e.response.data as ErrorResponse));
+        dispatch(setAccountsError(e.response.data as ErrorResponse));
       } else if (ex.request) {
         dispatch(
-          removeAccountsFailed({
+          setAccountsError({
             message: "Something Went Wrong",
             type: 1
           })
         );
       } else {
         dispatch(
-          removeAccountsFailed({
+          setAccountsError({
             message: ex.message,
             type: 2
           })
