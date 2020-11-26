@@ -2,14 +2,14 @@ import { createMuiTheme, MuiThemeProvider } from "@material-ui/core";
 import _ from "lodash";
 import MaterialTable from "material-table";
 import React, { useEffect, useState } from "react";
-import { Picklist, Option, Button } from "react-rainbow-components";
+import { Picklist, Option, Button, Notification } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { allUsers } from "~utils/types";
 import ActivityLogs from "../ActivityLogs";
-import { getRooms, getSemesters, resetRoomListState, setSelectedRoom } from "./roomListSlice";
+import { getRooms, getSemesters, resetRoomListError, resetRoomListState, setSelectedRoom } from "./roomListSlice";
 
 const Title = styled.h1`
   font-size: 2.5em;
@@ -31,6 +31,7 @@ const SemesterSelectionDiv = styled.div`
 const SelectSemesterText = styled.p`
   font-size: 1.75em;
   color: white;
+  margin-right: 20px;
 `;
 const StyledDiv = styled.div`
   div::before {
@@ -52,6 +53,19 @@ export const StyledButton = styled(Button)`
 const ActionContainer = styled.div`
   display: flex;
 `;
+const StyledNotifications = styled(Notification)`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  p {
+    font-size: 16px;
+  }
+  h1 {
+    font-size: 20px;
+  }
+  width: 30%;
+`;
+
 const theme = createMuiTheme({
   palette: {
     type: "dark",
@@ -85,7 +99,7 @@ const RoomList = () => {
   const [selectedSemester, setSelectedSemester] = useState({ name: null, label: "" });
   const roomData = roomListState.rooms.map((room) => ({
     ...room,
-    userName: _.find(allUsers, { id: room.teacherId }).userName
+    userName: _.find(allUsers, { id: room.teacherId })?.userName
   }));
 
   useEffect(() => {
@@ -100,10 +114,13 @@ const RoomList = () => {
       name: _.last(roomListState.semesters)?.id,
       label: _.last(roomListState.semesters)?.name
     });
-    setTimeout(() => {
-      dispatch(getRooms(selectedSemester.name));
-    }, 1000);
   }, [roomListState.semesters]);
+
+  useEffect(() => {
+    if (selectedSemester.name) {
+      dispatch(getRooms(selectedSemester?.name));
+    }
+  }, [selectedSemester]);
 
   return !roomListState.selectedRoom ? (
     <>
@@ -116,7 +133,7 @@ const RoomList = () => {
           <Picklist
             onChange={(value) => {
               setSelectedSemester({ name: value.name, label: value.label });
-              dispatch(getRooms(value.name.toString()));
+              dispatch(getRooms(value?.name.toString()));
             }}
             value={selectedSemester}
           >
@@ -187,6 +204,14 @@ const RoomList = () => {
           </MuiThemeProvider>
         </StyledDiv>
       </Container>
+      {roomListState.error ? (
+        <StyledNotifications
+          title="Error"
+          onRequestClose={() => dispatch(resetRoomListError())}
+          description={roomListState.error?.message}
+          icon="error"
+        />
+      ) : null}
     </>
   ) : (
     <ActivityLogs />

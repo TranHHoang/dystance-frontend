@@ -46,6 +46,9 @@ const roomListSlice = createSlice({
       state.semesters = [];
       state.rooms = [];
       state.error = undefined;
+    },
+    resetRoomListError(state) {
+      state.error = undefined;
     }
   }
 });
@@ -57,24 +60,15 @@ export const {
   fetchSemestersFailed,
   fetchSemestersSuccess,
   resetRoomListState,
-  setSelectedRoom
+  setSelectedRoom,
+  resetRoomListError
 } = roomListSlice.actions;
 
 export function getSemesters(): AppThunk {
   return async (dispatch) => {
     try {
       const response = await get("/semesters");
-      // const data = response.data as Semester[];
-      const data = [
-        {
-          id: "1",
-          name: "Semester Spring 2020"
-        },
-        {
-          id: "2",
-          name: "FU 2020"
-        }
-      ];
+      const data = response.data as Semester[];
       dispatch(fetchSemestersSuccess(data));
     } catch (e) {
       const ex = e as AxiosError;
@@ -103,19 +97,8 @@ export function getSemesters(): AppThunk {
 export function getRooms(semesterId: string): AppThunk {
   return async (dispatch) => {
     try {
-      const data = [
-        {
-          roomId: "65",
-          roomName: "SWD301.IS1301",
-          teacherId: "aed9e96f-975e-44fb-920f-3cdcf32bc2bf"
-        },
-        {
-          roomId: "23",
-          roomName: "ACC101.IS1302",
-          teacherId: "aed9e96f-975e-44fb-920f-3cdcf32bc2bf"
-        }
-      ];
-
+      const response = await get(`/rooms/getBySemesterId?id=${semesterId}`);
+      const data = response.data as Room[];
       dispatch(fetchRoomsSuccess(data));
     } catch (e) {
       const ex = e as AxiosError;

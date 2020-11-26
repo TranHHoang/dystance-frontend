@@ -30,12 +30,15 @@ const activityLogSlice = createSlice({
     },
     resetActivityLogState() {
       return initialState;
+    },
+    resetLogError(state) {
+      state.error = undefined;
     }
   }
 });
 
 export default activityLogSlice.reducer;
-export const { fetchLogsSuccess, fetchLogsFailed, resetActivityLogState } = activityLogSlice.actions;
+export const { fetchLogsSuccess, fetchLogsFailed, resetActivityLogState, resetLogError } = activityLogSlice.actions;
 
 export function getActivityLogs(roomId: string): AppThunk {
   return async (dispatch) => {

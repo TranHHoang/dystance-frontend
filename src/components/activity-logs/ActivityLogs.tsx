@@ -5,12 +5,12 @@ import _ from "lodash";
 import MaterialTable from "material-table";
 import moment from "moment";
 import React, { useEffect } from "react";
-import { Button, ButtonIcon } from "react-rainbow-components";
+import { Button, ButtonIcon, Notification } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { allUsers } from "~utils/types";
-import { getActivityLogs, resetActivityLogState } from "./activityLogsSlice";
+import { getActivityLogs, resetActivityLogState, resetLogError } from "./activityLogsSlice";
 import { setSelectedRoom } from "./room-list/roomListSlice";
 
 const Title = styled.h1`
@@ -48,6 +48,20 @@ const StyledHeader = styled.header`
     color: white;
   }
 `;
+
+const StyledNotifications = styled(Notification)`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  p {
+    font-size: 16px;
+  }
+  h1 {
+    font-size: 20px;
+  }
+  width: 30%;
+`;
+
 const theme = createMuiTheme({
   palette: {
     type: "dark",
@@ -82,7 +96,7 @@ const ActivityLogs = () => {
   const logData = activityLogState.logs.map((log) => ({
     date: moment(log.dateTime).format("YYYY-MM-DD"),
     time: moment(log.dateTime).format("HH:mm"),
-    user: _.find(allUsers, { id: log.userId }).userName,
+    user: _.find(allUsers, { id: log.userId })?.userName,
     ...log
   }));
 
@@ -168,6 +182,14 @@ const ActivityLogs = () => {
           </MuiThemeProvider>
         </StyledDiv>
       </Container>
+      {activityLogState.error ? (
+        <StyledNotifications
+          title="Error"
+          onRequestClose={() => dispatch(resetLogError())}
+          description={activityLogState.error?.message}
+          icon="error"
+        />
+      ) : null}
     </>
   );
 };
