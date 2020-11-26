@@ -30,6 +30,7 @@ import scheduleReducer from "../components/semester-management/schedule/schedule
 import studentListReducer from "../components/student-teacher-management/student/StudentListSlice";
 import teacherListReducer from "../components/student-teacher-management/teacher/teacherListSlice";
 import studentTeacherManagementReducer from "../components/student-teacher-management/studentTeacherManagementSlice";
+import classListReducer from "../components/semester-management/class/classListSlice";
 
 const appReducer = combineReducers({
   roomCreation: createRoomReducer,
@@ -61,7 +62,8 @@ const appReducer = combineReducers({
   scheduleState: scheduleReducer,
   studentListState: studentListReducer,
   teacherListState: teacherListReducer,
-  studentTeacherManagementState: studentTeacherManagementReducer
+  studentTeacherManagementState: studentTeacherManagementReducer,
+  classListState: classListReducer
 });
 
 const rootReducer = (state: any, action: AnyAction) => {

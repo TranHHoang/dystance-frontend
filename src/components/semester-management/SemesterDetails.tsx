@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Tabset, Tab } from "react-rainbow-components";
 import styled from "styled-components";
 import ScheduleList from "./schedule/ScheduleList";
+import ClassList from "./class/ClassList";
 
 const Title = styled.h1`
   font-size: 2.5em;
@@ -29,7 +30,7 @@ const SemesterDetails = (props: { semesterId: string }) => {
       case "schedule":
         return <ScheduleList semesterId={semesterId} />;
       case "classes":
-        return;
+        return <ClassList semesterId={semesterId} />;
     }
   }
   return (
