@@ -4,10 +4,10 @@ import {
   faChalkboardTeacher,
   faClipboardList,
   faComment,
-  faHome,
   faPencilAlt,
   faPowerOff,
-  faTasks
+  faTasks,
+  faUser
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
@@ -100,31 +100,30 @@ const SideNavigationBar = () => {
     >
       <SidebarItemContainer>
         <Logo src={logo} alt="logo "></Logo>
-        {role === "am" && (
+        {role === "academic management" && (
           <StyledSidebarItem icon={<StyledIcon icon={faTasks} size="2x" />} name="Semesters" label="Semesters" />
         )}
 
-        {["admin", "am"].includes(role) && (
-          <StyledSidebarItem icon={<StyledIcon icon={faTasks} size="2x" />} name="Accounts" label="Accounts" />
+        {["admin", "academic management"].includes(role) && (
+          <StyledSidebarItem icon={<StyledIcon icon={faUser} size="2x" />} name="Accounts" label="Accounts" />
         )}
-
-        <StyledSidebarItem icon={<StyledIcon icon={faHome} size="2x" />} name="Homepage" label="Homepage" />
 
         {["teacher", "student"].includes(role) && (
           <StyledSidebarItem icon={<StyledIcon icon={faCalendarAlt} size="2x" />} name="Timetable" label="Timetable" />
         )}
 
-        {role === "qa" && (
+        {role === "quality assurance" && (
           <StyledSidebarItem icon={<StyledIcon icon={faChalkboardTeacher} size="2x" />} name="Rooms" label="Rooms" />
         )}
+        {["teacher", "student", "quality assurance", "academic management"].includes(role) && (
+          <StyledSidebarItem
+            icon={<StyledIcon icon={faClipboardList} size="2x" />}
+            name="Reports"
+            label="Attendance Reports"
+          />
+        )}
 
-        <StyledSidebarItem
-          icon={<StyledIcon icon={faClipboardList} size="2x" />}
-          name="Reports"
-          label="Attendance Reports"
-        />
-
-        {["teacher", "student"].includes(role) && (
+        {/* {["teacher", "student"].includes(role) && (
           <StyledSidebarItem
             icon={
               chatPreviewState.privateChatBadge > 0 ? (
@@ -136,13 +135,13 @@ const SideNavigationBar = () => {
                   <StyledIcon icon={faComment} size="2x" />
                 </BadgeOverlay>
               ) : (
-                <StyledIcon icon={faComment} size="2x" />
-              )
+                  <StyledIcon icon={faComment} size="2x" />
+                )
             }
             name="Chat"
             label="Chat"
           />
-        )}
+        )} */}
       </SidebarItemContainer>
 
       <StyledAvatarMenu
@@ -165,7 +164,6 @@ const SideNavigationBar = () => {
           label="Logout"
           icon={<FontAwesomeIcon icon={faPowerOff} />}
           onClick={() => {
-            googleLogout.signOut();
             dispatch(signOut());
           }}
           iconPosition="left"

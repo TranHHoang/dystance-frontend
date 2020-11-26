@@ -5,7 +5,7 @@ import { hostName } from "./hostUtils";
 import { getLoginData } from "./tokenStorage";
 
 export const AllUsersInfo = "allUsersInfo"; // For autocomplete function
-type Role = "student" | "teacher" | "admin" | "qa" | "am";
+type Role = "student" | "teacher" | "admin" | "quality assurance" | "academic management";
 
 export interface UserLoginData {
   id: string;
@@ -18,7 +18,8 @@ export interface UserLoginData {
 export enum LoginLocalStorageKey {
   EmailOrUserName = "login/emailOrUserName",
   GoogleEmail = "login/googleEmail",
-  UserInfo = "login/userInfo"
+  UserInfo = "login/userInfo",
+  Profile = "profile"
 }
 
 export interface Room {
@@ -74,7 +75,7 @@ export async function getUserInfo(userId: string): Promise<UserInfo> {
 
 export function getCurrentRole(): Role {
   const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
-  return _.find(allUsers, { id: getLoginData().id }).role;
+  return _.find(allUsers, { id: getLoginData()?.id })?.role;
 }
 
 export const RoomAction = "RoomAction";

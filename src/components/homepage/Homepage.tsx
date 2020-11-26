@@ -8,7 +8,8 @@ import { showProfile } from "../profile-page/showProfileInfoSlice";
 import SideNavigationBar from "../sidebar/Sidebar";
 import { setSidebarValue } from "../sidebar/sidebarSlice";
 import { fetchAllUsers } from "./showRoomsSlice";
-import { resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
+import { initPrivateChatSocket, resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
+import SemesterManagement from "../management/semester/SemesterManagement";
 import StudentTeacherManagement from "../../components/student-teacher-management/StudentTeacherManagement";
 import RoomList from "../../components/activity-logs/room-list/RoomList";
 import fs from "fs";
@@ -19,7 +20,8 @@ import _ from "lodash";
 import AccountList from "../management/account/AccountList";
 import { AllUsersInfo, getCurrentRole } from "~utils/types";
 import { Spinner } from "react-rainbow-components";
-import SemesterManagement from "../../components/management/semester/SemesterManagement";
+import { socket } from "~app/App";
+import { getLoginData } from "~utils/tokenStorage";
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;
@@ -36,15 +38,13 @@ function getDefaultPage() {
   switch (getCurrentRole()) {
     case "admin":
       return "Accounts";
-    case "am":
+    case "academic management":
       return "Semesters";
-    case "qa":
+    case "quality assurance":
       return "Rooms";
     case "student":
     case "teacher":
       return "Timetable";
-    default:
-      return "Homepage";
   }
 }
 
@@ -85,10 +85,19 @@ export const HomePage = () => {
         fetchAllUsers().then(() => setReady(true));
       }
     }
+    if (socket && socket.state === "Disconnected") {
+      console.log("Start socket...");
+      socket.start().then(() => {
+        console.log("Started");
+        socket.invoke("ConnectionState", 0, getLoginData().id);
+        dispatch(initPrivateChatSocket());
+      });
+    }
   }, []);
 
   useEffect(() => {
     if (ready) {
+      console.log(getDefaultPage());
       dispatch(setSidebarValue(getDefaultPage()));
       dispatch(showProfile());
     }

@@ -96,7 +96,7 @@ const EventDetailsDrawer = () => {
           <FontAwesomeIcon icon={faUser} size="2x" />
         </StyledIcon>
         <InfoContainer>
-          <StyleTitle>Creator</StyleTitle>
+          <StyleTitle>Teacher</StyleTitle>
           <StyleSubTitle>{eventDetailsState.creator?.realName}</StyleSubTitle>
         </InfoContainer>
       </div>
@@ -104,10 +104,6 @@ const EventDetailsDrawer = () => {
         <StyledIcon>
           <FontAwesomeIcon icon={faComment} size="2x" />
         </StyledIcon>
-        <InfoContainer>
-          <StyleTitle>Description</StyleTitle>
-          <StyleSubTitle style={{ fontSize: "18px" }}>{eventDetailsState.event?.description}</StyleSubTitle>
-        </InfoContainer>
       </div>
       {eventDetailsState.event?.eventType === TimetableEventType.Schedule ? (
         <div>
