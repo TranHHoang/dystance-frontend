@@ -18,12 +18,25 @@ import InvitedUserCardComponent from "./invited-user-card-component/InvitedUserC
 import { kickInvitedUser, setKickModalOpen } from "./invited-user-card-component/invitedUserCardSlice";
 import { StyledText } from "../..//homepage/single-room/styles";
 
-const theme = createMuiTheme({
+export const theme = createMuiTheme({
   palette: {
     type: "dark",
     primary: {
       main: "#4ecca3",
       contrastText: "#36393f"
+    },
+    background: {
+      paper: "#36393f"
+    },
+    secondary: {
+      main: "#4ecca3"
+    }
+  },
+  overrides: {
+    MuiInputBase: {
+      root: {
+        height: "2em"
+      }
     }
   }
 });
