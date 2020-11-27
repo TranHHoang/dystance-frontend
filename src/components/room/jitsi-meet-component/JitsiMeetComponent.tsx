@@ -164,7 +164,7 @@ const JitsiMeetComponent = (props: any) => {
       saveFile();
       interval = setInterval(() => {
         saveFile();
-      }, 5000);
+      }, 2000 * 60);
       if (groupState.isGroupJoined === false && groupState.isGroupLeft === false) {
         logger.log(LogType.AttendanceJoin, roomId, `Joined room`);
       }
@@ -177,9 +177,13 @@ const JitsiMeetComponent = (props: any) => {
       dispatch(resetCardState());
       removeListeners();
       redirect();
-      // saveFile();
       clearInterval(interval);
       jitsiMeetAPI.dispose();
+    });
+    jitsiMeetAPI.on("screenSharingStatusChanged", (status: any) => {
+      status.on
+        ? logger.log(LogType.ShareScreenStart, roomId, `Started screen sharing`)
+        : logger.log(LogType.ShareScreenStop, roomId, `Stopped screen sharing`);
     });
   };
   return (

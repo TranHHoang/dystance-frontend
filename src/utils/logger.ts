@@ -26,7 +26,9 @@ export enum LogType {
   GroupStart = "GROUP_START",
   GroupStop = "GROUP_STOP",
   GroupJoin = "GROUP_JOIN",
-  GroupLeave = "GROUP_LEAVE"
+  GroupLeave = "GROUP_LEAVE",
+  ShareScreenStart = "SCREEN_SHARE_START",
+  ShareScreenStop = "SCREEN_SHARE_STOP"
 }
 
 export class Logger {

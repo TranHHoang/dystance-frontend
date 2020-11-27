@@ -9,7 +9,7 @@ import { Button, ButtonIcon, Notification } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { allUsers } from "~utils/types";
+import { AllUsersInfo, User } from "~utils/types";
 import { getActivityLogs, resetActivityLogState, resetLogError } from "./activityLogsSlice";
 import { setSelectedRoom } from "./room-list/roomListSlice";
 
@@ -92,6 +92,7 @@ const theme = createMuiTheme({
 const ActivityLogs = () => {
   const activityLogState = useSelector((state: RootState) => state.activityLogState);
   const roomListState = useSelector((state: RootState) => state.roomListState);
+  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
   const dispatch = useDispatch();
   const logData = activityLogState.logs.map((log) => ({
     date: moment(log.dateTime).format("YYYY-MM-DD"),

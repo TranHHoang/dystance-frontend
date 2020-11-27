@@ -7,9 +7,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { allUsers } from "~utils/types";
+import { AllUsersInfo, User } from "~utils/types";
 import ActivityLogs from "../ActivityLogs";
-import { getRooms, getSemesters, resetRoomListError, resetRoomListState, setSelectedRoom } from "./roomListSlice";
+import {
+  getRooms,
+  getSemesters,
+  resetRoomListError,
+  resetRoomListState,
+  setSelectedRoom,
+  setSelectedSemester
+} from "./roomListSlice";
 
 const Title = styled.h1`
   font-size: 2.5em;
@@ -96,12 +103,11 @@ const theme = createMuiTheme({
 const RoomList = () => {
   const roomListState = useSelector((state: RootState) => state.roomListState);
   const dispatch = useDispatch();
-  const [selectedSemester, setSelectedSemester] = useState({ name: null, label: "" });
+  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
   const roomData = roomListState.rooms.map((room) => ({
     ...room,
     userName: _.find(allUsers, { id: room.teacherId })?.userName
   }));
-
   useEffect(() => {
     dispatch(getSemesters());
     return () => {
@@ -110,17 +116,10 @@ const RoomList = () => {
   }, []);
 
   useEffect(() => {
-    setSelectedSemester({
-      name: _.last(roomListState.semesters)?.id,
-      label: _.last(roomListState.semesters)?.name
-    });
-  }, [roomListState.semesters]);
-
-  useEffect(() => {
-    if (selectedSemester.name) {
-      dispatch(getRooms(selectedSemester?.name));
+    if (roomListState.selectedSemester.name) {
+      dispatch(getRooms(roomListState.selectedSemester?.name));
     }
-  }, [selectedSemester]);
+  }, [roomListState.selectedSemester]);
 
   return !roomListState.selectedRoom ? (
     <>
@@ -132,10 +131,10 @@ const RoomList = () => {
           <SelectSemesterText>Select Semester: </SelectSemesterText>
           <Picklist
             onChange={(value) => {
-              setSelectedSemester({ name: value.name, label: value.label });
+              dispatch(setSelectedSemester({ name: value.name as string, label: value.label }));
               dispatch(getRooms(value?.name.toString()));
             }}
-            value={selectedSemester}
+            value={roomListState.selectedSemester}
           >
             {_.map(roomListState.semesters, (semester) => (
               <Option key={semester.id} name={semester.id} label={semester.name} />

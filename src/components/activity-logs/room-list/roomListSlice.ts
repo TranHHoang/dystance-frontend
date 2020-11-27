@@ -3,7 +3,7 @@ import { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
 import { get } from "~utils/axiosUtils";
-import { allUsers, ErrorResponse, Room, Semester } from "~utils/types";
+import { ErrorResponse, Room, Semester } from "~utils/types";
 
 interface RoomListState {
   semesters: Semester[];
@@ -11,13 +11,15 @@ interface RoomListState {
   rooms: Room[];
   error?: ErrorResponse;
   selectedRoom: string;
+  selectedSemester: { name: string; label: string };
 }
 
 const initialState: RoomListState = {
   semesters: [],
   isLoading: true,
   rooms: [],
-  selectedRoom: ""
+  selectedRoom: "",
+  selectedSemester: { name: null, label: "" }
 };
 
 const roomListSlice = createSlice({
@@ -29,6 +31,9 @@ const roomListSlice = createSlice({
     },
     fetchSemestersFailed(state, action: PayloadAction<ErrorResponse>) {
       state.error = action.payload;
+    },
+    setSelectedSemester(state, action: PayloadAction<{ name: string; label: string }>) {
+      state.selectedSemester = action.payload;
     },
     fetchRoomsSuccess(state, action: PayloadAction<Room[]>) {
       state.isLoading = false;
@@ -61,7 +66,8 @@ export const {
   fetchSemestersSuccess,
   resetRoomListState,
   setSelectedRoom,
-  resetRoomListError
+  resetRoomListError,
+  setSelectedSemester
 } = roomListSlice.actions;
 
 export function getSemesters(): AppThunk {
@@ -70,6 +76,7 @@ export function getSemesters(): AppThunk {
       const response = await get("/semesters");
       const data = response.data as Semester[];
       dispatch(fetchSemestersSuccess(data));
+      dispatch(setSelectedSemester({ name: _.first(data).id, label: _.first(data).name }));
     } catch (e) {
       const ex = e as AxiosError;
 
