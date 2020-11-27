@@ -17,35 +17,72 @@ export interface BreakoutGroup {
   endTime?: string;
 }
 
+interface GroupState {
+  groupId: string;
+  breakoutGroup: BreakoutGroup[];
+  isGroupJoined: boolean;
+  isGroupLeft: boolean;
+  mainRoomId: string;
+}
+
+const initialState: GroupState = {
+  groupId: null,
+  breakoutGroup: [],
+  isGroupJoined: false,
+  isGroupLeft: false,
+  mainRoomId: null
+};
+
 const groupSlice = createSlice({
   name: "groupSlice",
-  initialState: [] as BreakoutGroup[],
+  initialState,
   reducers: {
     setBreakoutGroups(state, action: PayloadAction<BreakoutGroup[]>) {
-      state = action.payload;
-      return state;
+      state.breakoutGroup = action.payload;
     },
     addBreakoutGroup(state, action: PayloadAction<BreakoutGroup>) {
-      state.push(action.payload);
+      state.breakoutGroup.push(action.payload);
     },
     removeBreakoutGroup(state, action: PayloadAction<string>) {
-      state = _.reject(state, { groupId: action.payload });
-      return state;
+      state.breakoutGroup = _.reject(state.breakoutGroup, { groupId: action.payload });
     },
     updateBreakoutGroup(state, action: PayloadAction<BreakoutGroup>) {
       // Update user list only
       if (action.payload) {
-        _.find(state, { groupId: action.payload.groupId }).userIds = action.payload.userIds;
+        _.find(state.breakoutGroup, { groupId: action.payload.groupId }).userIds = action.payload.userIds;
       } else {
-        return [];
+        state.breakoutGroup = [];
       }
+    },
+    setGroupJoined(state, action: PayloadAction<boolean>) {
+      state.isGroupJoined = action.payload;
+      state.isGroupLeft = !action.payload;
+    },
+    resetGroupJoinedLeftState(state) {
+      state.isGroupJoined = false;
+      state.isGroupLeft = false;
+    },
+    setGroupId(state, action: PayloadAction<string>) {
+      state.groupId = action.payload;
+    },
+    setMainRoomId(state, action: PayloadAction<string>) {
+      state.mainRoomId = action.payload;
     }
   }
 });
 
 export default groupSlice.reducer;
 
-export const { setBreakoutGroups, addBreakoutGroup, removeBreakoutGroup, updateBreakoutGroup } = groupSlice.actions;
+export const {
+  setBreakoutGroups,
+  addBreakoutGroup,
+  removeBreakoutGroup,
+  updateBreakoutGroup,
+  setGroupJoined,
+  resetGroupJoinedLeftState,
+  setGroupId,
+  setMainRoomId
+} = groupSlice.actions;
 
 export function createGroups(roomId: string, creatorId: string, groups: BreakoutGroup[]): AppThunk {
   return async (dispatch) => {

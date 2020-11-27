@@ -31,6 +31,8 @@ import studentListReducer from "../components/student-teacher-management/student
 import teacherListReducer from "../components/student-teacher-management/teacher/teacherListSlice";
 import studentTeacherManagementReducer from "../components/student-teacher-management/studentTeacherManagementSlice";
 import classListReducer from "../components/semester-management/class/classListSlice";
+import roomListReducer from "../components/activity-logs/room-list/roomListSlice";
+import activityLogReducer from "../components/activity-logs/activityLogsSlice";
 
 const appReducer = combineReducers({
   roomCreation: createRoomReducer,
@@ -63,7 +65,9 @@ const appReducer = combineReducers({
   studentListState: studentListReducer,
   teacherListState: teacherListReducer,
   studentTeacherManagementState: studentTeacherManagementReducer,
-  classListState: classListReducer
+  classListState: classListReducer,
+  roomListState: roomListReducer,
+  activityLogState: activityLogReducer
 });
 
 const rootReducer = (state: any, action: AnyAction) => {

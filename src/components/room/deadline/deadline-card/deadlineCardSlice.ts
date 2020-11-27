@@ -7,6 +7,7 @@ import { AxiosError } from "axios";
 import moment from "moment";
 import { CreateDeadlineFormValues } from "../DeadlineListComponent";
 import { resetDeadlines, showDeadlines } from "../deadlineListSlice";
+import { Logger, LogType } from "~utils/logger";
 
 interface DeadlineCardState {
   isUpdateModalOpen: boolean;
@@ -89,6 +90,7 @@ export const {
   resetDeadlineCardState
 } = deadlineCardSlice.actions;
 
+const logger = Logger.getInstance();
 export function updateDeadline({
   deadlineId,
   title,
@@ -130,7 +132,7 @@ export function updateDeadline({
     }
   };
 }
-export function deleteDeadline(deadlineId: string, roomId: string): AppThunk {
+export function deleteDeadline(deadlineId: string, title: string, roomId: string): AppThunk {
   return async (dispatch) => {
     try {
       dispatch(deadlineDeleteStart());

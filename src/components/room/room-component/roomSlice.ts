@@ -64,6 +64,9 @@ const roomSlice = createSlice({
     },
     stopGroup(state) {
       state.groupStopped = true;
+    },
+    setRoomId(state, action: PayloadAction<string>) {
+      state.roomId = action.payload;
     }
   }
 });
@@ -75,7 +78,8 @@ export const {
   switchToGroup,
   incrementChatBadge,
   resetChatBadge,
-  stopGroup
+  stopGroup,
+  setRoomId
 } = roomSlice.actions;
 
 export function initSocket(roomId: string): AppThunk {

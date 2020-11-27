@@ -1,9 +1,9 @@
 import NodeCache from "node-cache";
+import { StringLocale } from "yup";
 import Axios from "./fakeAPI";
 import { hostName } from "./hostUtils";
 
 export const AllUsersInfo = "allUsersInfo"; // For autocomplete function
-
 export interface UserLoginData {
   id: string;
   userName: string;
@@ -21,13 +21,7 @@ export enum LoginLocalStorageKey {
 export interface Room {
   roomId: string;
   roomName: string;
-  creatorId: string;
-  image: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  repeatOccurrence: string;
-  roomTimes: string;
+  teacherId: string;
 }
 
 export interface ErrorResponse {
@@ -121,4 +115,17 @@ export async function all<T>(array: T[], fn: (value: T) => Promise<void>) {
     await p;
     return await fn(item);
   }, Promise.resolve());
+}
+
+export interface Semester {
+  id: string;
+  name: string;
+}
+
+export interface ActivityLog {
+  dateTime: string;
+  logType: string;
+  roomId: string;
+  userId: string;
+  description: string;
 }

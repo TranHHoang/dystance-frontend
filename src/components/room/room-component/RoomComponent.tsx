@@ -19,11 +19,11 @@ import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import ChatArea from "../../chat/ChatArea";
 import { fetchAllMessages } from "../../chat/chatSlice";
-import { getUserInfo, RoomAction, RoomActionType } from "~utils/types";
+import { AllUsersInfo, getUserInfo, RoomAction, RoomActionType, User } from "~utils/types";
 import JitsiMeetComponent from "../jitsi-meet-component/JitsiMeetComponent";
 import UserListComponent from "../user-list/UserListComponent";
 import Whiteboard from "../whiteboard/Whiteboard";
-import { initSocket, removeListeners, resetChatBadge, setDrawerOpen, setTabsetValue } from "./roomSlice";
+import { initSocket, removeListeners, resetChatBadge, setDrawerOpen, setRoomId, setTabsetValue } from "./roomSlice";
 import { socket } from "~app/App";
 import {
   kickUser,
@@ -45,6 +45,8 @@ import ChatPreview from "../../private-chat/ChatPreview";
 import { ipcRenderer } from "electron";
 import { resetPrivateChatBadge, initPrivateChatSocket } from "../../private-chat/chatPreviewSlice";
 import GroupComponent from "../group/GroupComponent";
+import { Logger, LogType } from "~utils/logger";
+import _ from "lodash";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -173,16 +175,21 @@ const RoomComponent = (props: any) => {
   const [remoteInitiatorInfo, setRemoteInitiatorInfo] = useState<UserInfo>();
   const [privateChatOpen, setPrivateChatOpen] = useState(false);
   const dispatch = useDispatch();
-
+  const logger = Logger.getInstance();
+  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
+  const user = _.find(allUsers, { id: userCardState.userId });
+  const remoteControlUser = _.find(allUsers, { id: remoteControlState.userId });
+  const creatorUser = _.find(allUsers, { id: creatorId });
   const isBreakoutGroup = groupId !== undefined;
-  console.log(isBreakoutGroup);
   if (isBreakoutGroup) roomName = atob(roomName);
   console.log(roomName);
 
   useEffect(() => {
     dispatch(initSocket(roomId));
     dispatch(fetchAllMessages(roomId, undefined));
-    // dispatch(initPrivateChatSocket());
+    dispatch(initPrivateChatSocket());
+    dispatch(setRoomId(roomId));
+
     //Listen to the event sent from ipcMain and leave Room and remove socket
     ipcRenderer.on("app-close", () => {
       socket.invoke(RoomAction, roomId, RoomActionType.Leave, getLoginData().id);
@@ -323,7 +330,14 @@ const RoomComponent = (props: any) => {
       {remoteControlState.remoteControlAccepted ? (
         <InvisibleDiv className="hidden-class">
           <RemoteControlButtonDiv className="remote-control-div">
-            <Button variant="destructive" onClick={() => dispatch(setRemoteControlAccepted(undefined))}>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                // eslint-disable-next-line prettier/prettier
+                logger.log(LogType.RemoteControlStop, roomId, `Stopped remote-controlling ${remoteControlUser.realName}`);
+                dispatch(setRemoteControlAccepted(undefined));
+              }}
+            >
               <FontAwesomeIcon icon={faVideoSlash} className="rainbow-m-right_medium" /> Stop Connection
             </Button>
           </RemoteControlButtonDiv>
@@ -357,7 +371,10 @@ const RoomComponent = (props: any) => {
               label="Mute"
               variant="brand"
               type="submit"
-              onClick={() => dispatch(muteUser(roomId, userCardState.userId))}
+              onClick={() => {
+                dispatch(muteUser(roomId, userCardState.userId));
+                logger.log(LogType.Mute, roomId, `Muted user ${user.realName}`);
+              }}
               disabled={userCardState.isLoading || userCardState.isMuteSuccess}
             />
           </div>
@@ -385,7 +402,10 @@ const RoomComponent = (props: any) => {
               label="Kick"
               variant="brand"
               type="submit"
-              onClick={() => dispatch(kickUser(roomId, userCardState.userId))}
+              onClick={() => {
+                dispatch(kickUser(roomId, userCardState.userId));
+                logger.log(LogType.Kick, roomId, `Kicked user ${user.realName}`);
+              }}
               disabled={userCardState.isLoading || userCardState.isKickSuccess}
             />
           </div>
@@ -460,7 +480,11 @@ const RoomComponent = (props: any) => {
               label="Delete"
               variant="brand"
               type="submit"
-              onClick={() => dispatch(deleteDeadline(deadlineCardState.deadline?.deadlineId, roomId))}
+              onClick={() =>
+                dispatch(
+                  deleteDeadline(deadlineCardState.deadline?.deadlineId, deadlineCardState.deadline?.title, roomId)
+                )
+              }
               disabled={deadlineCardState.isLoading || deadlineCardState.isDeadlineDeleteSuccess}
             />
           </div>
@@ -483,12 +507,26 @@ const RoomComponent = (props: any) => {
       <StyledModal
         hideCloseButton={true}
         isOpen={userCardState.isRemoteControlOfferModalOpen}
+        onRequestClose={() => {
+          socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Reject, remoteInitiatorInfo.id, null);
+          logger.log(
+            LogType.RemoteControlReject,
+            roomId,
+            `Rejected remote control request from ${creatorUser.realName}`
+          );
+          dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
+        }}
         footer={
           <div className="rainbow-flex rainbow-justify_end">
             <Button
               label="Decline"
               onClick={() => {
                 socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Reject, remoteInitiatorInfo.id, null);
+                logger.log(
+                  LogType.RemoteControlReject,
+                  roomId,
+                  `Rejected remote control request from ${creatorUser.realName}`
+                );
                 dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
               }}
             />
@@ -497,15 +535,16 @@ const RoomComponent = (props: any) => {
               variant="brand"
               onClick={() => {
                 socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Accept, remoteInitiatorInfo.id, null);
+                logger.log(
+                  LogType.RemoteControlAccept,
+                  roomId,
+                  `Accepted remote control request from ${creatorUser.realName}`
+                );
                 dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
               }}
             />
           </div>
         }
-        onRequestClose={() => {
-          socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Reject, remoteInitiatorInfo.id, null);
-          dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
-        }}
       >
         <div className="rainbow-flex rainbow-m-bottom_medium">
           <StyledAvatar src={`${hostName}/${remoteInitiatorInfo?.avatar}`} />

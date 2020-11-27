@@ -4,7 +4,7 @@ import _ from "lodash";
 import moment from "moment";
 import * as React from "react";
 import { useRef } from "react";
-import { Button, MenuItem, Modal, WeekDayPicker, Accordion } from "react-rainbow-components";
+import { Button, MenuItem, WeekDayPicker, Accordion, AccordionSection, Modal } from "react-rainbow-components";
 import { WeekDayPickerProps } from "react-rainbow-components/components/WeekDayPicker";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
@@ -103,7 +103,7 @@ export const SingleRoom = (props: any) => {
           <Creator>
             Created By{" "}
             <CreatorName onClick={() => dispatch(setCreatorProfileOpen({ roomId, peopleProfileModalOpen: true }))}>
-              {creatorInfo.realName}
+              {creatorInfo?.realName}
             </CreatorName>
           </Creator>
         </TextContainer>
@@ -249,7 +249,7 @@ export const SingleRoom = (props: any) => {
         isOpen={peopleProfileState.roomId === roomId && peopleProfileState.peopleProfileModalOpen}
         onRequestClose={() => dispatch(setCreatorProfileOpen({ roomId: null, peopleProfileModalOpen: false }))}
       >
-        <PeopleProfilePage userId={creatorInfo.id} />
+        <PeopleProfilePage userId={creatorInfo?.id} />
       </Modal>
     </div>
   );

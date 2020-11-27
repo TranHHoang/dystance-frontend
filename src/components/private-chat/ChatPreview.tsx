@@ -2,17 +2,16 @@ import { faArrowLeft, faPaperclip, faPaperPlane, faPencilAlt, faSearch } from "@
 import ChatArea from "../chat/ChatArea";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { ButtonIcon, TimelineMarker, Input, Textarea, Button, Modal, Lookup } from "react-rainbow-components";
+import { ButtonIcon, TimelineMarker, Textarea, Button, Modal, Lookup } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
-import { AllUsersInfo, getUserInfo, PrivateMessage, User, UserInfo } from "~utils/types";
+import { AllUsersInfo, getUserInfo, User, UserInfo } from "~utils/types";
 import { broadcastMessage, ChatType, fetchAllMessages } from "../../components/chat/chatSlice";
 import { fetchAllPreview } from "./chatPreviewSlice";
 import { getLoginData } from "~utils/tokenStorage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { socket } from "~app/App";
 import * as Yup from "yup";
 import { Field, Form, Formik, FormikProps } from "formik";
 import { LookupValue } from "react-rainbow-components/components/types";
@@ -84,7 +83,7 @@ const schema = Yup.object({
 });
 
 const ChatPreview = (props: any) => {
-  const { inRoom, inSidebar } = props;
+  const { inRoom } = props;
   const [usersInfo, setUsersInfo] = useState<{ [key: string]: UserInfo }>({});
   const previews = useSelector((root: RootState) => root.chatPreviewState.chatPreview);
   const [selectedUserId, setSelectedUserId] = useState<string>();
@@ -244,7 +243,7 @@ const ChatPreview = (props: any) => {
             variant="brand"
             icon={<FontAwesomeIcon icon={faPencilAlt} />}
             size="large"
-            onClick={(e) => setShowNewMessageModal(true)}
+            onClick={() => setShowNewMessageModal(true)}
           />
         </>
       ) : (
@@ -262,7 +261,7 @@ const ChatPreview = (props: any) => {
             </span>
           </StyledHeader>
           <div style={{ margin: "0 5 0 5" }}>
-            <ChatArea receiverId={selectedUserId} />
+            <ChatArea receiverId={selectedUserId} inRoom={inRoom} />
           </div>
         </>
       )}

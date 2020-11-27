@@ -15,7 +15,17 @@ import { hostName } from "~utils/hostUtils";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
-import { createGroups, deleteGroups, fetchAllGroups, resetGroups, startNewSession, updateGroups } from "./groupSlice";
+import {
+  createGroups,
+  deleteGroups,
+  fetchAllGroups,
+  resetGroups,
+  setGroupId,
+  setGroupJoined,
+  setMainRoomId,
+  startNewSession,
+  updateGroups
+} from "./groupSlice";
 import { withRouter } from "react-router-dom";
 import { switchToGroup } from "../room-component/roomSlice";
 import { get } from "~utils/axiosUtils";
@@ -23,6 +33,7 @@ import { getLoginData } from "~utils/tokenStorage";
 import { faSignInAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
+import { Logger, LogType } from "~utils/logger";
 
 declare module "~utils/types" {
   interface User {
@@ -50,7 +61,7 @@ const GroupComponent = (props: any) => {
   const { roomId, roomName, creatorId } = props;
   const [picklistValue, setPicklistValue] = useState(0);
   const [usersByGroup, setUsersByGroup] = useState<UsersByGroup>({});
-  const groupState = useSelector((root: RootState) => root.groupState);
+  const breakoutGroups = useSelector((root: RootState) => root.groupState.breakoutGroup);
   const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
   const [usersInRoom, setUsersInRoom] = useState<User[]>();
   const keyToRoomNameDict = useRef<{ [key: number]: string }>({});
@@ -59,6 +70,7 @@ const GroupComponent = (props: any) => {
   const [timeout, setTimeout] = useState(10);
   const intervalRef = useRef<number>();
   const [hidden, setHidden] = useState(false);
+  const logger = Logger.getInstance();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -76,13 +88,13 @@ const GroupComponent = (props: any) => {
   }, []);
 
   useEffect(() => {
-    const usersDict = _(groupState)
+    const usersDict = _(breakoutGroups)
       .sortBy([(group) => group.groupId])
       .reduce((result, value, key) => {
         key += 1;
         keyToRoomNameDict.current[key] = value.groupId;
         _.each(usersInRoom, (user) => {
-          user.selected = _(groupState)
+          user.selected = _(breakoutGroups)
             .flatMap((group) => group.userIds)
             .some((id) => id === user.id);
         });
@@ -102,7 +114,7 @@ const GroupComponent = (props: any) => {
       }, {} as UsersByGroup);
 
     // If no room was found, release all users
-    if (groupState.length === 0) {
+    if (breakoutGroups.length === 0) {
       _.each(usersInRoom, (user) => {
         user.selected = false;
       });
@@ -110,7 +122,7 @@ const GroupComponent = (props: any) => {
 
     setUsersByGroup(usersDict);
     setPicklistValue(Object.values(usersDict).length);
-    const [group] = groupState;
+    const [group] = breakoutGroups;
 
     clearInterval(intervalRef.current);
     setStatus("Not started");
@@ -128,38 +140,40 @@ const GroupComponent = (props: any) => {
             dispatch(
               resetGroups(
                 roomId,
-                _.map(groupState, (group) => group.groupId)
+                _.map(breakoutGroups, (group) => group.groupId)
               )
             );
           }
         }
       }, 1000);
     }
-  }, [groupState]);
+  }, [breakoutGroups]);
 
   function saveChanges() {
-    // Check if room is add/remove
-    if (picklistValue > groupState.length) {
+    // Check if room is added/removed
+    if (picklistValue > breakoutGroups.length) {
       // The existing room always occupies from the first slot
       dispatch(
         createGroups(
           roomId,
           creatorId,
-          _.range(groupState.length + 1, picklistValue + 1).map((value) => ({
+          _.range(breakoutGroups.length + 1, picklistValue + 1).map((value) => ({
             name: `Group #${value}`,
             userIds: _.map(usersByGroup[value], "id") || []
           }))
         )
       );
-    } else if (picklistValue < groupState.length) {
+      logger.log(LogType.GroupCreate, roomId, `Created ${picklistValue - breakoutGroups.length} groups`);
+    } else if (picklistValue < breakoutGroups.length) {
       // Delete existing, always delete from end to start
       // Because the deleted groups are existing, they are guaranteed to have key in `keyToRoomNameDict`
       dispatch(
         deleteGroups(
           roomId,
-          _.range(picklistValue + 1, groupState.length + 1).map((key) => keyToRoomNameDict.current[key])
+          _.range(picklistValue + 1, breakoutGroups.length + 1).map((key) => keyToRoomNameDict.current[key])
         )
       );
+      logger.log(LogType.GroupDelete, roomId, `Deleted ${breakoutGroups.length - picklistValue} groups`);
     }
 
     const usersByGroupList = _(usersByGroup)
@@ -187,9 +201,13 @@ const GroupComponent = (props: any) => {
         id: keyToRoomNameDict.current[groupId],
         roomPath: `/room/${roomId}/${creatorId}/${roomName}`,
         name: groupName,
-        endTime: _.find(groupState, { groupId: keyToRoomNameDict.current[groupId] }).endTime
+        endTime: _.find(breakoutGroups, { groupId: keyToRoomNameDict.current[groupId] }).endTime
       })
     );
+    dispatch(setGroupId(groupId.toString()));
+    dispatch(setGroupJoined(true));
+    dispatch(setMainRoomId(roomId));
+    logger.log(LogType.GroupJoin, roomId, `Joined group ${groupId.toString()}`);
   }
 
   function handleSession() {
@@ -198,9 +216,14 @@ const GroupComponent = (props: any) => {
         startNewSession(
           roomId,
           status === "Not started" ? timeout : 0,
-          _.map(groupState, (group) => group.groupId)
+          _.map(breakoutGroups, (group) => group.groupId)
         )
       );
+      if (status === "Not started") {
+        logger.log(LogType.GroupStart, roomId, "Started groups");
+      } else {
+        logger.log(LogType.GroupStop, roomId, "Stopped groups");
+      }
     }
   }
 
