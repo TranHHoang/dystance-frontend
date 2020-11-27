@@ -18,7 +18,8 @@ import {
 import styled from "styled-components";
 import * as Yup from "yup";
 import { Button, FileSelector, Notification } from "react-rainbow-components";
-import { Form } from "formik";
+import moment from "moment";
+import { ErrorResponse } from "~utils/types";
 
 const Title = styled.h1`
   font-size: 2.5em;
@@ -33,6 +34,7 @@ const StyledNotifications = styled(Notification)`
   right: 20px;
   p {
     font-size: 16px;
+    color: ${(props) => props.theme.rainbow.palette.text.main};
   }
   h1 {
     font-size: 20px;
@@ -128,22 +130,33 @@ const AccountList = () => {
             {
               title: "Employee Code",
               field: "code",
-              validate: (rowData: Account) => Yup.string().required().isValidSync(rowData.code)
+              validate: (rowData: Account) => Yup.string().required().isValidSync(rowData.code),
+              filterPlaceholder: "Employee Code"
             },
             {
               title: "Email",
               field: "email",
-              validate: (rowData: Account) => Yup.string().email().required().isValidSync(rowData.email)
+              validate: (rowData: Account) => Yup.string().email().required().isValidSync(rowData.email),
+              filterPlaceholder: "Email"
             },
             {
               title: "Real Name",
               field: "realName",
-              validate: (rowData: Account) => Yup.string().required().isValidSync(rowData.realName)
+              validate: (rowData: Account) => Yup.string().required().isValidSync(rowData.realName),
+              filterPlaceholder: "Real Name"
+            },
+            {
+              title: "DOB",
+              field: "dob",
+              type: "date",
+              validate: (rowData: Account) => Yup.date().required().isValidSync(rowData.dob),
+              filterPlaceholder: "Date Of Birth"
             },
             {
               title: "Role",
               field: "role",
-              lookup: { 1: "Academic Management", 2: "Quality Assurance" }
+              lookup: { "academic management": "Academic Management", "quality assurance": "Quality Assurance" },
+              filterPlaceholder: "Role"
             }
           ]}
           onRowAdd={(newData: Account) => {
@@ -151,8 +164,10 @@ const AccountList = () => {
               code: newData.code,
               email: newData.email,
               realName: newData.realName,
+              dob: moment(newData.dob).format("YYYY-MM-DD"),
               role: newData.role
             };
+            console.log(format);
             if (_.some(format, _.isEmpty) || !Yup.string().email().isValidSync(format.email)) {
               return Promise.reject();
             } else {
@@ -162,7 +177,14 @@ const AccountList = () => {
             }
           }}
           onRowUpdate={(newData: Account) => {
-            if (_.some(newData, _.isEmpty) || !Yup.string().email().isValidSync(newData.email)) {
+            const format = {
+              code: newData.code,
+              email: newData.email,
+              realName: newData.realName,
+              dob: moment(newData.dob).format("YYYY-MM-DD"),
+              role: newData.role
+            };
+            if (_.some(format, _.isEmpty) || !Yup.string().email().isValidSync(format.email)) {
               return Promise.reject();
             } else {
               dispatch(resetAccountsError());
@@ -178,7 +200,14 @@ const AccountList = () => {
           onBulkUpdate={(changes: Account[]) =>
             new Promise((resolve, reject) => {
               const validated = _.every(changes, (change) => {
-                if (_.some(change, _.isEmpty) || !Yup.string().email().isValidSync(change.email)) {
+                const format = {
+                  code: change.code,
+                  email: change.email,
+                  realName: change.realName,
+                  dob: moment(change.dob).format("YYYY-MM-DD"),
+                  role: change.role
+                };
+                if (_.some(format, _.isEmpty) || !Yup.string().email().isValidSync(format.email)) {
                   reject();
                   return false;
                 }
@@ -197,11 +226,13 @@ const AccountList = () => {
           }}
         />
       </div>
-      {accountListState.error ? (
+      {accountListState.errors && accountListState.errors?.length > 0 ? (
         <StyledNotifications
           title="Error"
           onRequestClose={() => dispatch(resetAccountsError())}
-          description={accountListState.error?.message}
+          description={_.map(accountListState.errors, (error: ErrorResponse) => (
+            <p>{error?.message}</p>
+          ))}
           icon="error"
         />
       ) : null}

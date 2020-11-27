@@ -25,12 +25,12 @@ import remoteControlReducer from "../components/room/remote-control/remoteContro
 import chatPreviewReducer from "../components/private-chat/chatPreviewSlice";
 import invitedUserCardReducer from "../components/room/invite/invited-user-card-component/invitedUserCardSlice";
 import groupReducer from "../components/room/group/groupSlice";
-import semesterReducer from "../components/semester-management/semesterSlice";
-import scheduleReducer from "../components/semester-management/schedule/scheduleSlice";
+import semesterReducer from "../components/management/semester/semesterSlice";
+import scheduleReducer from "../components/management/schedule/scheduleSlice";
 import studentListReducer from "../components/student-teacher-management/student/StudentListSlice";
 import teacherListReducer from "../components/student-teacher-management/teacher/teacherListSlice";
 import studentTeacherManagementReducer from "../components/student-teacher-management/studentTeacherManagementSlice";
-import classListReducer from "../components/semester-management/class/classListSlice";
+import classListReducer from "../components/management/class/classListSlice";
 import accountListReducer from "../components/management/account/accountListSlice";
 
 const appReducer = combineReducers({

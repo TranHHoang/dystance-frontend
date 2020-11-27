@@ -10,17 +10,19 @@ export interface Account {
   code: string;
   realName: string;
   email: string;
+  dob: string;
   role: number;
 }
 interface AccountState {
   isLoading: boolean;
   accounts: Account[];
-  error?: ErrorResponse;
+  errors?: ErrorResponse[];
 }
 
 const initialState: AccountState = {
   isLoading: false,
-  accounts: []
+  accounts: [],
+  errors: []
 };
 
 const accountSlice = createSlice({
@@ -46,10 +48,10 @@ const accountSlice = createSlice({
       state.accounts = _.reject(state.accounts, ({ id }) => action.payload.includes(id));
     },
     setAccountsError(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     resetAccountsError(state) {
-      state.error = undefined;
+      state.errors = [];
     },
     resetAccountState() {
       return initialState;
@@ -73,14 +75,8 @@ export const {
 export function fetchAllAccounts(): AppThunk {
   return async (dispatch) => {
     try {
-      // const data = (await get(`/accounts`)).data;
-      const data: Account[] = [
-        { id: "1", code: "1", email: "SWD301@gmail.com", realName: "Test something", role: 1 },
-        { id: "2", code: "1", email: "SWD301@gmail.com", realName: "Test something", role: 1 },
-        { id: "3", code: "1", email: "SWD301@gmail.com", realName: "Test something", role: 1 },
-        { id: "4", code: "1", email: "SWD301@gmail.com", realName: "Test something", role: 1 },
-        { id: "5", code: "1", email: "SWD301@gmail.com", realName: "Test something", role: 1 }
-      ];
+      const data = (await get(`/admin/accounts`)).data;
+      console.log(data);
       dispatch(setAccounts(data));
     } catch (e) {
       const ex = e as AxiosError;
@@ -91,14 +87,14 @@ export function fetchAllAccounts(): AppThunk {
         dispatch(
           setAccountsError({
             message: "Something Went Wrong",
-            type: 1
+            type: 3
           })
         );
       } else {
         dispatch(
           setAccountsError({
             message: ex.message,
-            type: 2
+            type: 4
           })
         );
       }
@@ -115,8 +111,26 @@ export function importExcelFile(file: File): AppThunk {
 
       await postForm("/admin/accounts/import", form);
       dispatch(fetchAllAccounts());
-    } catch (ex) {
-      setAccountsError(ex.data);
+    } catch (e) {
+      const ex = e as AxiosError;
+
+      if (ex.response?.data) {
+        dispatch(setAccountsError(e.response.data as ErrorResponse));
+      } else if (ex.request) {
+        dispatch(
+          setAccountsError({
+            message: "Something Went Wrong",
+            type: 3
+          })
+        );
+      } else {
+        dispatch(
+          setAccountsError({
+            message: ex.message,
+            type: 4
+          })
+        );
+      }
     }
     setLoadingState(false);
   };
@@ -125,7 +139,7 @@ export function importExcelFile(file: File): AppThunk {
 export function addNewAccount(account: Account): AppThunk {
   return async (dispatch) => {
     try {
-      const data = (await postJson("/accounts/add", account)).data;
+      const data = (await postJson("/admin/accounts/add", account)).data;
       dispatch(addAccount(data));
     } catch (e) {
       const ex = e as AxiosError;
@@ -136,14 +150,14 @@ export function addNewAccount(account: Account): AppThunk {
         dispatch(
           setAccountsError({
             message: "Something Went Wrong",
-            type: 1
+            type: 3
           })
         );
       } else {
         dispatch(
           setAccountsError({
             message: ex.message,
-            type: 2
+            type: 4
           })
         );
       }
@@ -154,8 +168,17 @@ export function addNewAccount(account: Account): AppThunk {
 export function updateExistingAccounts(accounts: Account[]): AppThunk {
   return async (dispatch) => {
     try {
-      const data = (await postJson("/accounts/update", accounts)).data;
-      dispatch(updateAccounts(data));
+      const data = (await postJson("/admin/accounts/update", accounts)).data;
+      if (data.success.length > 0) {
+        dispatch(updateAccounts(data.success));
+      }
+      if (data.failed.length > 0) {
+        _.forEach(data.failed, (error: ErrorResponse) => {
+          console.log(error);
+          dispatch(setAccountsError(error));
+        });
+        dispatch(fetchAllAccounts());
+      }
     } catch (e) {
       const ex = e as AxiosError;
 
@@ -165,14 +188,14 @@ export function updateExistingAccounts(accounts: Account[]): AppThunk {
         dispatch(
           setAccountsError({
             message: "Something Went Wrong",
-            type: 1
+            type: 3
           })
         );
       } else {
         dispatch(
           setAccountsError({
             message: ex.message,
-            type: 2
+            type: 4
           })
         );
       }
@@ -183,7 +206,7 @@ export function updateExistingAccounts(accounts: Account[]): AppThunk {
 export function deleteExistingAccounts(ids: string[]): AppThunk {
   return async (dispatch) => {
     try {
-      await postJson("/accounts/delete", ids);
+      await postJson("/admin/accounts/delete", ids);
       dispatch(removeAccounts(ids));
     } catch (e) {
       const ex = e as AxiosError;

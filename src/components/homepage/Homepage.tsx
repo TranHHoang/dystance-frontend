@@ -12,7 +12,6 @@ import { resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
 import StudentTeacherManagement from "../../components/student-teacher-management/StudentTeacherManagement";
 import AccountList from "../management/account/AccountList";
 
-
 const Container = styled.div`
   display: flex;
   height: auto;

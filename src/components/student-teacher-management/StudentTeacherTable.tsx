@@ -4,7 +4,7 @@ import { ErrorResponse, UserTableInfo } from "~utils/types";
 import _ from "lodash";
 import * as Yup from "yup";
 import moment from "moment";
-import Table from "../semester-management/Table";
+import Table from "../management/Table";
 import { addStudent, updateStudents, deleteStudents, resetStudentError } from "./student/StudentListSlice";
 import { addTeacher, updateTeachers, deleteTeachers, resetTeacherError } from "./teacher/teacherListSlice";
 import styled from "styled-components";
