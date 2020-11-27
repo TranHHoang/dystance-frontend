@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Textarea, TimelineMarker, Avatar, Modal, Notification } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
-import { StyledNotification } from "../../account-management/styles";
+import { StyledNotification } from "../../account/styles";
 import { setInviteModalOpen, showInvitedUsers, startInvite } from "./inviteSlice";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { AllUsersInfo, User } from "~utils/types";

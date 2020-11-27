@@ -13,7 +13,7 @@ import {
   updateExistingSemester
 } from "./semesterSlice";
 import { useDispatch, useSelector } from "react-redux";
-import Table from "./Table";
+import Table from "../Table";
 import _ from "lodash";
 import { RootState } from "~app/rootReducer";
 import SemesterDetails from "./SemesterDetails";

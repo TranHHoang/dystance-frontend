@@ -16,6 +16,7 @@ import moment from "moment";
 import { getLoginData } from "~utils/tokenStorage";
 import { Logger } from "~utils/logger";
 import _ from "lodash";
+import AccountList from "../management/account/AccountList";
 
 const Container = styled.div`
   display: flex;
@@ -60,7 +61,7 @@ export const HomePage = () => {
   function getCurrentSidebarValue() {
     switch (sidebarState.sidebarValue) {
       case "Homepage":
-        return <RoomList />;
+        return <AccountList />;
       case "Profile":
         return <ProfilePage />;
       case "Timetable":
