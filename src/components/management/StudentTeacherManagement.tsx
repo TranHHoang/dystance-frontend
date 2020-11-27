@@ -1,5 +1,5 @@
-import StudentList from "../student-teacher-management/student/StudentList";
-import TeacherList from "../student-teacher-management/teacher/TeacherList";
+import StudentList from "./student/StudentList";
+import TeacherList from "./teacher/TeacherList";
 import React, { useRef, useState } from "react";
 import { Tabset, Tab, Button, FileSelector } from "react-rainbow-components";
 import styled from "styled-components";

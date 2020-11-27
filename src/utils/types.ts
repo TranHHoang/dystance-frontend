@@ -1,9 +1,12 @@
+import _ from "lodash";
 import NodeCache from "node-cache";
-import { StringLocale } from "yup";
 import Axios from "./fakeAPI";
 import { hostName } from "./hostUtils";
+import { getLoginData } from "./tokenStorage";
 
 export const AllUsersInfo = "allUsersInfo"; // For autocomplete function
+type Role = "student" | "teacher" | "admin" | "quality assurance" | "academic management";
+
 export interface UserLoginData {
   id: string;
   userName: string;
@@ -15,7 +18,8 @@ export interface UserLoginData {
 export enum LoginLocalStorageKey {
   EmailOrUserName = "login/emailOrUserName",
   GoogleEmail = "login/googleEmail",
-  UserInfo = "login/userInfo"
+  UserInfo = "login/userInfo",
+  Profile = "profile"
 }
 
 export interface Room {
@@ -38,6 +42,7 @@ export interface User {
   password: string;
   newPassword: string;
   avatar: string;
+  role: Role;
 }
 
 export interface UserTableInfo {
@@ -66,6 +71,11 @@ export async function getUserInfo(userId: string): Promise<UserInfo> {
   } catch (ex) {
     console.log(ex);
   }
+}
+
+export function getCurrentRole(): Role {
+  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
+  return _.find(allUsers, { id: getLoginData()?.id })?.role;
 }
 
 export const RoomAction = "RoomAction";

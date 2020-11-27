@@ -40,6 +40,7 @@ const Timetable = () => {
 
   useEffect(() => {
     dispatch(resetTimetable());
+    dispatch(setDrawerOpen(false));
     const startOfWeek = moment().startOf("week").toDate();
     const endOfWeek = moment().endOf("week").toDate();
     dispatch(showTimetableEvents(startOfWeek, endOfWeek));
@@ -47,18 +48,6 @@ const Timetable = () => {
       dispatch(resetTimetable());
     };
   }, []);
-
-  // useEffect(() => {
-  //   const calendarEvents = document.querySelectorAll("div[id^='calendar-event']");
-  //   calendarEvents.forEach((event) => {
-  //     const span = event.querySelector("span");
-  //     if (span.innerHTML.startsWith("Deadline - ")) {
-  //       event.style.backgroundColor = "#FE4849";
-  //       event.style.padding = "5px";
-  //       event.style.height = "auto";
-  //     }
-  //   });
-  // }, [timetableState.events]);
 
   return (
     <>

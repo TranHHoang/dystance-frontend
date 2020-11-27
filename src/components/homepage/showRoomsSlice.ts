@@ -79,13 +79,11 @@ export function showRoom(): AppThunk {
   };
 }
 
-export function fetchAllUsers(): AppThunk {
-  return async () => {
-    try {
-      const response = await Axios.get(`${hostName}/api/users/getAll`);
-      sessionStorage.setItem(AllUsersInfo, JSON.stringify(response.data));
-    } catch (ex) {
-      console.log(ex);
-    }
-  };
+export async function fetchAllUsers() {
+  try {
+    const response = await Axios.get(`${hostName}/api/users/getAll`);
+    sessionStorage.setItem(AllUsersInfo, JSON.stringify(response.data));
+  } catch (ex) {
+    console.log(ex);
+  }
 }

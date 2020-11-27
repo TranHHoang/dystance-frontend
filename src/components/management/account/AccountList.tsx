@@ -54,11 +54,13 @@ const StyledButton = styled(Button)`
   align-self: center;
   margin-left: 20px;
   font-size: 16px;
+  margin-top: 10px;
 `;
 
 export const StyledFileSelector = styled(FileSelector)`
   margin-bottom: 15px;
   height: auto;
+  width: 30vw;
   label {
     font-size: 15px;
     align-self: center;
@@ -67,6 +69,11 @@ export const StyledFileSelector = styled(FileSelector)`
   span {
     font-size: 16px;
   }
+`;
+
+export const Container = styled.div`
+  padding: 20px;
+  width: 100%;
 `;
 
 const AccountList = () => {
@@ -106,23 +113,23 @@ const AccountList = () => {
       <div style={{ padding: "20px 0 10px 20px" }}>
         <Title>Manage Accounts</Title>
       </div>
-      <FileSelectionDiv>
-        <StyledFileSelector
-          name="file"
-          label="Import Accounts List"
-          placeholder="Choose an Excel File"
-          accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-          onChange={(files) => handleChange(files[0])}
-          error={rejectFile ? rejectReason : null}
-        />
-        <StyledButton
-          variant="brand"
-          label="Upload File"
-          onClick={() => file && dispatch(importExcelFile(file))}
-          disabled={accountListState.isLoading || rejectFile}
-        />
-      </FileSelectionDiv>
-      <div style={{ margin: 20 }}>
+      <Container>
+        <FileSelectionDiv>
+          <StyledFileSelector
+            name="file"
+            label="Import Accounts List"
+            placeholder="Choose an Excel File"
+            accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            onChange={(files) => handleChange(files[0])}
+            error={rejectFile ? rejectReason : null}
+          />
+          <StyledButton
+            variant="brand"
+            label="Upload File"
+            onClick={() => file && dispatch(importExcelFile(file))}
+            disabled={accountListState.isLoading || rejectFile}
+          />
+        </FileSelectionDiv>
         <Table
           title="Account List"
           data={accounts}
@@ -225,7 +232,7 @@ const AccountList = () => {
             dispatch(deleteExistingAccounts(_.map(data, "id")));
           }}
         />
-      </div>
+      </Container>
       {accountListState.errors && accountListState.errors?.length > 0 ? (
         <StyledNotifications
           title="Error"
