@@ -172,6 +172,7 @@ const SemesterManagement = () => {
             dispatch(deleteExistingSemesters(_.map(data, "id")));
           }}
           onRowClick={(rowData) => {
+            console.log(rowData);
             setSelectedSemesterId(rowData.id);
           }}
         />

@@ -10,18 +10,18 @@ import { setSidebarValue } from "../sidebar/sidebarSlice";
 import { fetchAllUsers } from "./showRoomsSlice";
 import { initPrivateChatSocket, resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
 import SemesterManagement from "../management/semester/SemesterManagement";
-import StudentTeacherManagement from "../../components/student-teacher-management/StudentTeacherManagement";
 import RoomList from "../../components/activity-logs/room-list/RoomList";
 import fs from "fs";
 import moment from "moment";
 import { getLoginData } from "~utils/tokenStorage";
 import { Logger } from "~utils/logger";
 import _ from "lodash";
+import StudentTeacherManagement from "../management/StudentTeacherManagement";
 import AccountList from "../management/account/AccountList";
 import { AllUsersInfo, getCurrentRole } from "~utils/types";
 import { Spinner } from "react-rainbow-components";
 import { socket } from "~app/App";
-import { getLoginData } from "~utils/tokenStorage";
+import Timetable from "../../components/timetable/Timetable";
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;
@@ -55,6 +55,15 @@ export const HomePage = () => {
   const [ready, setReady] = useState(AllUsersInfo in sessionStorage);
 
   useEffect(() => {
+    fetchAllUsers().then(() => setReady(true));
+    if (socket && socket.state === "Disconnected") {
+      console.log("Start socket...");
+      socket.start().then(() => {
+        console.log("Started");
+        socket.invoke("ConnectionState", 0, getLoginData().id);
+        dispatch(initPrivateChatSocket());
+      });
+    }
     dispatch(setSidebarValue("Homepage"));
     dispatch(showProfile());
     if (!fs.existsSync(`./logs/${getLoginData().id}/${moment().format("YYYY-MM-DD")}.txt`)) {
@@ -81,17 +90,6 @@ export const HomePage = () => {
           });
         }
       });
-      if (!(AllUsersInfo in sessionStorage)) {
-        fetchAllUsers().then(() => setReady(true));
-      }
-    }
-    if (socket && socket.state === "Disconnected") {
-      console.log("Start socket...");
-      socket.start().then(() => {
-        console.log("Started");
-        socket.invoke("ConnectionState", 0, getLoginData().id);
-        dispatch(initPrivateChatSocket());
-      });
     }
   }, []);
 
@@ -109,17 +107,18 @@ export const HomePage = () => {
         return <AccountList />;
       case "Accounts":
         if (getCurrentRole() === "admin") return <AccountList />;
-        else return <div />;
+        else if (getCurrentRole() === "academic management") return <StudentTeacherManagement />;
       case "Semesters":
         return <SemesterManagement />;
       case "Profile":
         return <ProfilePage />;
       case "Timetable":
-        return <StudentTeacherManagement />;
+        return <Timetable />;
       case "Chat":
         dispatch(resetPrivateChatBadge());
         return <ChatPreview />;
       case "Rooms":
+        return;
       case "Reports":
         return <div />;
     }

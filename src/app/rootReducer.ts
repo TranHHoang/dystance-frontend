@@ -27,11 +27,11 @@ import invitedUserCardReducer from "../components/room/invite/invited-user-card-
 import groupReducer from "../components/room/group/groupSlice";
 import semesterReducer from "../components/management/semester/semesterSlice";
 import scheduleReducer from "../components/management/schedule/scheduleSlice";
-import studentListReducer from "../components/student-teacher-management/student/StudentListSlice";
-import teacherListReducer from "../components/student-teacher-management/teacher/teacherListSlice";
-import studentTeacherManagementReducer from "../components/student-teacher-management/studentTeacherManagementSlice";
 import roomListReducer from "../components/activity-logs/room-list/roomListSlice";
 import activityLogReducer from "../components/activity-logs/activityLogsSlice";
+import studentListReducer from "../components/management/student/StudentListSlice";
+import teacherListReducer from "../components/management/teacher/teacherListSlice";
+import studentTeacherManagementReducer from "../components/management/studentTeacherManagementSlice";
 import classListReducer from "../components/management/class/classListSlice";
 import accountListReducer from "../components/management/account/accountListSlice";
 

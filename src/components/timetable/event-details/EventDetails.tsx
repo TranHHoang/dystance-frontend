@@ -100,11 +100,6 @@ const EventDetailsDrawer = () => {
           <StyleSubTitle>{eventDetailsState.creator?.realName}</StyleSubTitle>
         </InfoContainer>
       </div>
-      <div className="rainbow-flex rainbow-m-bottom_medium">
-        <StyledIcon>
-          <FontAwesomeIcon icon={faComment} size="2x" />
-        </StyledIcon>
-      </div>
       {eventDetailsState.event?.eventType === TimetableEventType.Schedule ? (
         <div>
           <StyledJoinRoomLink

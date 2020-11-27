@@ -122,26 +122,6 @@ const SideNavigationBar = () => {
             label="Attendance Reports"
           />
         )}
-
-        {/* {["teacher", "student"].includes(role) && (
-          <StyledSidebarItem
-            icon={
-              chatPreviewState.privateChatBadge > 0 ? (
-                <BadgeOverlay
-                  className="rainbow-m-around_medium"
-                  variant="brand"
-                  value={chatPreviewState.privateChatBadge}
-                >
-                  <StyledIcon icon={faComment} size="2x" />
-                </BadgeOverlay>
-              ) : (
-                  <StyledIcon icon={faComment} size="2x" />
-                )
-            }
-            name="Chat"
-            label="Chat"
-          />
-        )} */}
       </SidebarItemContainer>
 
       <StyledAvatarMenu
