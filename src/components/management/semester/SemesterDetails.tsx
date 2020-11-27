@@ -23,7 +23,7 @@ const StyledTab = styled(Tab)`
 
 const SemesterDetails = (props: { semesterId: string }) => {
   const { semesterId } = props;
-  const [tabsetValue, setTabsetValue] = useState("schedule");
+  const [tabsetValue, setTabsetValue] = useState("classes");
 
   function getTabContent() {
     switch (tabsetValue) {
@@ -45,8 +45,8 @@ const SemesterDetails = (props: { semesterId: string }) => {
             setTabsetValue(selected);
           }}
         >
-          <StyledTab label="Schedule" name="schedule" />
           <StyledTab label="Classes" name="classes" />
+          <StyledTab label="Schedule" name="schedule" />
         </Tabset>
         {getTabContent()}
       </Container>

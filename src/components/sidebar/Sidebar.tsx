@@ -100,12 +100,13 @@ const SideNavigationBar = () => {
     >
       <SidebarItemContainer>
         <Logo src={logo} alt="logo "></Logo>
-        {role === "academic management" && (
-          <StyledSidebarItem icon={<StyledIcon icon={faTasks} size="2x" />} name="Semesters" label="Semesters" />
-        )}
 
         {["admin", "academic management"].includes(role) && (
           <StyledSidebarItem icon={<StyledIcon icon={faUser} size="2x" />} name="Accounts" label="Accounts" />
+        )}
+
+        {role === "academic management" && (
+          <StyledSidebarItem icon={<StyledIcon icon={faTasks} size="2x" />} name="Semesters" label="Semesters" />
         )}
 
         {["teacher", "student"].includes(role) && (

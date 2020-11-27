@@ -39,7 +39,7 @@ function getDefaultPage() {
     case "admin":
       return "Accounts";
     case "academic management":
-      return "Semesters";
+      return "Accounts";
     case "quality assurance":
       return "Rooms";
     case "student":

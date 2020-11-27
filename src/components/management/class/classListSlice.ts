@@ -135,11 +135,21 @@ export function addNewClass(semesterId: string, classObj: Class): AppThunk {
 }
 
 export function updateExistingClasses(semesterId: string, classes: Class[]): AppThunk {
-  console.log(classes);
   return async (dispatch) => {
     try {
       const data = (await postJson(`/semesters/classes/update?semesterId=${semesterId}`, classes)).data;
-      dispatch(updateClasses(data));
+      if (data.success.length > 0) {
+        dispatch(updateClasses(data.success));
+      }
+      if (data.failed.length > 0) {
+        dispatch(
+          updateClassesFailed({
+            message: "There was a problem with updating a few of the classes, please try again",
+            type: 1
+          })
+        );
+        dispatch(fetchAllClasses(semesterId));
+      }
     } catch (e) {
       const ex = e as AxiosError;
 
