@@ -83,15 +83,8 @@ const Logo = styled.img`
 const SideNavigationBar = () => {
   const sidebarState = useSelector((state: RootState) => state.sidebarState);
   const showProfileUser = useSelector((state: RootState) => state.showProfileState.user);
-  const chatPreviewState = useSelector((state: RootState) => state.chatPreviewState);
   const role = getCurrentRole();
   const dispatch = useDispatch();
-
-  const googleLogout = useGoogleLogout({
-    clientId: config.GoogleClientId,
-    onLogoutSuccess: () => console.log("Google signed out"),
-    onFailure: () => console.log("Google signed out error")
-  });
 
   return (
     <StyledSidebar

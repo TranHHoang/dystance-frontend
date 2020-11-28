@@ -70,7 +70,7 @@ const JitsiMeetComponent = (props: any) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const [remainingTime, setRemainingTime] = useState("00:00");
-  const { roomId, roomName, groupId, creatorId, history } = props;
+  const { roomId, roomName, groupId, teacherId, history } = props;
   const api = useRef(null);
   const groupRef = useRef<BreakoutGroup>();
   const intervalRef = useRef<number>();
@@ -137,7 +137,7 @@ const JitsiMeetComponent = (props: any) => {
       } else {
         // Redirect to group
         history.push("/temp");
-        history.replace(`/room/${groupRef.current.id}/${creatorId}/${groupRef.current.name}/${groupId}`);
+        history.replace(`/room/${groupRef.current.id}/${teacherId}/${groupRef.current.name}/${groupId}`);
         dispatch(switchToGroup(undefined));
       }
     } else {

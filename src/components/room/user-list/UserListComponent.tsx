@@ -18,7 +18,7 @@ const StyledAvatar = styled(Avatar)`
 `;
 const UserListComponent = (props: any) => {
   const userListState = useSelector((state: RootState) => state.userListState);
-  const { creatorId, roomId } = props;
+  const { teacherId, roomId } = props;
   return (
     <UserListContainer>
       {userListState.map((user) => (
@@ -27,7 +27,7 @@ const UserListComponent = (props: any) => {
             userId={user.id}
             icon={<StyledAvatar src={`${hostName}/${user.avatar}`} />}
             title={`${user.realName} (${user.userName})`}
-            creatorId={creatorId}
+            teacherId={teacherId}
             roomId={roomId}
           />
         </div>

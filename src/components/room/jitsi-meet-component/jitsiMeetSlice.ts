@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import moment from "moment";
 import { AppThunk } from "~app/store";
-import { post } from "~utils/axiosUtils";
+import { postForm } from "~utils/axiosUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { ErrorResponse } from "~utils/types";
 import { saveFile } from "./JitsiMeetComponent";
@@ -39,8 +39,8 @@ export function sendLog(): AppThunk {
 
       const fd = new FormData();
       fd.append("log", new Blob([Uint8Array.from(logFileBuf)]));
-
-      await post("/users/log", fd);
+      console.log("Send file");
+      await postForm("/users/log", fd);
     } catch (ex) {
       // Error code != 200
       const e = ex as AxiosError;

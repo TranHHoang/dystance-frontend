@@ -3,8 +3,7 @@ import { ipcRenderer } from "electron";
 export enum NotificationType {
   RoomNotification = "Room Notification",
   PrivateChat = "Private Message",
-  IncomingClass = "Incoming class",
-  IncomingDeadline = "Incoming deadline"
+  IncomingClass = "Incoming class"
 }
 
 export function createNotification(type: NotificationType, content: string) {

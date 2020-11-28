@@ -46,12 +46,11 @@ const StyledWhiteboard = styled.div`
 
 const Whiteboard = (props: any) => {
   const userCardState = useSelector((state: RootState) => state.userCardState);
-  const { roomId, creatorId } = props;
+  const { roomId, teacherId } = props;
   const [thickness, setThickness] = useState(3);
   const logger = Logger.getInstance();
   useEffect(() => {
     main(roomId);
-    // ReadOnlyService.activateReadOnlyMode();
   }, [roomId]);
 
   useEffect(() => {
@@ -69,7 +68,7 @@ const Whiteboard = (props: any) => {
       <div id="whiteboardContainer"></div>
 
       <Toolbar>
-        {creatorId === getLoginData().id ? (
+        {teacherId === getLoginData().id ? (
           <div className="btn-group">
             <WhiteboardLockButton id="whiteboardLockBtn" title="View and Write" type="button">
               <i className="fa fa-lock"></i>
