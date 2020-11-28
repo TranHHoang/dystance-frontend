@@ -182,7 +182,6 @@ const RoomComponent = (props: any) => {
   useEffect(() => {
     dispatch(initSocket(roomId));
     dispatch(fetchAllMessages(roomId, undefined));
-    dispatch(initPrivateChatSocket());
     dispatch(setRoomId(roomId));
 
     //Listen to the event sent from ipcMain and leave Room and remove socket
@@ -260,9 +259,11 @@ const RoomComponent = (props: any) => {
               )}
             </NormalButton>
           ) : null}
-          <RearButton variant="neutral" onClick={() => setWhiteboardOpen(!whiteboardOpen)}>
-            <FontAwesomeIcon icon={faChalkboard} size="2x" />
-          </RearButton>
+          {!isBreakoutGroup && (
+            <RearButton variant="neutral" onClick={() => setWhiteboardOpen(!whiteboardOpen)}>
+              <FontAwesomeIcon icon={faChalkboard} size="2x" />
+            </RearButton>
+          )}
         </ButtonGroup>
       ) : null}
 

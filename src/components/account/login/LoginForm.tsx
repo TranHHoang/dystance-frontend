@@ -167,18 +167,6 @@ const LoginForm = () => {
                 />
                 <ButtonContainer>
                   <StyledButton type="submit" label="Sign In" variant="brand" disabled={loginState.isLoading} />
-                  <GoogleLogin
-                    clientId={config.GoogleClientId}
-                    onSuccess={onGoogleResponse}
-                    onFailure={(e) => console.log(e)}
-                    render={(renderProps) => (
-                      <StyledButton onClick={renderProps.onClick} variant="destructive">
-                        <StyledGoogleIcon icon={faGoogle} />
-                        Login with Google
-                      </StyledButton>
-                    )}
-                    cookiePolicy="single_host_origin"
-                  />
                 </ButtonContainer>
 
                 <StyledLink to="/resetPassword" onClick={() => dispatch(resetPasswordSlice.resetState())}>
