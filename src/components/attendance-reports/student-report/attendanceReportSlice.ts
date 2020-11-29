@@ -1,7 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
 import { get, postJson } from "~utils/axiosUtils";
+import { getLoginData } from "~utils/tokenStorage";
+import { ErrorResponse } from "~utils/types";
 
 export interface AttendanceReportStudent {
   id: string;
@@ -20,83 +23,98 @@ export interface AttendanceReport {
   students?: AttendanceReportStudent[];
 }
 
+interface AttendanceReportState {
+  reports: AttendanceReport[];
+  error?: ErrorResponse;
+}
+const initialState: AttendanceReportState = {
+  reports: []
+};
+
 const attendanceReportSlice = createSlice({
   name: "attendanceReportSlice",
-  initialState: [] as AttendanceReport[],
+  initialState,
   reducers: {
-    setAttendanceReports(_, action: PayloadAction<AttendanceReport[]>) {
-      return action.payload;
+    setAttendanceReports(state, action: PayloadAction<AttendanceReport[]>) {
+      state.reports = action.payload;
     },
     updateStudentsStatus(state, action: PayloadAction<{ id: string; students: AttendanceReportStudent[] }>) {
-      const students = _.find(state, { id: action.payload.id }).students;
+      const students = _.find(state.reports, { id: action.payload.id }).students;
       _.each(action.payload.students, (student) => {
         _.find(students, { id: student.id }).status = student.status;
       });
+    },
+    setAttendanceError(state, action: PayloadAction<ErrorResponse>) {
+      state.error = action.payload;
+    },
+    resetAttendanceError(state) {
+      state.error = undefined;
     }
   }
 });
 
 export default attendanceReportSlice.reducer;
-const { setAttendanceReports, updateStudentsStatus } = attendanceReportSlice.actions;
+export const {
+  setAttendanceReports,
+  updateStudentsStatus,
+  setAttendanceError,
+  resetAttendanceError
+} = attendanceReportSlice.actions;
 
 export function fetchAttendanceReports(semesterId: string): AppThunk {
   return async (dispatch) => {
     try {
-      // const data = (await get(`/users/reports/attendance?id=${getLoginData().id}&semesterId=${semesterId}`)).data;
-      const data = [
-        {
-          id: "1",
-          class: "IS1301",
-          subject: "SWD301",
-          date: "2020-02-12",
-          startTime: "13:00",
-          endTime: "14:00",
-          teacher: "aed9e96f-975e-44fb-920f-3cdcf32bc2bf",
-          status: "future"
-        },
-        {
-          id: "2",
-          class: "IS1302",
-          subject: "SWD301",
-          date: "2020-02-12",
-          startTime: "13:00",
-          endTime: "14:00",
-          teacher: "aed9e96f-975e-44fb-920f-3cdcf32bc2bf",
-          status: "absent"
-        },
-        {
-          id: "3",
-          class: "IS1301",
-          subject: "SWD301",
-          date: "2020-02-12",
-          startTime: "13:00",
-          endTime: "14:00",
-          teacher: "aed9e96f-975e-44fb-920f-3cdcf32bc2bf",
-          students: [
-            {
-              id: "aed9e96f-975e-44fb-920f-3cdcf32bc2bf",
-              status: "present"
-            }
-          ]
-        }
-      ] as AttendanceReport[];
+      const data = (await get(`/users/reports/attendance?id=${getLoginData().id}&semesterId=${semesterId}`)).data;
       dispatch(setAttendanceReports(data));
     } catch (ex) {
-      console.log(ex);
+      const e = ex as AxiosError;
+
+      if (e.response) {
+        dispatch(setAttendanceError(e.response.data as ErrorResponse));
+      } else if (e.request) {
+        dispatch(
+          setAttendanceError({
+            type: 3,
+            message: "Something went wrong"
+          })
+        );
+      } else {
+        dispatch(
+          setAttendanceError({
+            type: 4,
+            message: e.message
+          })
+        );
+      }
     }
   };
 }
 
-export function updateAttendances(
-  semesterId: string,
-  attendance: { id: string; students: AttendanceReportStudent[] }
-): AppThunk {
+export function updateAttendances(attendance: { id: string; students: AttendanceReportStudent[] }): AppThunk {
   return async (dispatch) => {
     try {
-      // const data = (await postJson(`/users/reports/attendance/update?semesterId=${semesterId}`, attendance)).data;
-      dispatch(updateStudentsStatus(attendance));
+      const data = (await postJson(`/users/reports/attendance/update`, attendance)).data;
+      dispatch(updateStudentsStatus(data));
     } catch (ex) {
-      console.log(ex);
+      const e = ex as AxiosError;
+
+      if (e.response) {
+        dispatch(setAttendanceError(e.response.data as ErrorResponse));
+      } else if (e.request) {
+        dispatch(
+          setAttendanceError({
+            type: 3,
+            message: "Something went wrong"
+          })
+        );
+      } else {
+        dispatch(
+          setAttendanceError({
+            type: 4,
+            message: e.message
+          })
+        );
+      }
     }
   };
 }

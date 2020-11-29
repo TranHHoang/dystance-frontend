@@ -2,12 +2,12 @@ import { Box, createMuiTheme, makeStyles, MuiThemeProvider, Tab, Tabs, Theme } f
 import { fetchAllSemesters } from "../../semester-management/semesterSlice";
 import _ from "lodash";
 import React, { useEffect, useState } from "react";
-import { Picklist, Option } from "react-rainbow-components";
+import { Picklist, Option, Notification } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { AllUsersInfo, User } from "~utils/types";
-import { AttendanceReport, fetchAttendanceReports } from "./attendanceReportSlice";
+import { AttendanceReport, fetchAttendanceReports, resetAttendanceError } from "./attendanceReportSlice";
 import Table from "./Table";
 
 const Title = styled.h1`
@@ -16,7 +16,18 @@ const Title = styled.h1`
   color: white;
   padding-right: 20px;
 `;
-
+const StyledNotifications = styled(Notification)`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  p {
+    font-size: 16px;
+  }
+  h1 {
+    font-size: 20px;
+  }
+  width: 30%;
+`;
 const theme = createMuiTheme({
   palette: {
     type: "dark",
@@ -43,7 +54,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const StudentAttendanceReport = () => {
   const semesterState = useSelector((root: RootState) => root.semesterState);
   const attendanceReportState = useSelector((root: RootState) => root.attendanceReportState);
-  const attendanceByClass = _.groupBy(attendanceReportState, (report) => `${report.subject}.${report.class}`);
+  const attendanceByClass = _.groupBy(attendanceReportState.reports, (report) => `${report.subject}.${report.class}`);
   const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
   const [tab, setTab] = useState(0);
   const [selectedSemester, setSelectedSemester] = useState<{ id: string; label: string }>();
@@ -59,9 +70,7 @@ const StudentAttendanceReport = () => {
   }, [semesterState]);
 
   useEffect(() => {
-    if (selectedSemester) {
-      dispatch(fetchAttendanceReports(selectedSemester.id));
-    }
+    selectedSemester?.id && dispatch(fetchAttendanceReports(selectedSemester.id));
   }, [selectedSemester]);
 
   return (
@@ -144,6 +153,14 @@ const StudentAttendanceReport = () => {
               ]}
             />
           </Box>
+          {attendanceReportState.error ? (
+            <StyledNotifications
+              title="Error"
+              onRequestClose={() => dispatch(resetAttendanceError())}
+              description={attendanceReportState.error?.message}
+              icon="error"
+            />
+          ) : null}
         </div>
       </MuiThemeProvider>
     </div>

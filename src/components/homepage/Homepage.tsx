@@ -112,7 +112,7 @@ export const HomePage = () => {
       case "Profile":
         return <ProfilePage />;
       case "Timetable":
-        return <Timetable />;
+        return <AttendanceManagement />;
       case "Chat":
         dispatch(resetPrivateChatBadge());
         return <ChatPreview />;
