@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
-import { AllUsersInfo, getUserInfo, User, UserInfo } from "~utils/types";
+import { AllUsersInfo, getCurrentRole, getUserInfo, User, UserInfo } from "~utils/types";
 import { broadcastMessage, ChatType, fetchAllMessages } from "../../components/chat/chatSlice";
 import { fetchAllPreview } from "./chatPreviewSlice";
 import { getLoginData } from "~utils/tokenStorage";
@@ -129,25 +129,27 @@ const ChatPreview = (props: any) => {
   }
 
   const allUsersInfo = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
-  const options: LookupValue[] = allUsersInfo.map((userInfo) => ({
-    id: userInfo.id,
-    label: `${userInfo.realName} (${userInfo.userName})`,
-    description: `${userInfo.email}`,
-    // eslint-disable-next-line jsx-a11y/alt-text
-    icon: (
+  const options: LookupValue[] = allUsersInfo
+    .filter((userInfo) => userInfo.role === (getCurrentRole() === "teacher" ? "student" : "teacher"))
+    .map((userInfo) => ({
+      id: userInfo.id,
+      label: `${userInfo.realName} (${userInfo.userName})`,
+      description: `${userInfo.email}`,
       // eslint-disable-next-line jsx-a11y/alt-text
-      <img
-        style={{ height: "32px", width: "32px", borderRadius: "50%", objectFit: "cover" }}
-        src={`${hostName}/${userInfo.avatar}`}
-      />
-    )
-  }));
+      icon: (
+        // eslint-disable-next-line jsx-a11y/alt-text
+        <img
+          style={{ height: "32px", width: "32px", borderRadius: "50%", objectFit: "cover" }}
+          src={`${hostName}/${userInfo.avatar}`}
+        />
+      )
+    }));
 
   function filter(query: string, options: LookupValue[]) {
     if (query) {
       return options.filter((item) => {
         const regex = new RegExp(query, "i");
-        return regex.test(item.label) && item.id !== getLoginData().id;
+        return regex.test(item.label.toString()) && item.id !== getLoginData().id;
       });
     }
     return [];
@@ -203,7 +205,7 @@ const ChatPreview = (props: any) => {
                 <Form>
                   <Lookup
                     name="id"
-                    placeholder="To someone you ❤️"
+                    placeholder="Who do you want to talk to?"
                     debounce
                     value={selectedUser}
                     icon={<FontAwesomeIcon icon={faSearch} />}
