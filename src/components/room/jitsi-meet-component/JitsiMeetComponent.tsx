@@ -40,7 +40,7 @@ export async function saveFile() {
     fs.mkdirSync(folderName, { recursive: true });
   }
   if (!fs.existsSync(`${folderName}/${moment().format("YYYY-MM-DD")}.txt`)) {
-    console.log("File doesn't exist");
+    console.log("Log file doesn't exist");
     Logger.getInstance().resetLogs();
   }
   return new Promise((resolve, reject) => {
@@ -48,7 +48,7 @@ export async function saveFile() {
       `${folderName}/${moment().format("YYYY-MM-DD")}.txt`,
       Logger.getInstance().getLogs().join("\n"),
       (err) => {
-        console.log("WRite to file");
+        console.log("Write log to file");
         resolve();
         if (err) {
           console.log(err);

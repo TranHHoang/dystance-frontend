@@ -37,7 +37,6 @@ export function sendLog(): AppThunk {
 
       const fd = new FormData();
       fd.append("log", new Blob([Uint8Array.from(logFileBuf)]));
-      console.log("Send file");
       await post("/users/log", fd);
     } catch (ex) {
       // Error code != 200

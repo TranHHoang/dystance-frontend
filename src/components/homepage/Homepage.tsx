@@ -71,7 +71,7 @@ export const HomePage = () => {
         `./logs/${getLoginData().id}/${moment().format("YYYY-MM-DD")}.txt`,
         Logger.getInstance().getLogs().join("\n"),
         (err) => {
-          console.log("WRite to file");
+          console.log("Write log to file");
           if (err) {
             console.log(err);
           }

@@ -54,6 +54,5 @@ export class Logger {
   public log(type: string, roomId: string, description: string): void {
     const log = `${moment().format("YYYY-MM-DDTHH:mm:ss")} ${type} ${roomId} ${getLoginData().id} ${description}`;
     this.logs.push(log);
-    console.log(this.logs);
   }
 }

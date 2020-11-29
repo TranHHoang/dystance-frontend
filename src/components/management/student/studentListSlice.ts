@@ -116,7 +116,6 @@ export function addStudent(student: UserTableInfo): AppThunk {
         dob: moment(student.dob).format("YYYY-MM-DD")
       };
       const data = (await post(`/users/students/add`, studentFormat)).data;
-      console.log(data);
       dispatch(addStudentToList(data));
     } catch (e) {
       const ex = e as AxiosError;
@@ -144,7 +143,6 @@ export function addStudent(student: UserTableInfo): AppThunk {
 export function deleteStudents(userIds: string[]): AppThunk {
   return async (dispatch) => {
     try {
-      console.log(userIds);
       await post("/users/students/delete", userIds);
       dispatch(removeStudentsFromList(userIds));
     } catch (e) {
@@ -177,7 +175,6 @@ export function updateStudents(students: UserTableInfo[]): AppThunk {
       const studentFormat = students.map((s) => ({ ...s, dob: moment(s.dob).format("YYYY-MM-DD") }));
 
       const data = (await post(`/users/students/update`, studentFormat)).data;
-      console.log(data);
       if (data.success.length > 0) {
         dispatch(updateStudentList(data.success));
       }

@@ -137,14 +137,12 @@ export function addNewSemester(name: string, file: File): AppThunk {
 export function updateExistingSemester(semester: Semester): AppThunk {
   return async (dispatch) => {
     try {
-      console.log(semester.file);
       const fd = new FormData();
 
       fd.append("id", semester.id);
       fd.append("name", semester.name);
       fd.append("file", semester.file);
       const data = (await post("/semesters/update", fd)).data;
-      console.log(data);
       dispatch(updateSemester(data));
     } catch (e) {
       const ex = e as AxiosError;

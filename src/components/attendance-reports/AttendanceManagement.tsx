@@ -233,7 +233,6 @@ const AttendanceManagement = () => {
             getCurrentRole() !== "quality assurance"
               ? {
                   onRowUpdate: (newData: Student) => {
-                    console.log(newData);
                     dispatch(
                       updateAttendances({
                         id: selectedReport.id,

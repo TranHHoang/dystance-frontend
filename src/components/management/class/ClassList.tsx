@@ -236,7 +236,6 @@ const ClassList = (props: { semesterId: string }) => {
           }
         ]}
         onRowAdd={(newData: StudentValue) => {
-          console.log(newData);
           const format = {
             code: newData.code,
             realName: newData.realName,

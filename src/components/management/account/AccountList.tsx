@@ -174,7 +174,6 @@ const AccountList = () => {
               dob: moment(newData.dob).format("YYYY-MM-DD"),
               role: newData.role
             };
-            console.log(format);
             if (_.some(format, _.isEmpty) || !Yup.string().email().isValidSync(format.email)) {
               return Promise.reject();
             } else {

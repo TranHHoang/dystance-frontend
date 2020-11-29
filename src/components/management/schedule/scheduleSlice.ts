@@ -113,7 +113,6 @@ export function addNewSchedule(semesterId: string, schedule: Schedule): AppThunk
         ...schedule,
         date: moment(schedule.date).format("YYYY-MM-DD")
       };
-      console.log(scheduleFormat);
       const data = (await post(`/semesters/schedules/add?semesterId=${semesterId}`, scheduleFormat)).data;
       dispatch(addSchedule(data));
     } catch (e) {
@@ -144,7 +143,6 @@ export function updateExistingSchedules(semesterId: string, schedules: Schedule[
   return async (dispatch) => {
     try {
       const scheduleFormat = schedules.map((s) => ({ ...s, date: moment(s.date).format("YYYY-MM-DD") }));
-      console.log(scheduleFormat);
       const data = (await post(`/semesters/schedules/update?semesterId=${semesterId}`, scheduleFormat)).data;
       if (data.success.length > 0) {
         dispatch(updateSchedules(data.success));
