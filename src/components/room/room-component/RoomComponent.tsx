@@ -31,7 +31,6 @@ import {
   setRemoteControlOfferModalOpen,
   setRemoteControlWaitingModalOpen
 } from "../user-list/user-card/userCardSlice";
-import { StyledText } from "../../homepage/single-room/styles";
 import RemoteControl, { RemoteControlSignalType, REMOTE_CONTROL_SIGNAL } from "../remote-control/RemoteControl";
 import { setRemoteControlAccepted } from "../remote-control/remoteControlSlice";
 import ChatPreview from "../../private-chat/ChatPreview";
@@ -40,6 +39,11 @@ import { resetPrivateChatBadge } from "../../private-chat/chatPreviewSlice";
 import GroupComponent from "../group/GroupComponent";
 import { Logger, LogType } from "~utils/logger";
 import { RoomAction, getLoginData, hostName, RoomActionType, User, getUser, getCurrentRole } from "~utils/index";
+
+const StyledText = styled.p`
+  font-size: 20px;
+  margin-left: 12px;
+`;
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);

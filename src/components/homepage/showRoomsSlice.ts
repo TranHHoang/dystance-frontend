@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import { AppThunk } from "~app/store";
-import { getLoginData, AllUsersInfo, get } from "~utils/index";
-import { Room } from "./single-room/SingleRoomUpdateForm";
+import { getLoginData, AllUsersInfo, get, Room } from "~utils/index";
 
 enum ShowRoomError {
   OtherError = 2

@@ -7,8 +7,22 @@ import { setDrawerOpen } from "./eventDetailsSlice";
 import moment from "moment";
 import { faClock, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { StyledButton, StyledLink } from "../../homepage/single-room/styles";
 import { TimetableEventType } from "../Timetable";
+import { Button } from "react-rainbow-components";
+import { Link } from "react-router-dom";
+
+const StyledLink = styled(Link)`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const StyledButton = styled(Button)`
+  align-self: center;
+  width: 50%;
+  max-width: 250px;
+  margin: 10px 60px 10px 0;
+`;
 
 const StyledIcon = styled.span`
   width: 50px;

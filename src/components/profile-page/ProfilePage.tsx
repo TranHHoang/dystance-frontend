@@ -1,8 +1,9 @@
 import { Field, Formik, FormikProps } from "formik";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "react-rainbow-components";
+import { Button, Notification } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
+import styled from "styled-components";
 import * as Yup from "yup";
 import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
@@ -27,8 +28,10 @@ import {
   resetUpdateProfileState,
   updateProfile
 } from "./updateProfileSlice";
-import { StyledNotifications } from "../../components/homepage/single-room/styles";
 
+export const StyledNotifications = styled(Notification)`
+  width: 100%;
+`;
 export interface UpdateProfileFormValues {
   realName: string;
   userName: string;

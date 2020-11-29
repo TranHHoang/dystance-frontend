@@ -1,13 +1,10 @@
 import { AnyAction, combineReducers } from "@reduxjs/toolkit";
 import loginReducer from "../components/account/login/loginSlice";
-import googleUpdateInfoReducer from "../components/account/google-update-info/googleUpdateInfoSlice";
 import registerReducer from "../components/account/register/registerSlice";
 import createRoomReducer from "../components/room-management/create-room/createRoomSlice";
 import showRoomReducer from "../components/homepage/showRoomsSlice";
 import chatReducer from "../components/chat/chatSlice";
-import singleRoomReducer from "../components/homepage/single-room/singleRoomSlice";
 import resetPasswordReducer from "../components/account/reset-password/resetPasswordSlice";
-import inviteReducer from "../components/room/invite/inviteSlice";
 import { ResetStoreAction } from "../components/account/signout/signOut";
 import showProfileReducer from "../components/profile-page/showProfileInfoSlice";
 import updateProfileReducer from "../components/profile-page/updateProfileSlice";
@@ -21,7 +18,6 @@ import timetableReducer from "../components/timetable/timetableSlice";
 import eventDetailsReducer from "../components/timetable/event-details/eventDetailsSlice";
 import remoteControlReducer from "../components/room/remote-control/remoteControlSlice";
 import chatPreviewReducer from "../components/private-chat/chatPreviewSlice";
-import invitedUserCardReducer from "../components/room/invite/invited-user-card-component/invitedUserCardSlice";
 import groupReducer from "../components/room/group/groupSlice";
 import semesterReducer from "../components/management/semester/semesterSlice";
 import scheduleReducer from "../components/management/schedule/scheduleSlice";
@@ -38,12 +34,9 @@ const appReducer = combineReducers({
   roomCreation: createRoomReducer,
   showRoomState: showRoomReducer,
   loginState: loginReducer,
-  googleUpdateInfoState: googleUpdateInfoReducer,
   registerState: registerReducer,
   chatState: chatReducer,
-  singleRoomState: singleRoomReducer,
   resetPasswordState: resetPasswordReducer,
-  inviteState: inviteReducer,
   showProfileState: showProfileReducer,
   updateProfileState: updateProfileReducer,
   sidebarState: sidebarReducer,
@@ -56,7 +49,6 @@ const appReducer = combineReducers({
   eventDetailsState: eventDetailsReducer,
   remoteControlState: remoteControlReducer,
   chatPreviewState: chatPreviewReducer,
-  invitedUserCardState: invitedUserCardReducer,
   groupState: groupReducer,
   semesterState: semesterReducer,
   scheduleState: scheduleReducer,
