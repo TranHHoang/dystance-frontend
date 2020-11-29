@@ -39,7 +39,7 @@ function getDefaultPage() {
     case "admin":
       return "Accounts";
     case "academic management":
-      return "Semesters";
+      return "Accounts";
     case "quality assurance":
       return "Rooms";
     case "student":
@@ -95,7 +95,6 @@ export const HomePage = () => {
 
   useEffect(() => {
     if (ready) {
-      console.log(getDefaultPage());
       dispatch(setSidebarValue(getDefaultPage()));
       dispatch(showProfile());
     }
@@ -103,8 +102,6 @@ export const HomePage = () => {
 
   function getCurrentSidebarValue() {
     switch (sidebarState.sidebarValue) {
-      case "Homepage":
-        return <AccountList />;
       case "Accounts":
         if (getCurrentRole() === "admin") return <AccountList />;
         else if (getCurrentRole() === "academic management") return <StudentTeacherManagement />;
@@ -118,7 +115,7 @@ export const HomePage = () => {
         dispatch(resetPrivateChatBadge());
         return <ChatPreview />;
       case "Rooms":
-        return;
+        return <RoomList />;
       case "Reports":
         return <div />;
     }

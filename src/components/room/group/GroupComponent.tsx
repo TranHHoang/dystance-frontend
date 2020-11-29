@@ -58,7 +58,7 @@ const ButtonDiv = styled.div`
 `;
 
 const GroupComponent = (props: any) => {
-  const { roomId, roomName, creatorId } = props;
+  const { roomId, roomName, teacherId } = props;
   const [picklistValue, setPicklistValue] = useState(0);
   const [usersByGroup, setUsersByGroup] = useState<UsersByGroup>({});
   const breakoutGroups = useSelector((root: RootState) => root.groupState.breakoutGroup);
@@ -84,7 +84,7 @@ const GroupComponent = (props: any) => {
           .value()
       );
     });
-    setHidden(getLoginData().id !== creatorId);
+    setHidden(getLoginData().id !== teacherId);
   }, []);
 
   useEffect(() => {
@@ -136,7 +136,7 @@ const GroupComponent = (props: any) => {
         if (duration <= 0) {
           clearInterval(intervalRef.current);
           setStatus("Not started");
-          if (getLoginData().id === creatorId) {
+          if (getLoginData().id === teacherId) {
             dispatch(
               resetGroups(
                 roomId,
@@ -156,7 +156,7 @@ const GroupComponent = (props: any) => {
       dispatch(
         createGroups(
           roomId,
-          creatorId,
+          teacherId,
           _.range(breakoutGroups.length + 1, picklistValue + 1).map((value) => ({
             name: `Group #${value}`,
             userIds: _.map(usersByGroup[value], "id") || []
@@ -199,7 +199,7 @@ const GroupComponent = (props: any) => {
     dispatch(
       switchToGroup({
         id: keyToRoomNameDict.current[groupId],
-        roomPath: `/room/${roomId}/${creatorId}/${roomName}`,
+        roomPath: `/room/${roomId}/${teacherId}/${roomName}`,
         name: groupName,
         endTime: _.find(breakoutGroups, { groupId: keyToRoomNameDict.current[groupId] }).endTime
       })
@@ -285,7 +285,7 @@ const GroupComponent = (props: any) => {
                   onClick={() => joinGroup(groupId)}
                   disabled={
                     status === "Not started" ||
-                    (getLoginData().id !== creatorId &&
+                    (getLoginData().id !== teacherId &&
                       !usersByGroup[groupId]?.some((user) => user.id === getLoginData().id))
                   }
                 >

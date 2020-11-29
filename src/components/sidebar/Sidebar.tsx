@@ -83,15 +83,8 @@ const Logo = styled.img`
 const SideNavigationBar = () => {
   const sidebarState = useSelector((state: RootState) => state.sidebarState);
   const showProfileUser = useSelector((state: RootState) => state.showProfileState.user);
-  const chatPreviewState = useSelector((state: RootState) => state.chatPreviewState);
   const role = getCurrentRole();
   const dispatch = useDispatch();
-
-  const googleLogout = useGoogleLogout({
-    clientId: config.GoogleClientId,
-    onLogoutSuccess: () => console.log("Google signed out"),
-    onFailure: () => console.log("Google signed out error")
-  });
 
   return (
     <StyledSidebar
@@ -100,12 +93,13 @@ const SideNavigationBar = () => {
     >
       <SidebarItemContainer>
         <Logo src={logo} alt="logo "></Logo>
-        {role === "academic management" && (
-          <StyledSidebarItem icon={<StyledIcon icon={faTasks} size="2x" />} name="Semesters" label="Semesters" />
-        )}
 
         {["admin", "academic management"].includes(role) && (
           <StyledSidebarItem icon={<StyledIcon icon={faUser} size="2x" />} name="Accounts" label="Accounts" />
+        )}
+
+        {role === "academic management" && (
+          <StyledSidebarItem icon={<StyledIcon icon={faTasks} size="2x" />} name="Semesters" label="Semesters" />
         )}
 
         {["teacher", "student"].includes(role) && (

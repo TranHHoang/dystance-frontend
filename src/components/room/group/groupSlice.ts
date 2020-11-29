@@ -84,13 +84,13 @@ export const {
   setMainRoomId
 } = groupSlice.actions;
 
-export function createGroups(roomId: string, creatorId: string, groups: BreakoutGroup[]): AppThunk {
+export function createGroups(roomId: string, teacherId: string, groups: BreakoutGroup[]): AppThunk {
   return async (dispatch) => {
     await all(groups, async ({ name, userIds }) => {
       try {
         const form = new FormData();
         form.append("name", name);
-        form.append("creatorId", creatorId);
+        form.append("teacherId", teacherId);
         form.append("roomId", roomId);
         form.append("userIds", JSON.stringify(userIds || []));
 

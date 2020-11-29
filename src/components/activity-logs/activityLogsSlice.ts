@@ -3,7 +3,7 @@ import { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
 import { get } from "~utils/axiosUtils";
-import { ActivityLog, allUsers, ErrorResponse, Room, Semester } from "~utils/types";
+import { ActivityLog, ErrorResponse } from "~utils/types";
 
 interface ActivityLogState {
   logs: ActivityLog[];

@@ -17,8 +17,6 @@ import jitsiMeetReducer from "../components/room/jitsi-meet-component/jitsiMeetS
 import userListReducer from "../components/room/user-list/userListSlice";
 import peopleProfileReducer from "../components/profile-page/people-profile/peopleProfileSlice";
 import userCardReducer from "../components/room/user-list/user-card/userCardSlice";
-import deadlineListReducer from "../components/room/deadline/deadlineListSlice";
-import deadlineCardReducer from "../components/room/deadline/deadline-card/deadlineCardSlice";
 import timetableReducer from "../components/timetable/timetableSlice";
 import eventDetailsReducer from "../components/timetable/event-details/eventDetailsSlice";
 import remoteControlReducer from "../components/room/remote-control/remoteControlSlice";
@@ -53,8 +51,6 @@ const appReducer = combineReducers({
   userListState: userListReducer,
   peopleProfileState: peopleProfileReducer,
   userCardState: userCardReducer,
-  deadlineListState: deadlineListReducer,
-  deadlineCardState: deadlineCardReducer,
   timetableState: timetableReducer,
   eventDetailsState: eventDetailsReducer,
   remoteControlState: remoteControlReducer,

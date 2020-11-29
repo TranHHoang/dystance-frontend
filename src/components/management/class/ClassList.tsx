@@ -132,7 +132,7 @@ const ClassList = (props: { semesterId: string }) => {
             return Promise.reject();
           } else {
             dispatch(resetClassError());
-            dispatch(addNewClass(semesterId, newData));
+            dispatch(addNewClass(semesterId, toSendableObj({ ...newData, students: [] })));
             return Promise.resolve();
           }
         }}

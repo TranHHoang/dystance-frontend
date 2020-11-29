@@ -91,25 +91,16 @@ export enum RoomActionType {
   GroupNotification,
   StopGroup
 }
-export interface DeadlineInfo {
-  deadlineId: string;
-  creatorId: string;
-  roomId: string;
-  title: string;
-  endDate: string;
-  description: string;
-}
+
 export enum TimetableEventType {
-  Schedule,
-  Deadline
+  Schedule
 }
 export interface TimetableEvent {
   id: string;
   eventType: TimetableEventType;
   roomId: string;
   title: string;
-  creatorId: string;
-  description: string;
+  teacherId: string;
   startDate: string;
   endDate: string;
 }

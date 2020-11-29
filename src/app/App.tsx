@@ -26,7 +26,7 @@ export default hot(module)(function App() {
         <Route exact path="/chatRoom/:roomId" component={ChatArea} />
         <Route exact path="/resetPassword" component={ResetPasswordComponent} />
         <Route exact path="/profile" component={ProfilePage} />
-        <Route exact path="/room/:roomId/:creatorId/:roomName/:groupId?" component={RoomComponent} />
+        <Route exact path="/room/:roomId/:teacherId/:roomName/:groupId?" component={RoomComponent} />
       </Switch>
     </HashRouter>
   );

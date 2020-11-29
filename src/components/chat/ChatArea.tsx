@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { Logger, LogType } from "~utils/logger";
-import { allUsers } from "~utils/types";
+import { AllUsersInfo, User } from "~utils/types";
 import ChatBox from "./ChatBox";
 import ChatHistory from "./ChatHistory";
 import { broadcastMessage, ChatType } from "./chatSlice";
@@ -68,6 +68,7 @@ const ChatArea = (props: any) => {
   const { roomId, receiverId, inRoom } = props;
   const dispatch = useDispatch();
   const logger = Logger.getInstance();
+  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
   const user = _.find(allUsers, { id: receiverId });
   function isImageFile(file: File) {
     return file?.type.includes("image") ?? false;

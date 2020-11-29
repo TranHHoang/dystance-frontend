@@ -147,7 +147,18 @@ export function updateExistingSchedules(semesterId: string, schedules: Schedule[
       const scheduleFormat = schedules.map((s) => ({ ...s, date: moment(s.date).format("YYYY-MM-DD") }));
       console.log(scheduleFormat);
       const data = (await postJson(`/semesters/schedules/update?semesterId=${semesterId}`, scheduleFormat)).data;
-      dispatch(updateSchedules(data));
+      if (data.success.length > 0) {
+        dispatch(updateSchedules(data.success));
+      }
+      if (data.failed.length > 0) {
+        dispatch(
+          updateSchedulesFailed({
+            message: "There was a problem with updating a few of the schedules, please try again",
+            type: 1
+          })
+        );
+        dispatch(fetchAllSchedule(semesterId));
+      }
     } catch (e) {
       const ex = e as AxiosError;
 

@@ -14,7 +14,7 @@ import {
 } from "./userCardSlice";
 import { Logger, LogType } from "~utils/logger";
 import { setUserId } from "../../../../components/room/remote-control/remoteControlSlice";
-import { allUsers } from "~utils/types";
+import { AllUsersInfo, getCurrentRole, User } from "~utils/types";
 import _ from "lodash";
 
 const StyledCard = styled(Card)`
@@ -22,7 +22,8 @@ const StyledCard = styled(Card)`
 `;
 
 const UserCardComponent = (props: any) => {
-  const { userId, icon, title, creatorId, roomId } = props;
+  const { userId, icon, title, teacherId, roomId } = props;
+  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
   const user = _.find(allUsers, { id: userId });
   const dispatch = useDispatch();
   const logger = Logger.getInstance();
@@ -38,7 +39,7 @@ const UserCardComponent = (props: any) => {
                 label="View Profile"
                 onClick={() => dispatch(setPeopleProfileModalOpen({ userId, peopleProfileModalOpen: true }))}
               />
-              {getLoginData().id === creatorId ? (
+              {getLoginData().id === teacherId ? (
                 <div>
                   <MenuItem
                     label="Kick User Out"
