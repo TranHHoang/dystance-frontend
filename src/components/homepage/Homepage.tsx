@@ -22,8 +22,8 @@ import { AllUsersInfo, getCurrentRole } from "~utils/types";
 import { Spinner } from "react-rainbow-components";
 import { socket } from "~app/App";
 import Timetable from "../../components/timetable/Timetable";
-import StudentAttendanceReport from "../attendance-reports/student-report/StudentAttendanceReport";
-import AttendanceManagement from "../attendance-reports/student-report/AttendanceManagement";
+import StudentAttendanceReport from "../attendance-reports/StudentAttendanceReport";
+import AttendanceManagement from "../attendance-reports/AttendanceManagement";
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;
@@ -112,14 +112,15 @@ export const HomePage = () => {
       case "Profile":
         return <ProfilePage />;
       case "Timetable":
-        return <AttendanceManagement />;
+        return <Timetable />;
       case "Chat":
         dispatch(resetPrivateChatBadge());
         return <ChatPreview />;
       case "Rooms":
         return <RoomList />;
       case "Reports":
-        return <div />;
+        if (getCurrentRole() === "student") return <StudentAttendanceReport />;
+        else return <AttendanceManagement />;
     }
   }
   return (

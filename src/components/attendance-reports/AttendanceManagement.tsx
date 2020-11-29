@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { fetchAllSemesters } from "../../semester-management/semesterSlice";
+import { fetchAllSemesters } from "../management/semester/semesterSlice";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Checkbox, FormControlLabel } from "@material-ui/core";
@@ -9,7 +9,7 @@ import { ButtonIcon, Picklist, Option, Notification } from "react-rainbow-compon
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { AllUsersInfo, User } from "~utils/types";
+import { AllUsersInfo, getCurrentRole, User } from "~utils/types";
 import {
   AttendanceReport,
   AttendanceReportStudent,
@@ -39,6 +39,7 @@ const StyledHeader = styled.header`
   z-index: 1;
   display: flex;
   padding: 5 0 5 0;
+  margin: 0 16 0 16;
   span {
     align-self: center;
     font-size: 16px;
@@ -70,8 +71,8 @@ const AttendanceManagement = () => {
   }, []);
 
   useEffect(() => {
-    setSelectedSemester({ id: _.last(semesterState)?.id, label: _.last(semesterState)?.name });
-  }, [semesterState]);
+    setSelectedSemester({ id: _.last(semesterState.semesters)?.id, label: _.last(semesterState.semesters)?.name });
+  }, [semesterState.semesters]);
 
   useEffect(() => {
     selectedSemester?.id && dispatch(fetchAttendanceReports(selectedSemester.id));
@@ -99,7 +100,7 @@ const AttendanceManagement = () => {
           }}
           label="Select semester"
         >
-          {_.map(semesterState, (semester) => (
+          {_.map(semesterState.semesters, (semester) => (
             <Option key={semester.id} name={semester.id} label={semester.name} />
           ))}
         </Picklist>
@@ -160,15 +161,16 @@ const AttendanceManagement = () => {
       <div style={{ padding: "20px 10px 20px 20px" }}>
         <Title>View attendance report</Title>
       </div>
-      <Box m={2}>
-        <StyledHeader>
-          <ButtonIcon
-            icon={<FontAwesomeIcon icon={faArrowLeft} />}
-            onClick={() => setSelectedReport(undefined)}
-            size="medium"
-          />
-          <span>Back to Attendance Management</span>
-        </StyledHeader>
+
+      <StyledHeader>
+        <ButtonIcon
+          icon={<FontAwesomeIcon icon={faArrowLeft} />}
+          onClick={() => setSelectedReport(undefined)}
+          size="medium"
+        />
+        <span>Back to Attendance Management</span>
+      </StyledHeader>
+      <Box m={2} marginY={0}>
         <Table
           title={`${selectedReport.subject}.${selectedReport.class}`}
           data={_.map(selectedReport.students, (student) => {
@@ -228,33 +230,37 @@ const AttendanceManagement = () => {
               }
             }
           ]}
-          editable={{
-            onRowUpdate: (newData: Student) => {
-              console.log(newData);
-              dispatch(
-                updateAttendances({
-                  id: selectedReport.id,
-                  students: [
-                    {
-                      id: newData.id,
-                      status: newData.status
-                    }
-                  ]
-                })
-              );
-              return Promise.resolve();
-            },
-            onBulkUpdate: (changes) => {
-              const newData = _.map(changes, "newData") as Student[];
-              dispatch(
-                updateAttendances({
-                  id: selectedReport.id,
-                  students: _.map(newData, (student) => ({ id: student.id, status: student.status }))
-                })
-              );
-              return Promise.resolve();
-            }
-          }}
+          editable={
+            getCurrentRole() !== "quality assurance"
+              ? {
+                  onRowUpdate: (newData: Student) => {
+                    console.log(newData);
+                    dispatch(
+                      updateAttendances({
+                        id: selectedReport.id,
+                        students: [
+                          {
+                            id: newData.id,
+                            status: newData.status
+                          }
+                        ]
+                      })
+                    );
+                    return Promise.resolve();
+                  },
+                  onBulkUpdate: (changes) => {
+                    const newData = _.map(changes, "newData") as Student[];
+                    dispatch(
+                      updateAttendances({
+                        id: selectedReport.id,
+                        students: _.map(newData, (student) => ({ id: student.id, status: student.status }))
+                      })
+                    );
+                    return Promise.resolve();
+                  }
+                }
+              : undefined
+          }
         />
       </Box>
       {attendanceReportState.error ? (

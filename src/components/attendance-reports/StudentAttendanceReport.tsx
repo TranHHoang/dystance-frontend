@@ -1,5 +1,5 @@
 import { Box, createMuiTheme, makeStyles, MuiThemeProvider, Tab, Tabs, Theme } from "@material-ui/core";
-import { fetchAllSemesters } from "../../semester-management/semesterSlice";
+import { fetchAllSemesters } from "../management/semester/semesterSlice";
 import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import { Picklist, Option, Notification } from "react-rainbow-components";
@@ -66,8 +66,8 @@ const StudentAttendanceReport = () => {
   }, []);
 
   useEffect(() => {
-    setSelectedSemester({ id: _.last(semesterState)?.id, label: _.last(semesterState)?.name });
-  }, [semesterState]);
+    setSelectedSemester({ id: _.last(semesterState.semesters)?.id, label: _.last(semesterState.semesters)?.name });
+  }, [semesterState.semesters]);
 
   useEffect(() => {
     selectedSemester?.id && dispatch(fetchAttendanceReports(selectedSemester.id));
@@ -86,7 +86,7 @@ const StudentAttendanceReport = () => {
           }}
           label="Select semester"
         >
-          {_.map(semesterState, (semester) => (
+          {_.map(semesterState.semesters, (semester) => (
             <Option key={semester.id} name={semester.id} label={semester.name} />
           ))}
         </Picklist>
