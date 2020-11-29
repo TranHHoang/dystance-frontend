@@ -22,6 +22,8 @@ import { AllUsersInfo, getCurrentRole } from "~utils/types";
 import { Spinner } from "react-rainbow-components";
 import { socket } from "~app/App";
 import Timetable from "../../components/timetable/Timetable";
+import StudentAttendanceReport from "../attendance-reports/StudentAttendanceReport";
+import AttendanceManagement from "../attendance-reports/AttendanceManagement";
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;
@@ -117,7 +119,8 @@ export const HomePage = () => {
       case "Rooms":
         return <RoomList />;
       case "Reports":
-        return <div />;
+        if (getCurrentRole() === "student") return <StudentAttendanceReport />;
+        else return <AttendanceManagement />;
     }
   }
   return (
