@@ -253,9 +253,8 @@ const GroupComponent = (props: any) => {
             style={{ marginLeft: 8, marginTop: 23 }}
             onClick={handleSession}
             disabled={!saveDisabled || picklistValue === 0}
-          >
-            {status === "Not started" ? "Start" : "Stop"}
-          </Button>
+            label={status === "Not started" ? "Start" : "Stop"}
+          />
         </div>
       )}
 

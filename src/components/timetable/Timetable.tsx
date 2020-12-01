@@ -79,9 +79,10 @@ const Timetable = () => {
             dispatch(showTimetableEvents(week, endOfWeek));
           }}
           onEventClick={(event: any) => {
-            console.log(event);
             dispatch(setDrawerOpen(true));
-            dispatch(setEvent(event));
+            dispatch(
+              setEvent({ ...event, startDate: event.startDate.toISOString(), endDate: event.endDate.toISOString() })
+            );
             dispatch(showTeacherInfo(event.teacherId));
           }}
         />

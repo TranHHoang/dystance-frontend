@@ -121,7 +121,7 @@ const EventDetailsDrawer = () => {
               pathname: `/room/${eventDetailsState.event?.roomId}/${eventDetailsState.event?.teacherId}/${eventDetailsState.event?.title}`
             }}
           >
-            <StyledJoinRoomButton label="Join Room" variant="brand" />
+            <StyledJoinRoomButton label="Join Room" variant="brand" onClick={() => dispatch(setDrawerOpen(false))} />
           </StyledJoinRoomLink>
         </div>
       ) : null}
