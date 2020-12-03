@@ -29,6 +29,8 @@ const createWindow = () => {
     width: 1280,
     minWidth: 1024,
     minHeight: 576,
+    titleBarStyle: "hidden",
+    frame: false,
     webPreferences: {
       enableBlinkFeatures: "RTCInsertableStreams",
       nodeIntegration: true,
@@ -57,6 +59,7 @@ const createWindow = () => {
     const server = exApp.listen(exApp.get("port"), () => {
       mainWindow.loadURL(`http://localhost:${(server.address() as any).port}/app`);
     });
+    mainWindow.setMenu(null);
   }
   mainWindow.setIcon(path.join(__dirname, "../../src/components/sidebar/logo.png"));
   initPopupsConfigurationMain(mainWindow);

@@ -6,6 +6,14 @@ import { Application } from "react-rainbow-components";
 import store from "./store";
 import styled from "styled-components";
 
+import { Titlebar, Color } from "custom-electron-titlebar";
+
+new Titlebar({
+  backgroundColor: Color.fromHex("#36393f"),
+  icon: "../assets/logo.png"
+  // TODO: Add menu: null to release build
+});
+
 const theme = {
   rainbow: {
     palette: {
