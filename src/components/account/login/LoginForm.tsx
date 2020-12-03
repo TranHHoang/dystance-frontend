@@ -122,11 +122,6 @@ const LoginForm = () => {
       <Container>
         <Title>Sign in</Title>
 
-        <Register>
-          Don&apos;t have an account? &nbsp;
-          <StyledLink to="/register">Create Account Here</StyledLink>
-        </Register>
-
         <StyledCard>
           {loginState.error && loginState.error.type !== LoginError.EmailIsNotConfirmed && (
             <StyledNotification title={loginState.error.message} hideCloseButton={true} icon="error" />
