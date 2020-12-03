@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
 import moment from "moment";
 import { resetTimetable, showTimetableEvents } from "./timetableSlice";
-import { setDrawerOpen, setEvent, showTeacherInfo } from "./event-details/eventDetailsSlice";
+import { setDrawerOpen, setEvent } from "./event-details/eventDetailsSlice";
 import EventDetailsDrawer from "./event-details/EventDetails";
 
 export const Container = styled.div`
@@ -83,7 +83,6 @@ const Timetable = () => {
             dispatch(
               setEvent({ ...event, startDate: event.startDate.toISOString(), endDate: event.endDate.toISOString() })
             );
-            dispatch(showTeacherInfo(event.teacherId));
           }}
         />
         <EventDetailsDrawer />

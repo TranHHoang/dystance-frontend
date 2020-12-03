@@ -12,7 +12,8 @@ import {
   createNotification,
   NotificationType,
   User,
-  get
+  get,
+  getAllUsers
 } from "~utils/index";
 import { fetchAllGroups } from "../group/groupSlice";
 import { setUserInfoList } from "../user-list/userListSlice";
@@ -103,12 +104,7 @@ export function initSocket(roomId: string): AppThunk {
           break;
         case RoomActionType.Join:
         case RoomActionType.Leave:
-          const userInfoList: User[] = [];
-          for (const id of response.payload) {
-            const response = await get(`/users/info?id=${id}`);
-            const data = response.data as User;
-            userInfoList.push(data);
-          }
+          const userInfoList = (response.payload as string[]).map(getUser);
           dispatch(setUserInfoList(userInfoList));
           break;
         case RoomActionType.Mute:

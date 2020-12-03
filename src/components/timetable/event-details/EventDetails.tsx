@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { TimetableEventType } from "../Timetable";
 import { Button } from "react-rainbow-components";
 import { Link } from "react-router-dom";
+import { getUser } from "~utils/index";
 
 const StyledLink = styled(Link)`
   width: 100%;
@@ -110,7 +111,7 @@ const EventDetailsDrawer = () => {
         </StyledIcon>
         <InfoContainer>
           <StyleTitle>Teacher</StyleTitle>
-          <StyleSubTitle>{eventDetailsState.teacher?.realName}</StyleSubTitle>
+          <StyleSubTitle>{getUser(eventDetailsState.event.teacherId).realName}</StyleSubTitle>
         </InfoContainer>
       </div>
       {eventDetailsState.event?.eventType === TimetableEventType.Schedule ? (
