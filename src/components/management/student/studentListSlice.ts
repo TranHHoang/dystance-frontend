@@ -143,8 +143,17 @@ export function addStudent(student: UserTableInfo): AppThunk {
 export function deleteStudents(userIds: string[]): AppThunk {
   return async (dispatch) => {
     try {
-      await post("/users/students/delete", userIds);
-      dispatch(removeStudentsFromList(userIds));
+      const data = (await post("/users/students/delete", userIds)).data;
+      if (data.success.length > 0) {
+        dispatch(removeStudentsFromList(data.success));
+      }
+      if (data.failed.length > 0) {
+        _.forEach(data.failed, (error: ErrorResponse) => {
+          console.log(error);
+          dispatch(removeStudentsFromListFailed(error));
+        });
+        dispatch(showStudentList());
+      }
     } catch (e) {
       const ex = e as AxiosError;
 

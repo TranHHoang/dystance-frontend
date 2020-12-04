@@ -1,6 +1,5 @@
 import { AnyAction, combineReducers } from "@reduxjs/toolkit";
 import loginReducer from "../components/account/login/loginSlice";
-import registerReducer from "../components/account/register/registerSlice";
 import createRoomReducer from "../components/room-management/create-room/createRoomSlice";
 import showRoomReducer from "../components/homepage/showRoomsSlice";
 import chatReducer from "../components/chat/chatSlice";
@@ -34,7 +33,6 @@ const appReducer = combineReducers({
   roomCreation: createRoomReducer,
   showRoomState: showRoomReducer,
   loginState: loginReducer,
-  registerState: registerReducer,
   chatState: chatReducer,
   resetPasswordState: resetPasswordReducer,
   showProfileState: showProfileReducer,

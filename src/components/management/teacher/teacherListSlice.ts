@@ -182,8 +182,17 @@ export function updateTeachers(teachers: UserTableInfo[]): AppThunk {
 export function deleteTeachers(userIds: string[]): AppThunk {
   return async (dispatch) => {
     try {
-      await post("/users/teachers/delete", userIds);
-      dispatch(removeTeachersFromList(userIds));
+      const data = (await post("/users/teachers/delete", userIds)).data;
+      if (data.success.length > 0) {
+        dispatch(removeTeachersFromList(data.success));
+      }
+      if (data.failed.length > 0) {
+        _.forEach(data.failed, (error: ErrorResponse) => {
+          console.log(error);
+          dispatch(removeTeacherListFailed(error));
+        });
+        dispatch(showTeacherList());
+      }
     } catch (e) {
       const ex = e as AxiosError;
 
