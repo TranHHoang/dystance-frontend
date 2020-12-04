@@ -75,7 +75,7 @@ export function getSemesters(): AppThunk {
       const response = await get("/semesters");
       const data = response.data as Semester[];
       dispatch(fetchSemestersSuccess(data));
-      dispatch(setSelectedSemester({ name: _.first(data).id, label: _.first(data).name }));
+      dispatch(setSelectedSemester({ name: _.last(data).id, label: _.last(data).name }));
     } catch (e) {
       const ex = e as AxiosError;
 

@@ -111,7 +111,7 @@ const EventDetailsDrawer = () => {
         </StyledIcon>
         <InfoContainer>
           <StyleTitle>Teacher</StyleTitle>
-          <StyleSubTitle>{getUser(eventDetailsState.event.teacherId).realName}</StyleSubTitle>
+          <StyleSubTitle>{getUser(eventDetailsState.event?.teacherId)?.realName}</StyleSubTitle>
         </InfoContainer>
       </div>
       {eventDetailsState.event?.eventType === TimetableEventType.Schedule ? (

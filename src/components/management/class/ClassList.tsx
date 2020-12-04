@@ -6,7 +6,7 @@ import _ from "lodash";
 import { RootState } from "~app/rootReducer";
 import Table from "../Table";
 import { ButtonIcon, Notification } from "react-rainbow-components";
-import { getAllUsers, getUser, User } from "~utils/index";
+import { ErrorResponse, getAllUsers, getUser, User } from "~utils/index";
 import {
   addNewClass,
   Class,
@@ -47,6 +47,7 @@ const StyledNotifications = styled(Notification)`
   right: 20px;
   p {
     font-size: 16px;
+    color: ${(props) => props.theme.rainbow.palette.text.main};
   }
   h1 {
     font-size: 20px;
@@ -145,7 +146,7 @@ const ClassList = (props: { semesterId: string }) => {
         }}
         onRowDelete={(oldData: { id: string }) => {
           dispatch(resetClassError());
-          dispatch(deleteExistingClasses([oldData.id]));
+          dispatch(deleteExistingClasses(semesterId, [oldData.id]));
           return Promise.resolve();
         }}
         onBulkUpdate={(changes: Class[]) =>
@@ -161,15 +162,17 @@ const ClassList = (props: { semesterId: string }) => {
         }
         onBulkDelete={(data) => {
           dispatch(resetClassError());
-          dispatch(deleteExistingClasses(_.map(data, "id")));
+          dispatch(deleteExistingClasses(semesterId, _.map(data, "id")));
         }}
         onRowClick={(rowData) => setSelectedClass(rowData)}
       />
-      {classState.error ? (
+      {classState.errors && classState.errors?.length > 0 ? (
         <StyledNotifications
           title="Error"
           onRequestClose={() => dispatch(resetClassError())}
-          description={classState.error?.message}
+          description={_.map(classState.errors, (error: ErrorResponse) => (
+            <p>{error?.message}</p>
+          ))}
           icon="error"
         />
       ) : null}

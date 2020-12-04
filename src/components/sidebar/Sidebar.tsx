@@ -71,7 +71,7 @@ const StyledAvatarMenu = styled(AvatarMenu)`
 
 const Logo = styled.img`
   margin-bottom: 10vh;
-  @media (max-height: 700px) {
+  @media (max-height: 550px) {
     display: none;
   }
 `;

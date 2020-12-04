@@ -13,11 +13,12 @@ export interface Class {
 }
 interface ClassState {
   classes: Class[];
-  error?: ErrorResponse;
+  errors?: ErrorResponse[];
 }
 
 const initialState: ClassState = {
-  classes: []
+  classes: [],
+  errors: []
 };
 
 const classSlice = createSlice({
@@ -28,13 +29,13 @@ const classSlice = createSlice({
       state.classes = action.payload;
     },
     setClassesFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     addClass(state, action: PayloadAction<Class>) {
       state.classes.push(action.payload);
     },
     addClassFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     updateClasses(state, action: PayloadAction<Class[]>) {
       _.each(action.payload, (schedule) => {
@@ -43,16 +44,16 @@ const classSlice = createSlice({
       });
     },
     updateClassesFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     removeClasses(state, action: PayloadAction<string[]>) {
       state.classes = _.reject(state.classes, ({ id }) => action.payload.includes(id));
     },
     removeClassesFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     resetClassError(state) {
-      state.error = undefined;
+      state.errors = [];
     },
     resetClassState() {
       return initialState;
@@ -173,11 +174,22 @@ export function updateExistingClasses(semesterId: string, classes: Class[]): App
   };
 }
 
-export function deleteExistingClasses(ids: string[]): AppThunk {
+export function deleteExistingClasses(semesterId: string, ids: string[]): AppThunk {
   return async (dispatch) => {
     try {
-      await post(`/semesters/classes/delete`, ids);
-      dispatch(removeClasses(ids));
+      const data = (await post(`/semesters/classes/delete`, ids)).data;
+      if (data.success.length > 0) {
+        dispatch(removeClasses(data.success));
+      }
+      if (data.failed.length > 0) {
+        dispatch(
+          removeClassesFailed({
+            message: "Class cannot be deleted",
+            type: 1
+          })
+        );
+        dispatch(fetchAllClasses(semesterId));
+      }
     } catch (e) {
       const ex = e as AxiosError;
 
