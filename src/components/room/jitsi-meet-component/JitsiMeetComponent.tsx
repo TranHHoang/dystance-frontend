@@ -195,7 +195,7 @@ const JitsiMeetComponent = (props: any) => {
         userInfo={{
           email: `${profile.email}`
         }}
-        containerStyle={{ width: "100%", height: "100vh" }}
+        containerStyle={{ width: "100%", height: "100%" }}
         frameStyle={{ width: "100%", height: "100%", display: "block" }}
         interfaceConfig={{
           filmStripOnly: false,

@@ -90,7 +90,7 @@ const whiteboard = {
     );
 
     $(whiteboardContainer)
-      // .append(_this.backgroundGrid)
+      .empty()
       .append(_this.imgContainer)
       .append(_this.canvasElement)
       .append(_this.svgContainer)

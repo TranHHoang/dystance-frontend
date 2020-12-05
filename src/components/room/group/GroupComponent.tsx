@@ -82,12 +82,14 @@ const GroupComponent = (props: any) => {
   }, []);
 
   useEffect(() => {
+    const users = (usersInRoom || []).map((user) => ({ ...user }));
+
     const usersDict = _(breakoutGroups)
       .sortBy([(group) => group.groupId])
       .reduce((result, value, key) => {
         key += 1;
         keyToRoomNameDict.current[key] = value.groupId;
-        _.each(usersInRoom, (user) => {
+        _.each(users, (user) => {
           user.selected = _(breakoutGroups)
             .flatMap((group) => group.userIds)
             .some((id) => id === user.id);
@@ -109,10 +111,12 @@ const GroupComponent = (props: any) => {
 
     // If no room was found, release all users
     if (breakoutGroups.length === 0) {
-      _.each(usersInRoom, (user) => {
+      _.each(users, (user) => {
         user.selected = false;
       });
     }
+
+    setUsersInRoom(users);
 
     setUsersByGroup(usersDict);
     setPicklistValue(Object.values(usersDict).length);
@@ -298,10 +302,13 @@ const GroupComponent = (props: any) => {
                   .flatMap((users) => users.map((user) => user.id))
                   .value();
 
-                _.each(usersInRoom, (user) => {
-                  user.selected =
-                    _.some(otherGroupsSelectedUserIds, (id) => id === user.id) || _.some(values, { name: user.id });
-                });
+                setUsersInRoom(
+                  _.map(usersInRoom, (user) => ({
+                    ...user,
+                    selected:
+                      _.some(otherGroupsSelectedUserIds, (id) => id === user.id) || _.some(values, { name: user.id })
+                  }))
+                );
 
                 setUsersByGroup({
                   ...usersByGroup,
