@@ -27,23 +27,26 @@ export default hot(module)(function App() {
     const endOfWeek = moment().endOf("week").toDate();
     dispatch(showTimetableEvents(startOfWeek, endOfWeek));
   }, []);
+  function checkIncomingClass() {
+    _.each(timetableState.events, (event) => {
+      console.log(moment().format("dddd") === moment(event?.startDate).format("dddd"));
 
+      if (moment().format("dddd") === moment(event?.startDate).format("dddd")) {
+        const minuteDiff = moment.duration(moment(event?.startDate).diff(moment())).asMinutes();
+        if (minuteDiff > 0 && minuteDiff <= 15) {
+          createNotification(
+            NotificationType.IncomingClass,
+            `Room "${event?.title}" will start in ${Math.ceil(minuteDiff)} minutes`
+          );
+        }
+      }
+    });
+  }
   useEffect(() => {
+    checkIncomingClass();
     clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
-      _.each(timetableState.events, (event) => {
-        console.log(moment().format("dddd") === moment(event?.startDate).format("dddd"));
-
-        if (moment().format("dddd") === moment(event?.startDate).format("dddd")) {
-          const minuteDiff = moment.duration(moment(event?.startDate).diff(moment())).asMinutes();
-          if (minuteDiff > 0 && minuteDiff <= 15) {
-            createNotification(
-              NotificationType.IncomingClass,
-              `Room "${event?.title}" will start in ${Math.ceil(minuteDiff)} minutes`
-            );
-          }
-        }
-      });
+      checkIncomingClass();
     }, 5000 * 60);
   }, [timetableState.events]);
 
