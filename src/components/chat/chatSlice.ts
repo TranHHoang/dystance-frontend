@@ -84,8 +84,8 @@ export function fetchLatestMessage(roomId: string, privateChat: { id1: string; i
       const message = (
         await get(
           roomId
-            ? `rooms/chat/getLast?id=${roomId}`
-            : `users/chat/getLast?id1=${privateChat.id1}&id2=${privateChat.id2}`
+            ? `/rooms/chat/getLast?id=${roomId}`
+            : `/users/chat/getLast?id1=${privateChat.id1}&id2=${privateChat.id2}`
         )
       ).data as RoomMessage | PrivateMessage;
       dispatch(addChat({ type: roomId ? "room" : "private", content: message }));

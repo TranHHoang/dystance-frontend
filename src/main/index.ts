@@ -57,6 +57,7 @@ const createWindow = () => {
     const server = exApp.listen(exApp.get("port"), () => {
       mainWindow.loadURL(`http://localhost:${(server.address() as any).port}/app`);
     });
+    mainWindow.setMenu(null);
   }
   mainWindow.setIcon(path.join(__dirname, "../../src/components/sidebar/logo.png"));
   initPopupsConfigurationMain(mainWindow);
@@ -77,7 +78,6 @@ const createWindow = () => {
   mainWindow.on("close", () => {
     mainWindow.webContents.send("app-close");
   });
-  // mainWindow.setMenu(null);
 };
 // Open the DevTools.
 // mainWindow.webContents.openDevTools();

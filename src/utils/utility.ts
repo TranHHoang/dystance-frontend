@@ -9,7 +9,10 @@ export function saveLoginData(data: UserLoginData) {
 }
 
 export function getLoginData(): UserLoginData {
-  return JSON.parse(localStorage.getItem(LoginLocalStorageKey.UserInfo));
+  if (LoginLocalStorageKey.UserInfo in localStorage) {
+    return JSON.parse(localStorage.getItem(LoginLocalStorageKey.UserInfo));
+  }
+  return {} as UserLoginData;
 }
 
 export function getAllUsers(): User[] {

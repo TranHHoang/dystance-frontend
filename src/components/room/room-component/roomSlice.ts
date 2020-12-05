@@ -11,9 +11,8 @@ import {
   getUser,
   createNotification,
   NotificationType,
-  User,
-  get,
-  getAllUsers
+  Logger,
+  LogType
 } from "~utils/index";
 import { fetchAllGroups } from "../group/groupSlice";
 import { setUserInfoList } from "../user-list/userListSlice";
@@ -88,8 +87,9 @@ export const {
 } = roomSlice.actions;
 
 export function initSocket(roomId: string): AppThunk {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     socket.invoke(RoomAction, roomId, RoomActionType.Join, getLoginData().id);
+    const logger = Logger.getInstance();
 
     socket.on(RoomAction, async (data: string) => {
       const response = JSON.parse(data);
@@ -116,6 +116,12 @@ export function initSocket(roomId: string): AppThunk {
           createNotification(NotificationType.RoomNotification, "You have been kicked");
           break;
         case RoomActionType.ToggleWhiteboard:
+          const previousAllowWhiteboardState = getState().userCardState.allowWhiteboard;
+          if (previousAllowWhiteboardState) {
+            logger.log(LogType.WhiteboardDisable, roomId, `Lost whiteboard permissions`);
+          } else {
+            logger.log(LogType.WhiteboardAllow, roomId, `Gained whiteboard permissions`);
+          }
           dispatch(toggleWhiteboard());
           createNotification(NotificationType.RoomNotification, "Your whiteboard permission has been changed");
           break;
