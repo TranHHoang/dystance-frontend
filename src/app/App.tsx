@@ -32,14 +32,14 @@ export default hot(module)(function App() {
     clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
       _.each(timetableState.events, (event) => {
-        console.log(moment().format("dddd") === moment(event.startDate).format("dddd"));
+        console.log(moment().format("dddd") === moment(event?.startDate).format("dddd"));
 
-        if (moment().format("dddd").toLowerCase() === moment(event.startDate).format("dddd")) {
-          const minuteDiff = moment.duration(moment(event.startDate, "HH:mm").diff(moment())).asMinutes();
+        if (moment().format("dddd") === moment(event?.startDate).format("dddd")) {
+          const minuteDiff = moment.duration(moment(event?.startDate).diff(moment())).asMinutes();
           if (minuteDiff > 0 && minuteDiff <= 15) {
             createNotification(
               NotificationType.IncomingClass,
-              `Room "${event.title}" will start in ${Math.ceil(minuteDiff)} minutes`
+              `Room "${event?.title}" will start in ${Math.ceil(minuteDiff)} minutes`
             );
           }
         }
