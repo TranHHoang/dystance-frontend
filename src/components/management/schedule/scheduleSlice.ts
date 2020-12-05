@@ -3,8 +3,7 @@ import { AxiosError } from "axios";
 import _ from "lodash";
 import moment from "moment";
 import { AppThunk } from "~app/store";
-import { get, postJson } from "~utils/axiosUtils";
-import { ErrorResponse } from "~utils/types";
+import { get, post, ErrorResponse } from "~utils/index";
 
 export interface Schedule {
   id: string;
@@ -114,8 +113,7 @@ export function addNewSchedule(semesterId: string, schedule: Schedule): AppThunk
         ...schedule,
         date: moment(schedule.date).format("YYYY-MM-DD")
       };
-      console.log(scheduleFormat);
-      const data = (await postJson(`/semesters/schedules/add?semesterId=${semesterId}`, scheduleFormat)).data;
+      const data = (await post(`/semesters/schedules/add?semesterId=${semesterId}`, scheduleFormat)).data;
       dispatch(addSchedule(data));
     } catch (e) {
       const ex = e as AxiosError;
@@ -145,8 +143,7 @@ export function updateExistingSchedules(semesterId: string, schedules: Schedule[
   return async (dispatch) => {
     try {
       const scheduleFormat = schedules.map((s) => ({ ...s, date: moment(s.date).format("YYYY-MM-DD") }));
-      console.log(scheduleFormat);
-      const data = (await postJson(`/semesters/schedules/update?semesterId=${semesterId}`, scheduleFormat)).data;
+      const data = (await post(`/semesters/schedules/update?semesterId=${semesterId}`, scheduleFormat)).data;
       if (data.success.length > 0) {
         dispatch(updateSchedules(data.success));
       }
@@ -186,7 +183,7 @@ export function updateExistingSchedules(semesterId: string, schedules: Schedule[
 export function deleteExistingSchedules(ids: string[]): AppThunk {
   return async (dispatch) => {
     try {
-      await postJson("/semesters/schedules/delete", ids);
+      await post("/semesters/schedules/delete", ids);
       dispatch(removeSchedules(ids));
     } catch (e) {
       const ex = e as AxiosError;

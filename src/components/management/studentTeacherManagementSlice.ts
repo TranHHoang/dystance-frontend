@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import { AppThunk } from "~app/store";
-import { postForm } from "~utils/axiosUtils";
-import { ErrorResponse } from "~utils/types";
+import { ErrorResponse, post } from "~utils/index";
 import { showStudentList } from "./student/StudentListSlice";
 import { FileUploadFormValues } from "./StudentTeacherManagement";
 import { showTeacherList } from "./teacher/teacherListSlice";
@@ -48,7 +47,7 @@ export function uploadFile({ file }: FileUploadFormValues): AppThunk {
       form.append("name", name);
       form.append("file", file);
 
-      await postForm("/users/accounts", form);
+      await post("/users/accounts", form);
       dispatch(fileUploadSuccess());
       dispatch(showStudentList());
       dispatch(showTeacherList());

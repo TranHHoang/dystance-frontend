@@ -2,15 +2,14 @@ import { faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { shell } from "electron";
 import moment from "moment";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { Card, TimelineMarker } from "react-rainbow-components";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { hostName } from "~utils/hostUtils";
 import { ChatType, isPrivateMessage, PrivateMessage, RoomMessage } from "./chatSlice";
-import { getUserInfo, UserInfo } from "~utils/types";
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from "react-virtualized";
+import { getUser, hostName } from "~utils/index";
 
 const StyledTimeline = styled.div`
   overflow: hidden;
@@ -59,7 +58,6 @@ const StyledAvatar = styled.img`
 `;
 
 const ChatHistory = ({ isPrivateChat }: { isPrivateChat: boolean }) => {
-  const [usersInfo, setUsersInfo] = useState<{ [key: string]: UserInfo }>({});
   const chatState = useSelector((root: RootState) => root.chatState);
   const listRef = useRef<List>();
   const cache = useRef<CellMeasurerCache>(
@@ -84,20 +82,6 @@ const ChatHistory = ({ isPrivateChat }: { isPrivateChat: boolean }) => {
   const messages: Array<RoomMessage | PrivateMessage> = isPrivateChat ? chatState.privateChat : chatState.roomChat;
 
   useEffect(() => {
-    const fetchUsersInfo = async () => {
-      const userDict: { [key: string]: UserInfo } = {};
-      const usersInfoPromise = messages.map(async (chat) => {
-        const id = isPrivateMessage(chat) ? chat.senderId : chat.userId;
-        const info = await getUserInfo(id);
-        userDict[id] = info; // { 1: { avatar: "", }}
-      });
-      await Promise.all(usersInfoPromise);
-      setUsersInfo(userDict);
-    };
-    fetchUsersInfo();
-  }, [isPrivateChat, chatState, messages]);
-
-  useEffect(() => {
     listRef.current.scrollToRow(messages.length);
   }, [chatState]);
 
@@ -112,13 +96,11 @@ const ChatHistory = ({ isPrivateChat }: { isPrivateChat: boolean }) => {
               key={chat.id}
               label={
                 <b>
-                  {usersInfo[id]?.realName} ({usersInfo[id]?.userName})
+                  {getUser(id)?.realName} ({getUser(id)?.userName})
                 </b>
               }
               datetime={moment(chat.date).calendar()}
-              icon={
-                <StyledAvatar src={usersInfo[id]?.avatar ? `${hostName}/${usersInfo[id]?.avatar}` : ""} alt="avatar" />
-              }
+              icon={<StyledAvatar src={getUser(id)?.avatar ? `${hostName}/${getUser(id)?.avatar}` : ""} alt="avatar" />}
               style={style}
               description={
                 <>

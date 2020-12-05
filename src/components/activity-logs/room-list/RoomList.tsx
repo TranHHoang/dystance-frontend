@@ -1,13 +1,13 @@
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core";
 import _ from "lodash";
 import MaterialTable from "material-table";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Picklist, Option, Button, Notification } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { AllUsersInfo, User } from "~utils/types";
+import { AllUsersInfo, User } from "~utils/index";
 import ActivityLogs from "../ActivityLogs";
 import {
   getRooms,

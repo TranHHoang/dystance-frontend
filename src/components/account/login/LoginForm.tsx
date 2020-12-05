@@ -1,14 +1,12 @@
-import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { faLock, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Field, Formik, FormikProps } from "formik";
 import React, { useEffect } from "react";
-import GoogleLogin, { GoogleLoginResponse } from "react-google-login";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
 import * as Yup from "yup";
 import { RootState } from "~app/rootReducer";
-import { LoginLocalStorageKey } from "~utils/types";
+import { LoginLocalStorageKey } from "~utils/interfaces";
 import * as resetPasswordSlice from "../reset-password/resetPasswordSlice";
 import {
   BackgroundContainer,
@@ -20,13 +18,11 @@ import {
   StyledButton,
   StyledCard,
   StyledForm,
-  StyledGoogleIcon,
   StyledInput,
   StyledLink,
   StyledNotification,
   Title
 } from "../styles";
-import config from "./googleConfigs.json";
 import { LoginError, resendEmail, resetLoginState, startLogin } from "./loginSlice";
 
 interface LoginFormValues {
@@ -70,11 +66,6 @@ const LoginForm = () => {
     } else {
       dispatch(startLogin(_, values.emailOrUserName, values.password));
     }
-  }
-
-  function onGoogleResponse(response: GoogleLoginResponse) {
-    window.localStorage.setItem(LoginLocalStorageKey.GoogleEmail, response.profileObj.email);
-    dispatch(startLogin(_, _, _, response.tokenId));
   }
 
   function onResendEmail() {
@@ -130,11 +121,6 @@ const LoginForm = () => {
     <BackgroundContainer>
       <Container>
         <Title>Sign in</Title>
-
-        <Register>
-          Don&apos;t have an account? &nbsp;
-          <StyledLink to="/register">Create Account Here</StyledLink>
-        </Register>
 
         <StyledCard>
           {loginState.error && loginState.error.type !== LoginError.EmailIsNotConfirmed && (

@@ -1,10 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
-import { getLoginData } from "~utils/tokenStorage";
-import { ErrorResponse, User } from "~utils/types";
+import { User, ErrorResponse, getLoginData, get } from "~utils/index";
 
 interface ShowProfileState {
   isLoading: boolean;
@@ -41,7 +38,7 @@ export const { fetchProfileSuccess, fetchProfileFailure, setProfileInfo } = show
 export function showProfile(): AppThunk {
   return async (dispatch) => {
     try {
-      const response = await Axios.get(`${hostName}/api/users/info?id=${getLoginData().id}`);
+      const response = await get(`/users/info?id=${getLoginData().id}`);
       localStorage.setItem("profile", JSON.stringify(response.data));
 
       const data = response.data as User;

@@ -10,8 +10,6 @@ import {
   Badge
 } from "react-rainbow-components";
 import _ from "lodash";
-import { AllUsersInfo, User } from "~utils/types";
-import { hostName } from "~utils/hostUtils";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
@@ -28,14 +26,12 @@ import {
 } from "./groupSlice";
 import { withRouter } from "react-router-dom";
 import { switchToGroup } from "../room-component/roomSlice";
-import { get } from "~utils/axiosUtils";
-import { getLoginData } from "~utils/tokenStorage";
 import { faSignInAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
-import { Logger, LogType } from "~utils/logger";
+import { Logger, LogType, User, getLoginData, getUser, hostName, get } from "~utils/index";
 
-declare module "~utils/types" {
+declare module "~utils/interfaces" {
   interface User {
     selected: boolean;
   }
@@ -62,7 +58,6 @@ const GroupComponent = (props: any) => {
   const [picklistValue, setPicklistValue] = useState(0);
   const [usersByGroup, setUsersByGroup] = useState<UsersByGroup>({});
   const breakoutGroups = useSelector((root: RootState) => root.groupState.breakoutGroup);
-  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
   const [usersInRoom, setUsersInRoom] = useState<User[]>();
   const keyToRoomNameDict = useRef<{ [key: number]: string }>({});
   const [saveDisabled, setSaveDisabled] = useState(true);
@@ -76,11 +71,10 @@ const GroupComponent = (props: any) => {
   useEffect(() => {
     dispatch(fetchAllGroups(roomId));
     get(`/rooms/getUsers?id=${roomId}`).then(({ data: userIds }) => {
-      console.log(userIds);
       setUsersInRoom(
         _(userIds)
           .reject((id) => id === getLoginData().id)
-          .map((id) => _.find(allUsers, { id }))
+          .map((id) => getUser(id))
           .value()
       );
     });
@@ -102,7 +96,7 @@ const GroupComponent = (props: any) => {
         result[key] =
           // usersByGroup[key] ||
           _.map(value.userIds, (value) => {
-            const user = _.find(allUsers, { id: value });
+            const user = getUser(value);
 
             return {
               id: value,
@@ -194,7 +188,6 @@ const GroupComponent = (props: any) => {
   }
 
   function joinGroup(groupId: number) {
-    console.log(groupId);
     const groupName = btoa(`${roomName} - Group #${groupId}`);
     dispatch(
       switchToGroup({
@@ -260,9 +253,8 @@ const GroupComponent = (props: any) => {
             style={{ marginLeft: 8, marginTop: 23 }}
             onClick={handleSession}
             disabled={!saveDisabled || picklistValue === 0}
-          >
-            {status === "Not started" ? "Start" : "Stop"}
-          </Button>
+            label={status === "Not started" ? "Start" : "Stop"}
+          />
         </div>
       )}
 

@@ -2,9 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
-import { get, postJson } from "~utils/axiosUtils";
-import { getLoginData } from "~utils/tokenStorage";
-import { ErrorResponse } from "~utils/types";
+import { ErrorResponse, getLoginData, get, post } from "~utils/index";
 
 export interface AttendanceReportStudent {
   id: string;
@@ -93,7 +91,7 @@ export function fetchAttendanceReports(semesterId: string): AppThunk {
 export function updateAttendances(attendance: { id: string; students: AttendanceReportStudent[] }): AppThunk {
   return async (dispatch) => {
     try {
-      const data = (await postJson(`/users/reports/attendance/update`, attendance)).data;
+      const data = (await post(`/users/reports/attendance/update`, attendance)).data;
       dispatch(updateStudentsStatus(data));
     } catch (ex) {
       const e = ex as AxiosError;

@@ -2,8 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
-import { get } from "~utils/axiosUtils";
-import { ErrorResponse, Room, Semester } from "~utils/types";
+import { ErrorResponse, get, Room, Semester } from "~utils/index";
 
 interface RoomListState {
   semesters: Semester[];
@@ -76,7 +75,7 @@ export function getSemesters(): AppThunk {
       const response = await get("/semesters");
       const data = response.data as Semester[];
       dispatch(fetchSemestersSuccess(data));
-      dispatch(setSelectedSemester({ name: _.first(data).id, label: _.first(data).name }));
+      dispatch(setSelectedSemester({ name: _.last(data).id, label: _.last(data).name }));
     } catch (e) {
       const ex = e as AxiosError;
 

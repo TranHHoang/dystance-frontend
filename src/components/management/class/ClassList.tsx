@@ -1,13 +1,12 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/display-name */
 import React, { useEffect, useState } from "react";
-import { Column } from "material-table";
 import { useDispatch, useSelector } from "react-redux";
 import _ from "lodash";
 import { RootState } from "~app/rootReducer";
 import Table from "../Table";
 import { ButtonIcon, Notification } from "react-rainbow-components";
-import { AllUsersInfo, User } from "~utils/types";
+import { ErrorResponse, getAllUsers, getUser, User } from "~utils/index";
 import {
   addNewClass,
   Class,
@@ -48,6 +47,7 @@ const StyledNotifications = styled(Notification)`
   right: 20px;
   p {
     font-size: 16px;
+    color: ${(props) => props.theme.rainbow.palette.text.main};
   }
   h1 {
     font-size: 20px;
@@ -68,16 +68,15 @@ const ClassList = (props: { semesterId: string }) => {
   const [selectedClass, setSelectedClass] = useState<Class>();
   const dispatch = useDispatch();
 
-  const allUsersInfo = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
-  const teachers = _.filter(allUsersInfo, { role: "teacher" });
-  const students = _.filter(allUsersInfo, { role: "student" });
+  const teachers = _.filter(getAllUsers(), { role: "teacher" });
+  const students = _.filter(getAllUsers(), { role: "student" });
   const classes = classState.classes?.map((s) => ({
     ...s,
-    teacher: _.find(allUsersInfo, { id: s.teacher })?.userName
+    teacher: getUser(s.teacher)?.userName
   }));
 
   function toSendableObj(data: Class): Class {
-    return { ...data, teacher: _.find(allUsersInfo, { userName: data.teacher })?.id };
+    return { ...data, teacher: _.find(getAllUsers(), { userName: data.teacher })?.id };
   }
 
   useEffect(() => {
@@ -147,7 +146,7 @@ const ClassList = (props: { semesterId: string }) => {
         }}
         onRowDelete={(oldData: { id: string }) => {
           dispatch(resetClassError());
-          dispatch(deleteExistingClasses([oldData.id]));
+          dispatch(deleteExistingClasses(semesterId, [oldData.id]));
           return Promise.resolve();
         }}
         onBulkUpdate={(changes: Class[]) =>
@@ -163,15 +162,17 @@ const ClassList = (props: { semesterId: string }) => {
         }
         onBulkDelete={(data) => {
           dispatch(resetClassError());
-          dispatch(deleteExistingClasses(_.map(data, "id")));
+          dispatch(deleteExistingClasses(semesterId, _.map(data, "id")));
         }}
         onRowClick={(rowData) => setSelectedClass(rowData)}
       />
-      {classState.error ? (
+      {classState.errors && classState.errors?.length > 0 ? (
         <StyledNotifications
           title="Error"
           onRequestClose={() => dispatch(resetClassError())}
-          description={classState.error?.message}
+          description={_.map(classState.errors, (error: ErrorResponse) => (
+            <p>{error?.message}</p>
+          ))}
           icon="error"
         />
       ) : null}
@@ -189,7 +190,7 @@ const ClassList = (props: { semesterId: string }) => {
       <Table
         title={`Students of class ${selectedClass.subject}.${selectedClass.class}`}
         data={_.map(selectedClass.students, (studentId) => {
-          const studentInfo = _.find(allUsersInfo, { id: studentId });
+          const studentInfo = getUser(studentId);
           return {
             id: studentId,
             code: studentInfo?.userName,
@@ -238,7 +239,6 @@ const ClassList = (props: { semesterId: string }) => {
           }
         ]}
         onRowAdd={(newData: StudentValue) => {
-          console.log(newData);
           const format = {
             code: newData.code,
             realName: newData.realName,

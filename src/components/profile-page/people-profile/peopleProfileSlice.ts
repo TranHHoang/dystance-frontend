@@ -1,9 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
-import { ErrorResponse, User } from "~utils/types";
+import { ErrorResponse, User, get } from "~utils/index";
 
 interface PeopleProfileState {
   userId: string;
@@ -51,7 +49,7 @@ export const {
 export function showPeopleProfile(userId: string): AppThunk {
   return async (dispatch) => {
     try {
-      const response = await Axios.get(`${hostName}/api/users/info?id=${userId}`);
+      const response = await get(`/users/info?id=${userId}`);
       const data = response.data as User;
       dispatch(fetchPeopleProfileSuccess(data));
     } catch (ex) {

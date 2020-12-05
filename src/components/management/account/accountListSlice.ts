@@ -2,8 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
-import { get, postForm, postJson } from "~utils/axiosUtils";
-import { ErrorResponse } from "~utils/types";
+import { get, post, ErrorResponse } from "~utils/index";
 
 export interface Account {
   id: string;
@@ -109,7 +108,7 @@ export function importExcelFile(file: File): AppThunk {
       const form = new FormData();
       form.append("file", file);
 
-      await postForm("/admin/accounts/import", form);
+      await post("/admin/accounts/import", form);
       dispatch(fetchAllAccounts());
     } catch (e) {
       const ex = e as AxiosError;
@@ -139,7 +138,7 @@ export function importExcelFile(file: File): AppThunk {
 export function addNewAccount(account: Account): AppThunk {
   return async (dispatch) => {
     try {
-      const data = (await postJson("/admin/accounts/add", account)).data;
+      const data = (await post("/admin/accounts/add", account)).data;
       dispatch(addAccount(data));
     } catch (e) {
       const ex = e as AxiosError;
@@ -168,7 +167,7 @@ export function addNewAccount(account: Account): AppThunk {
 export function updateExistingAccounts(accounts: Account[]): AppThunk {
   return async (dispatch) => {
     try {
-      const data = (await postJson("/admin/accounts/update", accounts)).data;
+      const data = (await post("/admin/accounts/update", accounts)).data;
       if (data.success.length > 0) {
         dispatch(updateAccounts(data.success));
       }
@@ -206,7 +205,7 @@ export function updateExistingAccounts(accounts: Account[]): AppThunk {
 export function deleteExistingAccounts(ids: string[]): AppThunk {
   return async (dispatch) => {
     try {
-      await postJson("/admin/accounts/delete", ids);
+      await post("/admin/accounts/delete", ids);
       dispatch(removeAccounts(ids));
     } catch (e) {
       const ex = e as AxiosError;

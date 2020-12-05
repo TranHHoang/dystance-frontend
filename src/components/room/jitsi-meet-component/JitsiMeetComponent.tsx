@@ -5,9 +5,6 @@ import Jitsi from "react-jitsi";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { hostName } from "~utils/hostUtils";
-import { getLoginData } from "~utils/tokenStorage";
-import { RoomAction, RoomActionType, User } from "~utils/types";
 import { setRemoteControlAccepted } from "../remote-control/remoteControlSlice";
 import { socket } from "~app/App";
 import { resetCardState, setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
@@ -16,9 +13,9 @@ import { BreakoutGroup, resetRoomState, switchToGroup, removeListeners } from ".
 import { Spinner } from "react-rainbow-components";
 import { withRouter } from "react-router-dom";
 import moment from "moment";
-import { Logger, LogType } from "~utils/logger";
 import fs from "fs";
 import { resetGroupJoinedLeftState, setGroupJoined } from "../group/groupSlice";
+import { Logger, LogType, User, hostName, RoomAction, RoomActionType, getLoginData } from "~utils/index";
 
 const loader = styled.div`
   display: none;
@@ -43,7 +40,7 @@ export async function saveFile() {
     fs.mkdirSync(folderName, { recursive: true });
   }
   if (!fs.existsSync(`${folderName}/${moment().format("YYYY-MM-DD")}.txt`)) {
-    console.log("File doesn't exist");
+    console.log("Log file doesn't exist");
     Logger.getInstance().resetLogs();
   }
   return new Promise((resolve, reject) => {
@@ -51,7 +48,7 @@ export async function saveFile() {
       `${folderName}/${moment().format("YYYY-MM-DD")}.txt`,
       Logger.getInstance().getLogs().join("\n"),
       (err) => {
-        console.log("WRite to file");
+        console.log("Write log to file");
         resolve();
         if (err) {
           console.log(err);

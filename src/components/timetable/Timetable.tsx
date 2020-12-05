@@ -6,9 +6,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
 import moment from "moment";
 import { resetTimetable, showTimetableEvents } from "./timetableSlice";
-import { setDrawerOpen, setEvent, showTeacherInfo } from "./event-details/eventDetailsSlice";
+import { setDrawerOpen, setEvent } from "./event-details/eventDetailsSlice";
 import EventDetailsDrawer from "./event-details/EventDetails";
-import { TimetableEventType } from "~utils/types";
 
 export const Container = styled.div`
   padding: 20px;
@@ -25,6 +24,22 @@ const Title = styled.h1`
   color: white;
   padding-right: 20px;
 `;
+
+export enum TimetableEventType {
+  Schedule,
+  Deadline
+}
+
+export interface TimetableEvent {
+  id: string;
+  eventType: TimetableEventType;
+  roomId: string;
+  title: string;
+  teacherId: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+}
 
 const Timetable = () => {
   const [currentWeek, setCurrentWeek] = useState(new Date());
@@ -64,10 +79,10 @@ const Timetable = () => {
             dispatch(showTimetableEvents(week, endOfWeek));
           }}
           onEventClick={(event: any) => {
-            console.log(event);
             dispatch(setDrawerOpen(true));
-            dispatch(setEvent(event));
-            dispatch(showTeacherInfo(event.teacherId));
+            dispatch(
+              setEvent({ ...event, startDate: event.startDate.toISOString(), endDate: event.endDate.toISOString() })
+            );
           }}
         />
         <EventDetailsDrawer />

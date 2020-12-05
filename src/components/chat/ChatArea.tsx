@@ -1,13 +1,11 @@
 import { faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import _ from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { Button, Modal, ProgressBar } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { Logger, LogType } from "~utils/logger";
-import { AllUsersInfo, User } from "~utils/types";
+import { getUser, Logger, LogType } from "~utils/index";
 import ChatBox from "./ChatBox";
 import ChatHistory from "./ChatHistory";
 import { broadcastMessage, ChatType } from "./chatSlice";
@@ -68,8 +66,8 @@ const ChatArea = (props: any) => {
   const { roomId, receiverId, inRoom } = props;
   const dispatch = useDispatch();
   const logger = Logger.getInstance();
-  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
-  const user = _.find(allUsers, { id: receiverId });
+  const user = getUser(receiverId);
+
   function isImageFile(file: File) {
     return file?.type.includes("image") ?? false;
   }

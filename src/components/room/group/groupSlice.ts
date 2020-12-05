@@ -1,13 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
-import { postForm, get } from "~utils/axiosUtils";
 import _ from "lodash";
 import moment from "moment";
 import { socket } from "~app/App";
-import { all, RoomAction, RoomActionType } from "~utils/types";
-import { getLoginData } from "~utils/tokenStorage";
+import { all, RoomAction, RoomActionType, getLoginData, get, hostName, post, Axios } from "~utils/index";
 
 export interface BreakoutGroup {
   groupId?: string;
@@ -94,7 +90,7 @@ export function createGroups(roomId: string, teacherId: string, groups: Breakout
         form.append("roomId", roomId);
         form.append("userIds", JSON.stringify(userIds || []));
 
-        const response = await postForm("/rooms/groups/create", form);
+        const response = await post("/rooms/groups/create", form);
         dispatch(addBreakoutGroup(response.data as BreakoutGroup));
       } catch (ex) {
         console.log(ex);
@@ -120,7 +116,6 @@ export function fetchAllGroups(roomId: string): AppThunk {
   return async (dispatch) => {
     try {
       const response = await get(`/rooms/groups/get?roomId=${roomId}`);
-      console.log(response.data);
       dispatch(setBreakoutGroups(response.data as BreakoutGroup[]));
     } catch (ex) {
       console.log(ex);
@@ -136,7 +131,7 @@ export function updateGroups(roomId: string, groups: BreakoutGroup[]): AppThunk 
         form.append("groupId", groupId);
         form.append("userIds", JSON.stringify(userIds));
 
-        const response = await postForm("/rooms/groups/update", form);
+        const response = await post("/rooms/groups/update", form);
         if (response.data === null) return;
 
         dispatch(updateBreakoutGroup(response.data));
@@ -169,7 +164,7 @@ export function startNewSession(roomId: string, duration: number, groupIds: stri
       form.append("roomId", roomId);
       form.append("startTime", startTime);
       form.append("duration", duration.toString());
-      await postForm("/rooms/groups/start", form);
+      await post("/rooms/groups/start", form);
     } catch (ex) {
       console.log(ex);
     }

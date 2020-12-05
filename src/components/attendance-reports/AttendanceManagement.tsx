@@ -9,7 +9,7 @@ import { ButtonIcon, Picklist, Option, Notification } from "react-rainbow-compon
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { AllUsersInfo, getCurrentRole, User } from "~utils/types";
+import { getCurrentRole, getUser } from "~utils/index";
 import {
   AttendanceReport,
   AttendanceReportStudent,
@@ -62,7 +62,6 @@ const AttendanceManagement = () => {
   const semesterState = useSelector((root: RootState) => root.semesterState);
   const attendanceReportState = useSelector((root: RootState) => root.attendanceReportState);
   const [selectedReport, setSelectedReport] = useState<AttendanceReport>();
-  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
   const [selectedSemester, setSelectedSemester] = useState<{ id: string; label: string }>();
   const dispatch = useDispatch();
 
@@ -110,7 +109,7 @@ const AttendanceManagement = () => {
           title="Sessions"
           data={_.map(attendanceReportState.reports, (v) => ({
             ...v,
-            teacher: _.find(allUsers, { id: v.teacher }).userName,
+            teacher: getUser(v.teacher).userName,
             room: `${v.subject}.${v.class}`
           }))}
           options={{
@@ -174,7 +173,7 @@ const AttendanceManagement = () => {
         <Table
           title={`${selectedReport.subject}.${selectedReport.class}`}
           data={_.map(selectedReport.students, (student) => {
-            const studentInfo = _.find(allUsers, { id: student.id });
+            const studentInfo = getUser(student.id);
             return {
               id: student?.id,
               code: studentInfo?.userName,
@@ -234,7 +233,6 @@ const AttendanceManagement = () => {
             getCurrentRole() !== "quality assurance"
               ? {
                   onRowUpdate: (newData: Student) => {
-                    console.log(newData);
                     dispatch(
                       updateAttendances({
                         id: selectedReport.id,

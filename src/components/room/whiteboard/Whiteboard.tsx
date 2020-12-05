@@ -7,8 +7,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { Logger, LogType } from "~utils/logger";
-import { getLoginData } from "~utils/tokenStorage";
+import { Logger, LogType, getLoginData } from "~utils/index";
 import "./js/index";
 import main, { setAllowWhiteboard } from "./js/main";
 import ReadOnlyService from "./js/services/ReadOnlyService";
@@ -63,6 +62,7 @@ const Whiteboard = (props: any) => {
       logger.log(LogType.WhiteboardDisable, roomId, `Lost whiteboard permissions`);
     }
   }, [userCardState.allowWhiteboard]);
+
   return (
     <StyledWhiteboard id="whiteboard">
       <div id="whiteboardContainer"></div>
