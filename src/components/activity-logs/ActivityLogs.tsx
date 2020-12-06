@@ -178,7 +178,7 @@ const ActivityLogs = () => {
                 exportButton: true,
                 exportAllData: true
               }}
-              title="Rooms"
+              title={_.find(roomListState.rooms, { roomId: roomListState.selectedRoom })?.roomName}
             />
           </MuiThemeProvider>
         </StyledDiv>
