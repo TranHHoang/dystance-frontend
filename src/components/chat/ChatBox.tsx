@@ -5,10 +5,14 @@ import { Picker } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
 import React, { useRef, useState } from "react";
 import { Modal } from "react-rainbow-components";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { broadcastMessage } from "./chatSlice";
 import { resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
+import { Logger, LogType } from "~utils/logger";
+import { AllUsersInfo, User } from "~utils/types";
+import _ from "lodash";
+import { RootState } from "~app/rootReducer";
 
 const StyledChatBox = styled.div`
   display: flex;
@@ -57,17 +61,23 @@ const StyledModal = styled(Modal)`
 const ChatBox = ({
   setFile,
   roomId,
-  receiverId
+  receiverId,
+  inRoom
 }: {
   setFile: (file: File) => void;
   roomId: string;
   receiverId: string;
+  inRoom: boolean;
 }) => {
   const [toggleEmoji, setToggleEmoji] = useState(false);
   const dispatch = useDispatch();
   const imageInput = useRef<HTMLInputElement>();
   const messageInput = useRef<HTMLInputElement>();
   const fileInput = useRef<HTMLInputElement>();
+  const logger = Logger.getInstance();
+  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
+  const user = _.find(allUsers, { id: receiverId });
+  const roomState = useSelector((state: RootState) => state.roomState);
 
   function addEmoji(emoji: any) {
     messageInput.current.value += emoji.native;
@@ -80,6 +90,11 @@ const ChatBox = ({
       if (messageInput.current.value.trim()) {
         dispatch(broadcastMessage(roomId, receiverId, messageInput.current.value));
         messageInput.current.value = "";
+        if (roomId) {
+          logger.log(LogType.RoomChatText, roomId, `Sent message`);
+        } else if (!roomId && inRoom === true) {
+          logger.log(LogType.PrivateChatText, roomState.roomId, `Sent message to ${user.realName}`);
+        }
       }
     }
   }

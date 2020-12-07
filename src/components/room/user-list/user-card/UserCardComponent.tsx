@@ -12,18 +12,21 @@ import {
   setRemoteControlWaitingModalOpen,
   toggleWhiteboardUsage
 } from "./userCardSlice";
-import { RootState } from "~app/rootReducer";
-import { useEffect } from "react";
-import { setDrawerOpen } from "../../room-component/roomSlice";
+import { Logger, LogType } from "~utils/logger";
+import { setUserId } from "../../../../components/room/remote-control/remoteControlSlice";
+import { AllUsersInfo, getCurrentRole, User } from "~utils/types";
+import _ from "lodash";
 
 const StyledCard = styled(Card)`
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
 `;
 
 const UserCardComponent = (props: any) => {
-  const { userId, icon, title, creatorId, roomId } = props;
+  const { userId, icon, title, teacherId, roomId } = props;
+  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
+  const user = _.find(allUsers, { id: userId });
   const dispatch = useDispatch();
-
+  const logger = Logger.getInstance();
   return (
     <div>
       <StyledCard
@@ -36,7 +39,7 @@ const UserCardComponent = (props: any) => {
                 label="View Profile"
                 onClick={() => dispatch(setPeopleProfileModalOpen({ userId, peopleProfileModalOpen: true }))}
               />
-              {getLoginData().id === creatorId ? (
+              {getLoginData().id === teacherId ? (
                 <div>
                   <MenuItem
                     label="Kick User Out"
@@ -48,11 +51,18 @@ const UserCardComponent = (props: any) => {
                   />
                   <MenuItem
                     label="Remote control"
-                    onClick={() => dispatch(setRemoteControlWaitingModalOpen({ userId, isModalOpen: true }))}
+                    onClick={() => {
+                      dispatch(setRemoteControlWaitingModalOpen({ userId, isModalOpen: true }));
+                      logger.log(LogType.RemoteControlPermission, roomId, `Asked to remote control ${user.realName}`);
+                      dispatch(setUserId(userId));
+                    }}
                   />
                   <MenuItem
                     label="Toggle Whiteboard Usage"
-                    onClick={() => dispatch(toggleWhiteboardUsage(roomId, userId))}
+                    onClick={() => {
+                      dispatch(toggleWhiteboardUsage(roomId, userId));
+                      logger.log(LogType.ToggleWhiteboard, roomId, `Toggled whiteboard usage for ${user.realName}`);
+                    }}
                   />
                 </div>
               ) : null}

@@ -3,13 +3,15 @@ import { AppThunk } from "~app/store";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
-import { ErrorResponse, RoomAction, RoomActionType } from "~utils/types";
+import { AllUsersInfo, ErrorResponse, RoomAction, RoomActionType, User } from "~utils/types";
 import { fetchLatestMessage } from "../../chat/chatSlice";
 import { setUserInfoList } from "../user-list/userListSlice";
 import { UserInfo } from "~utils/types";
 import { toggleWhiteboard, setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
 import { socket } from "~app/App";
 import { fetchAllGroups } from "../group/groupSlice";
+import { createNotification, NotificationType } from "~utils/notification";
+import _ from "lodash";
 
 export interface BreakoutGroup {
   id: string;
@@ -62,6 +64,9 @@ const roomSlice = createSlice({
     },
     stopGroup(state) {
       state.groupStopped = true;
+    },
+    setRoomId(state, action: PayloadAction<string>) {
+      state.roomId = action.payload;
     }
   }
 });
@@ -73,12 +78,14 @@ export const {
   switchToGroup,
   incrementChatBadge,
   resetChatBadge,
-  stopGroup
+  stopGroup,
+  setRoomId
 } = roomSlice.actions;
 
 export function initSocket(roomId: string): AppThunk {
   return (dispatch) => {
     socket.invoke(RoomAction, roomId, RoomActionType.Join, getLoginData().id);
+    const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
 
     socket.on(RoomAction, async (data: string) => {
       const response = JSON.parse(data);
@@ -86,7 +93,9 @@ export function initSocket(roomId: string): AppThunk {
         case RoomActionType.Chat:
           dispatch(fetchLatestMessage(roomId, undefined));
           if (response.payload !== getLoginData().id) {
+            const user = _.find(allUsers, { id: response.payload });
             dispatch(incrementChatBadge());
+            createNotification(NotificationType.RoomNotification, `New message from ${user.userName}`);
           }
           break;
         case RoomActionType.Join:
@@ -101,18 +110,23 @@ export function initSocket(roomId: string): AppThunk {
           break;
         case RoomActionType.Mute:
           dispatch(setMuteOtherUser(true));
+          createNotification(NotificationType.RoomNotification, "You have been muted");
           break;
         case RoomActionType.Kick:
           dispatch(setKickOtherUser(true));
+          createNotification(NotificationType.RoomNotification, "You have been kicked");
           break;
         case RoomActionType.ToggleWhiteboard:
           dispatch(toggleWhiteboard());
+          createNotification(NotificationType.RoomNotification, "Your whiteboard permission has been changed");
           break;
         case RoomActionType.GroupNotification:
           dispatch(fetchAllGroups(roomId));
+          createNotification(NotificationType.RoomNotification, "Breakout groups have been updated");
           break;
         case RoomActionType.StopGroup:
           dispatch(stopGroup());
+          createNotification(NotificationType.RoomNotification, "All breakout groups have been stopped");
           break;
       }
     });

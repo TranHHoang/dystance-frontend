@@ -11,11 +11,14 @@ import { RoomAction, RoomActionType, User } from "~utils/types";
 import { setRemoteControlAccepted } from "../remote-control/remoteControlSlice";
 import { socket } from "~app/App";
 import { resetCardState, setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
-import { setShowUpperToolbar } from "./jitsiMeetSlice";
+import { sendLog, setShowUpperToolbar } from "./jitsiMeetSlice";
 import { BreakoutGroup, resetRoomState, switchToGroup, removeListeners } from "../room-component/roomSlice";
 import { Spinner } from "react-rainbow-components";
 import { withRouter } from "react-router-dom";
 import moment from "moment";
+import { Logger, LogType } from "~utils/logger";
+import fs from "fs";
+import { resetGroupJoinedLeftState, setGroupJoined } from "../group/groupSlice";
 
 const loader = styled.div`
   display: none;
@@ -34,23 +37,50 @@ const StyledClock = styled.div`
   border-bottom-right-radius: 10px;
   opacity: 50%;
 `;
+export async function saveFile() {
+  const folderName = `./logs/${getLoginData().id}`;
+  if (!fs.existsSync(folderName)) {
+    fs.mkdirSync(folderName, { recursive: true });
+  }
+  if (!fs.existsSync(`${folderName}/${moment().format("YYYY-MM-DD")}.txt`)) {
+    console.log("File doesn't exist");
+    Logger.getInstance().resetLogs();
+  }
+  return new Promise((resolve, reject) => {
+    fs.writeFile(
+      `${folderName}/${moment().format("YYYY-MM-DD")}.txt`,
+      Logger.getInstance().getLogs().join("\n"),
+      (err) => {
+        console.log("WRite to file");
+        resolve();
+        if (err) {
+          console.log(err);
+          reject();
+        }
+      }
+    );
+  });
+}
 
 const JitsiMeetComponent = (props: any) => {
   const userCardState = useSelector((state: RootState) => state.userCardState);
+  const groupState = useSelector((state: RootState) => state.groupState);
   const roomState = useSelector((state: RootState) => state.roomState);
   const profile = JSON.parse(localStorage.getItem("profile")) as User;
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const [remainingTime, setRemainingTime] = useState("00:00");
-  const { roomId, roomName, groupId, creatorId, history } = props;
+  const { roomId, roomName, groupId, teacherId, history } = props;
   const api = useRef(null);
   const groupRef = useRef<BreakoutGroup>();
   const intervalRef = useRef<number>();
+  const logger = Logger.getInstance();
 
   useEffect(() => {
     if (userCardState.muteOtherUser) {
       api?.current?.isAudioMuted().then((response: any) => {
         if (!response) {
+          logger.log(LogType.GotMuted, roomId, `Got muted`);
           api?.current?.executeCommand("toggleAudio");
           dispatch(setMuteOtherUser(false));
         }
@@ -63,6 +93,7 @@ const JitsiMeetComponent = (props: any) => {
 
   useEffect(() => {
     if (userCardState.kickOtherUser) {
+      logger.log(LogType.GotKicked, roomId, `Got kicked`);
       api?.current?.executeCommand("hangup");
       dispatch(setKickOtherUser(false));
     }
@@ -99,21 +130,27 @@ const JitsiMeetComponent = (props: any) => {
       if (groupId) {
         // Redirect back to room
         history.push("/temp");
+        logger.log(LogType.GroupLeave, groupState.mainRoomId, `Left group ${groupState.groupId}`);
+        dispatch(setGroupJoined(false));
         history.replace(`${groupRef.current.roomPath}`);
         groupRef.current = undefined;
       } else {
         // Redirect to group
         history.push("/temp");
-        history.replace(`/room/${groupRef.current.id}/${creatorId}/${groupRef.current.name}/${groupId}`);
+        history.replace(`/room/${groupRef.current.id}/${teacherId}/${groupRef.current.name}/${groupId}`);
         dispatch(switchToGroup(undefined));
       }
     } else {
       history.replace("/homepage");
+      dispatch(resetGroupJoinedLeftState());
       groupRef.current = undefined;
+      logger.log(LogType.AttendanceLeave, roomId, `Left room`);
+      dispatch(sendLog());
     }
   }
 
   const handleAPI = (jitsiMeetAPI: any) => {
+    let interval: number;
     setIsLoading(false);
     api.current = jitsiMeetAPI;
     jitsiMeetAPI.executeCommand("displayName", `${profile.realName} (${profile.userName})`);
@@ -124,6 +161,13 @@ const JitsiMeetComponent = (props: any) => {
 
     jitsiMeetAPI.addEventListener("videoConferenceJoined", () => {
       dispatch(setShowUpperToolbar(true));
+      saveFile();
+      interval = setInterval(() => {
+        saveFile();
+      }, 2000 * 60);
+      if (groupState.isGroupJoined === false && groupState.isGroupLeft === false) {
+        logger.log(LogType.AttendanceJoin, roomId, `Joined room`);
+      }
     });
     jitsiMeetAPI.on("readyToClose", () => {
       socket.invoke(RoomAction, roomId, RoomActionType.Leave, getLoginData().id);
@@ -133,7 +177,13 @@ const JitsiMeetComponent = (props: any) => {
       dispatch(resetCardState());
       removeListeners();
       redirect();
+      clearInterval(interval);
       jitsiMeetAPI.dispose();
+    });
+    jitsiMeetAPI.on("screenSharingStatusChanged", (status: any) => {
+      status.on
+        ? logger.log(LogType.ShareScreenStart, roomId, `Started screen sharing`)
+        : logger.log(LogType.ShareScreenStop, roomId, `Stopped screen sharing`);
     });
   };
   return (

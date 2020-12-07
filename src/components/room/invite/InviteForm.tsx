@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Textarea, TimelineMarker, Avatar, Modal, Notification } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
-import { StyledNotification } from "../../account-management/styles";
+import { StyledNotification } from "../../account/styles";
 import { setInviteModalOpen, showInvitedUsers, startInvite } from "./inviteSlice";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { AllUsersInfo, User } from "~utils/types";
@@ -18,12 +18,25 @@ import InvitedUserCardComponent from "./invited-user-card-component/InvitedUserC
 import { kickInvitedUser, setKickModalOpen } from "./invited-user-card-component/invitedUserCardSlice";
 import { StyledText } from "../..//homepage/single-room/styles";
 
-const theme = createMuiTheme({
+export const theme = createMuiTheme({
   palette: {
     type: "dark",
     primary: {
       main: "#4ecca3",
       contrastText: "#36393f"
+    },
+    background: {
+      paper: "#36393f"
+    },
+    secondary: {
+      main: "#4ecca3"
+    }
+  },
+  overrides: {
+    MuiInputBase: {
+      root: {
+        height: "2em"
+      }
     }
   }
 });

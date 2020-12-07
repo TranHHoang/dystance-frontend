@@ -6,7 +6,7 @@ import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
 import { ErrorResponse } from "~utils/types";
-import { resetRoom, showRoom } from "../../homepage/showRoomsSlice";
+import { showRoom } from "../../homepage/showRoomsSlice";
 import { CreateRoomFormValues } from "./CreateRoomForm";
 import _ from "lodash";
 
@@ -99,7 +99,6 @@ export function createRoom({
 
       await Axios.post(`${hostName}/api/rooms/create`, fd, config);
       dispatch(createRoomSuccess());
-      dispatch(resetRoom());
       dispatch(showRoom());
     } catch (ex) {
       // Error code != 200

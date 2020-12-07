@@ -2,17 +2,16 @@ import { faArrowLeft, faPaperclip, faPaperPlane, faPencilAlt, faSearch } from "@
 import ChatArea from "../chat/ChatArea";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { ButtonIcon, TimelineMarker, Input, Textarea, Button, Modal, Lookup } from "react-rainbow-components";
+import { ButtonIcon, TimelineMarker, Textarea, Button, Modal, Lookup } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
-import { AllUsersInfo, getUserInfo, PrivateMessage, User, UserInfo } from "~utils/types";
+import { AllUsersInfo, getCurrentRole, getUserInfo, User, UserInfo } from "~utils/types";
 import { broadcastMessage, ChatType, fetchAllMessages } from "../../components/chat/chatSlice";
 import { fetchAllPreview } from "./chatPreviewSlice";
 import { getLoginData } from "~utils/tokenStorage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { socket } from "~app/App";
 import * as Yup from "yup";
 import { Field, Form, Formik, FormikProps } from "formik";
 import { LookupValue } from "react-rainbow-components/components/types";
@@ -84,7 +83,7 @@ const schema = Yup.object({
 });
 
 const ChatPreview = (props: any) => {
-  const { inRoom, inSidebar } = props;
+  const { inRoom } = props;
   const [usersInfo, setUsersInfo] = useState<{ [key: string]: UserInfo }>({});
   const previews = useSelector((root: RootState) => root.chatPreviewState.chatPreview);
   const [selectedUserId, setSelectedUserId] = useState<string>();
@@ -130,25 +129,27 @@ const ChatPreview = (props: any) => {
   }
 
   const allUsersInfo = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
-  const options: LookupValue[] = allUsersInfo.map((userInfo) => ({
-    id: userInfo.id,
-    label: `${userInfo.realName} (${userInfo.userName})`,
-    description: `${userInfo.email}`,
-    // eslint-disable-next-line jsx-a11y/alt-text
-    icon: (
+  const options: LookupValue[] = allUsersInfo
+    .filter((userInfo) => userInfo.role === (getCurrentRole() === "teacher" ? "student" : "teacher"))
+    .map((userInfo) => ({
+      id: userInfo.id,
+      label: `${userInfo.realName} (${userInfo.userName})`,
+      description: `${userInfo.email}`,
       // eslint-disable-next-line jsx-a11y/alt-text
-      <img
-        style={{ height: "32px", width: "32px", borderRadius: "50%", objectFit: "cover" }}
-        src={`${hostName}/${userInfo.avatar}`}
-      />
-    )
-  }));
+      icon: (
+        // eslint-disable-next-line jsx-a11y/alt-text
+        <img
+          style={{ height: "32px", width: "32px", borderRadius: "50%", objectFit: "cover" }}
+          src={`${hostName}/${userInfo.avatar}`}
+        />
+      )
+    }));
 
   function filter(query: string, options: LookupValue[]) {
     if (query) {
       return options.filter((item) => {
         const regex = new RegExp(query, "i");
-        return regex.test(item.label) && item.id !== getLoginData().id;
+        return regex.test(item.label.toString()) && item.id !== getLoginData().id;
       });
     }
     return [];
@@ -204,7 +205,7 @@ const ChatPreview = (props: any) => {
                 <Form>
                   <Lookup
                     name="id"
-                    placeholder="To someone you ❤️"
+                    placeholder="Who do you want to talk to?"
                     debounce
                     value={selectedUser}
                     icon={<FontAwesomeIcon icon={faSearch} />}
@@ -244,7 +245,7 @@ const ChatPreview = (props: any) => {
             variant="brand"
             icon={<FontAwesomeIcon icon={faPencilAlt} />}
             size="large"
-            onClick={(e) => setShowNewMessageModal(true)}
+            onClick={() => setShowNewMessageModal(true)}
           />
         </>
       ) : (
@@ -262,7 +263,7 @@ const ChatPreview = (props: any) => {
             </span>
           </StyledHeader>
           <div style={{ margin: "0 5 0 5" }}>
-            <ChatArea receiverId={selectedUserId} />
+            <ChatArea receiverId={selectedUserId} inRoom={inRoom} />
           </div>
         </>
       )}

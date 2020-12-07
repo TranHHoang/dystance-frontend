@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
 import { setupScreenSharingMain, initPopupsConfigurationMain } from "jitsi-meet-electron-utils";
 import express from "express";
@@ -68,6 +68,11 @@ const createWindow = () => {
     mainWindow.show();
   });
 
+  ipcMain.on("restore-and-focus", () => {
+    mainWindow.restore();
+    mainWindow.focus();
+  });
+
   //Send app-close event to ipcRenderer
   mainWindow.on("close", () => {
     mainWindow.webContents.send("app-close");
@@ -99,7 +104,7 @@ app.on("activate", () => {
     createWindow();
   }
 });
-
+app.setAppUserModelId(process.execPath);
 // app.userAgentFallback = app.userAgentFallback.replace(/Electron\/*/, '');
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.

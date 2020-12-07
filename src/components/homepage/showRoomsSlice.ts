@@ -32,7 +32,7 @@ const showRoomSlice = createSlice({
   reducers: {
     fetchRoomSuccess(state, action: PayloadAction<Room[]>) {
       state.isLoading = false;
-      state.rooms = state.rooms.concat(action.payload);
+      state.rooms = action.payload;
     },
     fetchRoomFailed(state, action: PayloadAction<ErrorResponse>) {
       state.isLoading = false;
@@ -79,13 +79,11 @@ export function showRoom(): AppThunk {
   };
 }
 
-export function fetchAllUsers(): AppThunk {
-  return async () => {
-    try {
-      const response = await Axios.get(`${hostName}/api/users/getAll`);
-      sessionStorage.setItem(AllUsersInfo, JSON.stringify(response.data));
-    } catch (ex) {
-      console.log(ex);
-    }
-  };
+export async function fetchAllUsers() {
+  try {
+    const response = await Axios.get(`${hostName}/api/users/getAll`);
+    sessionStorage.setItem(AllUsersInfo, JSON.stringify(response.data));
+  } catch (ex) {
+    console.log(ex);
+  }
 }

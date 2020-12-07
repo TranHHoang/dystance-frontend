@@ -1,4 +1,4 @@
-import { StyledNotification } from "../../../components/account-management/styles";
+import { StyledNotification } from "../../account/styles";
 import { Button, ButtonMenu, Card, Textarea, Notification, AccordionSection } from "react-rainbow-components";
 import { Link } from "react-router-dom";
 import styled from "styled-components";

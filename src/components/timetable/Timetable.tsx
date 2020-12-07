@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~app/rootReducer";
 import moment from "moment";
 import { resetTimetable, showTimetableEvents } from "./timetableSlice";
-import { setDrawerOpen, setEvent, showCreatorInfo } from "./event-details/eventDetailsSlice";
+import { setDrawerOpen, setEvent, showTeacherInfo } from "./event-details/eventDetailsSlice";
 import EventDetailsDrawer from "./event-details/EventDetails";
 import { TimetableEventType } from "~utils/types";
 
@@ -34,11 +34,12 @@ const Timetable = () => {
   const events = timetableState.events.map((event) => ({
     ...event,
     startDate: new Date(`${event.startDate}`),
-    endDate: new Date(`${event.endDate}`),
-    backgroundColor: event.eventType === TimetableEventType.Deadline ? "rgba(254,72,73,1)" : null
+    endDate: new Date(`${event.endDate}`)
   }));
+
   useEffect(() => {
     dispatch(resetTimetable());
+    dispatch(setDrawerOpen(false));
     const startOfWeek = moment().startOf("week").toDate();
     const endOfWeek = moment().endOf("week").toDate();
     dispatch(showTimetableEvents(startOfWeek, endOfWeek));
@@ -46,18 +47,6 @@ const Timetable = () => {
       dispatch(resetTimetable());
     };
   }, []);
-
-  // useEffect(() => {
-  //   const calendarEvents = document.querySelectorAll("div[id^='calendar-event']");
-  //   calendarEvents.forEach((event) => {
-  //     const span = event.querySelector("span");
-  //     if (span.innerHTML.startsWith("Deadline - ")) {
-  //       event.style.backgroundColor = "#FE4849";
-  //       event.style.padding = "5px";
-  //       event.style.height = "auto";
-  //     }
-  //   });
-  // }, [timetableState.events]);
 
   return (
     <>
@@ -75,9 +64,10 @@ const Timetable = () => {
             dispatch(showTimetableEvents(week, endOfWeek));
           }}
           onEventClick={(event: any) => {
+            console.log(event);
             dispatch(setDrawerOpen(true));
             dispatch(setEvent(event));
-            dispatch(showCreatorInfo(event.creatorId));
+            dispatch(showTeacherInfo(event.teacherId));
           }}
         />
         <EventDetailsDrawer />

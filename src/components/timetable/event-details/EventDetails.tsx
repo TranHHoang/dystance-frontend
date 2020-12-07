@@ -1,5 +1,4 @@
 import React from "react";
-import { useState } from "react";
 import { Drawer } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
@@ -7,7 +6,7 @@ import { RootState } from "~app/rootReducer";
 import { setDrawerOpen } from "./eventDetailsSlice";
 import moment from "moment";
 import { TimetableEventType } from "~utils/types";
-import { faClock, faUser, faComment } from "@fortawesome/free-solid-svg-icons";
+import { faClock, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { StyledButton, StyledLink } from "../../homepage/single-room/styles";
 
@@ -96,17 +95,8 @@ const EventDetailsDrawer = () => {
           <FontAwesomeIcon icon={faUser} size="2x" />
         </StyledIcon>
         <InfoContainer>
-          <StyleTitle>Creator</StyleTitle>
-          <StyleSubTitle>{eventDetailsState.creator?.realName}</StyleSubTitle>
-        </InfoContainer>
-      </div>
-      <div className="rainbow-flex rainbow-m-bottom_medium">
-        <StyledIcon>
-          <FontAwesomeIcon icon={faComment} size="2x" />
-        </StyledIcon>
-        <InfoContainer>
-          <StyleTitle>Description</StyleTitle>
-          <StyleSubTitle style={{ fontSize: "18px" }}>{eventDetailsState.event?.description}</StyleSubTitle>
+          <StyleTitle>Teacher</StyleTitle>
+          <StyleSubTitle>{eventDetailsState.teacher?.realName}</StyleSubTitle>
         </InfoContainer>
       </div>
       {eventDetailsState.event?.eventType === TimetableEventType.Schedule ? (
@@ -114,7 +104,7 @@ const EventDetailsDrawer = () => {
           <StyledJoinRoomLink
             style={{ textDecoration: "none", width: "100%" }}
             to={{
-              pathname: `/room/${eventDetailsState.event?.roomId}/${eventDetailsState.event?.creatorId}/${eventDetailsState.event?.title}`
+              pathname: `/room/${eventDetailsState.event?.roomId}/${eventDetailsState.event?.teacherId}/${eventDetailsState.event?.title}`
             }}
           >
             <StyledJoinRoomButton label="Join Room" variant="brand" />

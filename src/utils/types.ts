@@ -1,8 +1,11 @@
+import _ from "lodash";
 import NodeCache from "node-cache";
 import Axios from "./fakeAPI";
 import { hostName } from "./hostUtils";
+import { getLoginData } from "./tokenStorage";
 
 export const AllUsersInfo = "allUsersInfo"; // For autocomplete function
+type Role = "student" | "teacher" | "admin" | "quality assurance" | "academic management";
 
 export interface UserLoginData {
   id: string;
@@ -15,19 +18,14 @@ export interface UserLoginData {
 export enum LoginLocalStorageKey {
   EmailOrUserName = "login/emailOrUserName",
   GoogleEmail = "login/googleEmail",
-  UserInfo = "login/userInfo"
+  UserInfo = "login/userInfo",
+  Profile = "profile"
 }
 
 export interface Room {
   roomId: string;
   roomName: string;
-  creatorId: string;
-  image: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  repeatOccurrence: string;
-  roomTimes: string;
+  teacherId: string;
 }
 
 export interface ErrorResponse {
@@ -44,8 +42,16 @@ export interface User {
   password: string;
   newPassword: string;
   avatar: string;
+  role: Role;
 }
 
+export interface UserTableInfo {
+  id?: string;
+  code: string;
+  email: string;
+  realName: string;
+  dob: string;
+}
 export interface UserInfo {
   userName: string;
   realName: string;
@@ -67,6 +73,11 @@ export async function getUserInfo(userId: string): Promise<UserInfo> {
   }
 }
 
+export function getCurrentRole(): Role {
+  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
+  return _.find(allUsers, { id: getLoginData()?.id })?.role;
+}
+
 export const RoomAction = "RoomAction";
 export const PrivateMessage = "PrivateMessage";
 
@@ -80,25 +91,16 @@ export enum RoomActionType {
   GroupNotification,
   StopGroup
 }
-export interface DeadlineInfo {
-  deadlineId: string;
-  creatorId: string;
-  roomId: string;
-  title: string;
-  endDate: string;
-  description: string;
-}
+
 export enum TimetableEventType {
-  Schedule,
-  Deadline
+  Schedule
 }
 export interface TimetableEvent {
   id: string;
   eventType: TimetableEventType;
   roomId: string;
   title: string;
-  creatorId: string;
-  description: string;
+  teacherId: string;
   startDate: string;
   endDate: string;
 }
@@ -107,4 +109,24 @@ export interface RoomTimes {
   dayOfWeek: string;
   startTime: string;
   endTime: string;
+}
+
+export async function all<T>(array: T[], fn: (value: T) => Promise<void>) {
+  return array.reduce(async (p, item) => {
+    await p;
+    return await fn(item);
+  }, Promise.resolve());
+}
+
+export interface Semester {
+  id: string;
+  name: string;
+}
+
+export interface ActivityLog {
+  dateTime: string;
+  logType: string;
+  roomId: string;
+  userId: string;
+  description: string;
 }

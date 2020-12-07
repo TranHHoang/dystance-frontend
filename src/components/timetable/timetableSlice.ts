@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppThunk } from "~app/store";
-import { getLoginData } from "~utils/tokenStorage";
 import { ErrorResponse, TimetableEvent } from "~utils/types";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";

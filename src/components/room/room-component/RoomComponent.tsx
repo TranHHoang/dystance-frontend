@@ -12,18 +12,18 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PeopleProfilePage from "../../profile-page/people-profile/PeopleProfilePage";
 import { setPeopleProfileModalOpen } from "../../profile-page/people-profile/peopleProfileSlice";
 import React from "react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Button, Drawer, Modal, Tab, Tabset, Notification, BadgeOverlay } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import ChatArea from "../../chat/ChatArea";
 import { fetchAllMessages } from "../../chat/chatSlice";
-import { getUserInfo, RoomAction, RoomActionType } from "~utils/types";
+import { AllUsersInfo, getCurrentRole, getUserInfo, RoomAction, RoomActionType, User } from "~utils/types";
 import JitsiMeetComponent from "../jitsi-meet-component/JitsiMeetComponent";
 import UserListComponent from "../user-list/UserListComponent";
 import Whiteboard from "../whiteboard/Whiteboard";
-import { initSocket, removeListeners, resetChatBadge, setDrawerOpen, setTabsetValue } from "./roomSlice";
+import { initSocket, removeListeners, resetChatBadge, setDrawerOpen, setRoomId, setTabsetValue } from "./roomSlice";
 import { socket } from "~app/App";
 import {
   kickUser,
@@ -39,12 +39,12 @@ import RemoteControl, { RemoteControlSignalType, REMOTE_CONTROL_SIGNAL } from ".
 import { UserInfo } from "~utils/types";
 import { getLoginData } from "~utils/tokenStorage";
 import { setRemoteControlAccepted } from "../remote-control/remoteControlSlice";
-import DeadlineListComponent, { DeadlineFormComponent } from "../deadline/DeadlineListComponent";
-import { deleteDeadline, setDeleteModalOpen, setUpdateModalOpen } from "../deadline/deadline-card/deadlineCardSlice";
 import ChatPreview from "../../private-chat/ChatPreview";
 import { ipcRenderer } from "electron";
 import { resetPrivateChatBadge, initPrivateChatSocket } from "../../private-chat/chatPreviewSlice";
 import GroupComponent from "../group/GroupComponent";
+import { Logger, LogType } from "~utils/logger";
+import _ from "lodash";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -162,27 +162,28 @@ const RoomComponent = (props: any) => {
   const peopleProfileState = useSelector((state: RootState) => state.peopleProfileState);
   const jitsiMeetState = useSelector((state: RootState) => state.jitisiMeetState);
   const userCardState = useSelector((state: RootState) => state.userCardState);
-  const deadlineCardState = useSelector((state: RootState) => state.deadlineCardState);
   const userListState = useSelector((state: RootState) => state.userListState);
   const chatPreviewState = useSelector((state: RootState) => state.chatPreviewState);
-  const formRef = useRef(null);
   const remoteControlState = useSelector((state: RootState) => state.remoteControlState);
-  const { roomId, creatorId, groupId } = props.match.params;
+  const { roomId, teacherId, groupId } = props.match.params;
   let { roomName } = props.match.params;
   const [whiteboardOpen, setWhiteboardOpen] = useState(false);
   const [remoteInitiatorInfo, setRemoteInitiatorInfo] = useState<UserInfo>();
   const [privateChatOpen, setPrivateChatOpen] = useState(false);
   const dispatch = useDispatch();
-
+  const logger = Logger.getInstance();
+  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
+  const user = _.find(allUsers, { id: userCardState.userId });
+  const remoteControlUser = _.find(allUsers, { id: remoteControlState.userId });
   const isBreakoutGroup = groupId !== undefined;
-  console.log(isBreakoutGroup);
+  const role = getCurrentRole();
   if (isBreakoutGroup) roomName = atob(roomName);
-  console.log(roomName);
 
   useEffect(() => {
     dispatch(initSocket(roomId));
     dispatch(fetchAllMessages(roomId, undefined));
-    dispatch(initPrivateChatSocket());
+    dispatch(setRoomId(roomId));
+
     //Listen to the event sent from ipcMain and leave Room and remove socket
     ipcRenderer.on("app-close", () => {
       socket.invoke(RoomAction, roomId, RoomActionType.Leave, getLoginData().id);
@@ -196,11 +197,9 @@ const RoomComponent = (props: any) => {
       case "Chat":
         return <ChatArea roomId={roomId} />;
       case "People":
-        return <UserListComponent roomId={roomId} creatorId={creatorId} />;
-      case "Deadline":
-        return <DeadlineListComponent roomId={roomId} creatorId={creatorId} />;
+        return <UserListComponent roomId={roomId} teacherId={teacherId} />;
       case "Groups":
-        return <GroupComponent roomId={roomId} roomName={roomName} creatorId={creatorId} />;
+        return <GroupComponent roomId={roomId} roomName={roomName} teacherId={teacherId} />;
     }
   }
 
@@ -210,19 +209,6 @@ const RoomComponent = (props: any) => {
     }
   }, [userCardState.isRemoteControlWaitingModalOpen]);
 
-  useEffect(() => {
-    if (roomState.isDrawerOpen) {
-      const closeAction = setInterval(() => {
-        if ($("#drawer-close-button").length) {
-          clearInterval(closeAction);
-        }
-        $("#drawer-close-button").on("click", () => {
-          dispatch(setDrawerOpen(false));
-        }),
-          500;
-      });
-    }
-  }, [roomState.isDrawerOpen]);
   socket.on(REMOTE_CONTROL_SIGNAL, async (data) => {
     const objData = JSON.parse(data);
     switch (objData.type) {
@@ -256,24 +242,28 @@ const RoomComponent = (props: any) => {
               <FontAwesomeIcon icon={faBars} size="2x" />
             )}
           </TopButton>
-          <NormalButton
-            variant="neutral"
-            onClick={() => {
-              setPrivateChatOpen(true);
-              dispatch(resetPrivateChatBadge());
-            }}
-          >
-            {chatPreviewState.privateChatBadge > 0 ? (
-              <BadgeOverlay>
+          {role !== "quality assurance" ? (
+            <NormalButton
+              variant="neutral"
+              onClick={() => {
+                setPrivateChatOpen(true);
+                dispatch(resetPrivateChatBadge());
+              }}
+            >
+              {chatPreviewState.privateChatBadge > 0 ? (
+                <BadgeOverlay>
+                  <FontAwesomeIcon icon={faComments} size="2x" />
+                </BadgeOverlay>
+              ) : (
                 <FontAwesomeIcon icon={faComments} size="2x" />
-              </BadgeOverlay>
-            ) : (
-              <FontAwesomeIcon icon={faComments} size="2x" />
-            )}
-          </NormalButton>
-          <RearButton variant="neutral" onClick={() => setWhiteboardOpen(!whiteboardOpen)}>
-            <FontAwesomeIcon icon={faChalkboard} size="2x" />
-          </RearButton>
+              )}
+            </NormalButton>
+          ) : null}
+          {!isBreakoutGroup && (
+            <RearButton variant="neutral" onClick={() => setWhiteboardOpen(!whiteboardOpen)}>
+              <FontAwesomeIcon icon={faChalkboard} size="2x" />
+            </RearButton>
+          )}
         </ButtonGroup>
       ) : null}
 
@@ -317,16 +307,16 @@ const RoomComponent = (props: any) => {
                 }
                 name="People"
               />
-              {!isBreakoutGroup && (
+              {!isBreakoutGroup && role !== "quality assurance" ? (
                 <>
-                  <StyledTab label={<FontAwesomeIcon icon={faCalendarTimes} size="2x" />} name="Deadline" />
                   <StyledTab label={<FontAwesomeIcon icon={faObjectUngroup} size="2x" />} name="Groups" />
                 </>
-              )}
+              ) : null}
             </Tabset>
           </span>
         }
         isOpen={roomState.isDrawerOpen}
+        onRequestClose={() => dispatch(setDrawerOpen(false))}
       >
         {getTabContent()}
       </StyledDrawer>
@@ -335,14 +325,21 @@ const RoomComponent = (props: any) => {
       {remoteControlState.remoteControlAccepted ? (
         <InvisibleDiv className="hidden-class">
           <RemoteControlButtonDiv className="remote-control-div">
-            <Button variant="destructive" onClick={() => dispatch(setRemoteControlAccepted(undefined))}>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                // eslint-disable-next-line prettier/prettier
+                logger.log(LogType.RemoteControlStop, roomId, `Stopped remote-controlling ${remoteControlUser.realName}`);
+                dispatch(setRemoteControlAccepted(undefined));
+              }}
+            >
               <FontAwesomeIcon icon={faVideoSlash} className="rainbow-m-right_medium" /> Stop Connection
             </Button>
           </RemoteControlButtonDiv>
         </InvisibleDiv>
       ) : null}
-      {whiteboardOpen ? <Whiteboard roomId={roomId} creatorId={creatorId} /> : null}
-      <JitsiMeetComponent roomId={roomId} roomName={roomName} creatorId={creatorId} groupId={groupId} />
+      {whiteboardOpen ? <Whiteboard roomId={roomId} teacherId={teacherId} /> : null}
+      <JitsiMeetComponent roomId={roomId} roomName={roomName} teacherId={teacherId} groupId={groupId} />
 
       <StyledModal
         isOpen={peopleProfileState.peopleProfileModalOpen}
@@ -369,7 +366,10 @@ const RoomComponent = (props: any) => {
               label="Mute"
               variant="brand"
               type="submit"
-              onClick={() => dispatch(muteUser(roomId, userCardState.userId))}
+              onClick={() => {
+                dispatch(muteUser(roomId, userCardState.userId));
+                logger.log(LogType.Mute, roomId, `Muted user ${user.realName}`);
+              }}
               disabled={userCardState.isLoading || userCardState.isMuteSuccess}
             />
           </div>
@@ -397,7 +397,10 @@ const RoomComponent = (props: any) => {
               label="Kick"
               variant="brand"
               type="submit"
-              onClick={() => dispatch(kickUser(roomId, userCardState.userId))}
+              onClick={() => {
+                dispatch(kickUser(roomId, userCardState.userId));
+                logger.log(LogType.Kick, roomId, `Kicked user ${user.realName}`);
+              }}
               disabled={userCardState.isLoading || userCardState.isKickSuccess}
             />
           </div>
@@ -405,102 +408,30 @@ const RoomComponent = (props: any) => {
       >
         <StyledText>Are you sure you want to kick this member out of the room?</StyledText>
       </StyledModal>
-      <Modal
-        isOpen={deadlineCardState.isUpdateModalOpen}
-        title="Update Deadline"
-        hideCloseButton={true}
-        footer={
-          <div className="rainbow-flex rainbow-justify_end">
-            <Button
-              className="rainbow-m-right_large"
-              label="Cancel"
-              variant="neutral"
-              onClick={() => {
-                formRef?.current.resetForm();
-                dispatch(setUpdateModalOpen(false));
-              }}
-              disabled={deadlineCardState.isLoading || deadlineCardState.isDeadlineUpdateSuccess}
-            />
-            <Button
-              label="Update"
-              variant="brand"
-              type="submit"
-              onClick={() => formRef.current.handleSubmit()}
-              disabled={deadlineCardState.isLoading || deadlineCardState.isDeadlineUpdateSuccess}
-            />
-          </div>
-        }
-      >
-        {deadlineCardState.error && deadlineCardState.error.type !== 1 ? (
-          <StyledNotification
-            title="An Error Occured"
-            hideCloseButton={true}
-            description={deadlineCardState.error.message}
-            icon="error"
-          />
-        ) : null}
-        {deadlineCardState.isDeadlineUpdateSuccess && (
-          <StyledNotification
-            title="Deadline Created Successfully"
-            hideCloseButton={true}
-            description="Your deadline will appear shortly"
-            icon="success"
-          />
-        )}
-        <DeadlineFormComponent
-          innerRef={formRef}
-          roomId={roomId}
-          creatorId={creatorId}
-          deadline={deadlineCardState.deadline}
-        />
-      </Modal>
-      <StyledModal
-        title="Confirm Delete"
-        isOpen={deadlineCardState.isDeleteModalOpen}
-        hideCloseButton={true}
-        onRequestClose={() => dispatch(setDeleteModalOpen(false))}
-        footer={
-          <div className="rainbow-flex rainbow-justify_end">
-            <Button
-              className="rainbow-m-right_large"
-              label="Cancel"
-              variant="neutral"
-              onClick={() => dispatch(setDeleteModalOpen(false))}
-              disabled={deadlineCardState.isLoading || deadlineCardState.isDeadlineDeleteSuccess}
-            />
-            <Button
-              label="Delete"
-              variant="brand"
-              type="submit"
-              onClick={() => dispatch(deleteDeadline(deadlineCardState.deadline?.deadlineId, roomId))}
-              disabled={deadlineCardState.isLoading || deadlineCardState.isDeadlineDeleteSuccess}
-            />
-          </div>
-        }
-      >
-        {deadlineCardState.error ? (
-          <StyledNotification
-            title="An Error Occured"
-            hideCloseButton={true}
-            description={deadlineCardState.error.message}
-            icon="error"
-          />
-        ) : null}
-        {deadlineCardState.isDeadlineDeleteSuccess && (
-          <StyledNotification title="Deadline deleted Successfully" hideCloseButton={true} icon="success" />
-        )}
-        <StyledText>Are you sure you want to delete this deadline?</StyledText>
-      </StyledModal>
 
       <StyledModal
         hideCloseButton={true}
         isOpen={userCardState.isRemoteControlOfferModalOpen}
+        onRequestClose={() => {
+          socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Reject, remoteInitiatorInfo.id, null);
+          logger.log(
+            LogType.RemoteControlReject,
+            roomId,
+            `Rejected remote control request from ${remoteInitiatorInfo.realName}`
+          );
+          dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
+        }}
         footer={
           <div className="rainbow-flex rainbow-justify_end">
             <Button
               label="Decline"
               onClick={() => {
                 socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Reject, remoteInitiatorInfo.id, null);
+                logger.log(
+                  LogType.RemoteControlReject,
+                  roomId,
+                  `Rejected remote control request from ${remoteInitiatorInfo.realName}`
+                );
                 dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
               }}
             />
@@ -509,15 +440,16 @@ const RoomComponent = (props: any) => {
               variant="brand"
               onClick={() => {
                 socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Accept, remoteInitiatorInfo.id, null);
+                logger.log(
+                  LogType.RemoteControlAccept,
+                  roomId,
+                  `Accepted remote control request from ${remoteInitiatorInfo.realName}`
+                );
                 dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
               }}
             />
           </div>
         }
-        onRequestClose={() => {
-          socket.invoke(REMOTE_CONTROL_SIGNAL, RemoteControlSignalType.Reject, remoteInitiatorInfo.id, null);
-          dispatch(setRemoteControlOfferModalOpen({ userId: null, isModalOpen: false }));
-        }}
       >
         <div className="rainbow-flex rainbow-m-bottom_medium">
           <StyledAvatar src={`${hostName}/${remoteInitiatorInfo?.avatar}`} />

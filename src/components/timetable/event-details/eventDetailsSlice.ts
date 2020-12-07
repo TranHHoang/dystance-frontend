@@ -8,14 +8,14 @@ import { AxiosError } from "axios";
 interface EventDetailsState {
   isDrawerOpen: boolean;
   event: TimetableEvent;
-  creator: User;
+  teacher: User;
   error?: ErrorResponse;
 }
 
 const initialState: EventDetailsState = {
   isDrawerOpen: false,
   event: null,
-  creator: null
+  teacher: null
 };
 
 const eventDetailsSlice = createSlice({
@@ -28,38 +28,38 @@ const eventDetailsSlice = createSlice({
     setEvent(state, action: PayloadAction<TimetableEvent>) {
       state.event = action.payload;
     },
-    fetchCreatorInfoSuccess(state, action: PayloadAction<User>) {
-      state.creator = action.payload;
+    fetchTeacherInfoSuccess(state, action: PayloadAction<User>) {
+      state.teacher = action.payload;
     },
-    fetchCreatorInfoFailed(state, action: PayloadAction<ErrorResponse>) {
+    fetchTeacherInfoFailed(state, action: PayloadAction<ErrorResponse>) {
       state.error = action.payload;
     }
   }
 });
 export default eventDetailsSlice.reducer;
-export const { setDrawerOpen, setEvent, fetchCreatorInfoSuccess, fetchCreatorInfoFailed } = eventDetailsSlice.actions;
+export const { setDrawerOpen, setEvent, fetchTeacherInfoSuccess, fetchTeacherInfoFailed } = eventDetailsSlice.actions;
 
-export function showCreatorInfo(creatorId: string): AppThunk {
+export function showTeacherInfo(teacherId: string): AppThunk {
   return async (dispatch) => {
     try {
-      const response = await Axios.get(`${hostName}/api/users/info?id=${creatorId}`);
+      const response = await Axios.get(`${hostName}/api/users/info?id=${teacherId}`);
       const data = response.data as User;
-      dispatch(fetchCreatorInfoSuccess(data));
+      dispatch(fetchTeacherInfoSuccess(data));
     } catch (ex) {
       const e = ex as AxiosError;
 
       if (e.response?.data) {
-        dispatch(fetchCreatorInfoFailed(e.response.data as ErrorResponse));
+        dispatch(fetchTeacherInfoFailed(e.response.data as ErrorResponse));
       } else if (e.request) {
         dispatch(
-          fetchCreatorInfoFailed({
+          fetchTeacherInfoFailed({
             type: 2,
             message: "Something Went Wrong"
           })
         );
       } else {
         dispatch(
-          fetchCreatorInfoFailed({
+          fetchTeacherInfoFailed({
             type: 3,
             message: e.message
           })

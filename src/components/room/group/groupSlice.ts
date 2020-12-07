@@ -2,11 +2,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppThunk } from "~app/store";
 import Axios from "~utils/fakeAPI";
 import { hostName } from "~utils/hostUtils";
-import { post, get } from "~utils/axiosUtils";
+import { postForm, get } from "~utils/axiosUtils";
 import _ from "lodash";
 import moment from "moment";
 import { socket } from "~app/App";
-import { RoomAction, RoomActionType } from "~utils/types";
+import { all, RoomAction, RoomActionType } from "~utils/types";
 import { getLoginData } from "~utils/tokenStorage";
 
 export interface BreakoutGroup {
@@ -17,60 +17,89 @@ export interface BreakoutGroup {
   endTime?: string;
 }
 
+interface GroupState {
+  groupId: string;
+  breakoutGroup: BreakoutGroup[];
+  isGroupJoined: boolean;
+  isGroupLeft: boolean;
+  mainRoomId: string;
+}
+
+const initialState: GroupState = {
+  groupId: null,
+  breakoutGroup: [],
+  isGroupJoined: false,
+  isGroupLeft: false,
+  mainRoomId: null
+};
+
 const groupSlice = createSlice({
   name: "groupSlice",
-  initialState: [] as BreakoutGroup[],
+  initialState,
   reducers: {
     setBreakoutGroups(state, action: PayloadAction<BreakoutGroup[]>) {
-      state = action.payload;
-      return state;
+      state.breakoutGroup = action.payload;
     },
     addBreakoutGroup(state, action: PayloadAction<BreakoutGroup>) {
-      state.push(action.payload);
+      state.breakoutGroup.push(action.payload);
     },
     removeBreakoutGroup(state, action: PayloadAction<string>) {
-      state = _.reject(state, { groupId: action.payload });
-      return state;
+      state.breakoutGroup = _.reject(state.breakoutGroup, { groupId: action.payload });
     },
     updateBreakoutGroup(state, action: PayloadAction<BreakoutGroup>) {
       // Update user list only
       if (action.payload) {
-        _.find(state, { groupId: action.payload.groupId }).userIds = action.payload.userIds;
+        _.find(state.breakoutGroup, { groupId: action.payload.groupId }).userIds = action.payload.userIds;
       } else {
-        return [];
+        state.breakoutGroup = [];
       }
+    },
+    setGroupJoined(state, action: PayloadAction<boolean>) {
+      state.isGroupJoined = action.payload;
+      state.isGroupLeft = !action.payload;
+    },
+    resetGroupJoinedLeftState(state) {
+      state.isGroupJoined = false;
+      state.isGroupLeft = false;
+    },
+    setGroupId(state, action: PayloadAction<string>) {
+      state.groupId = action.payload;
+    },
+    setMainRoomId(state, action: PayloadAction<string>) {
+      state.mainRoomId = action.payload;
     }
   }
 });
 
 export default groupSlice.reducer;
 
-export const { setBreakoutGroups, addBreakoutGroup, removeBreakoutGroup, updateBreakoutGroup } = groupSlice.actions;
+export const {
+  setBreakoutGroups,
+  addBreakoutGroup,
+  removeBreakoutGroup,
+  updateBreakoutGroup,
+  setGroupJoined,
+  resetGroupJoinedLeftState,
+  setGroupId,
+  setMainRoomId
+} = groupSlice.actions;
 
-async function all<T>(array: T[], fn: (value: T) => Promise<void>) {
-  return array.reduce(async (p, item) => {
-    await p;
-    return await fn(item);
-  }, Promise.resolve());
-}
-
-export function createGroups(roomId: string, creatorId: string, groups: BreakoutGroup[]): AppThunk {
+export function createGroups(roomId: string, teacherId: string, groups: BreakoutGroup[]): AppThunk {
   return async (dispatch) => {
     await all(groups, async ({ name, userIds }) => {
       try {
         const form = new FormData();
         form.append("name", name);
-        form.append("creatorId", creatorId);
+        form.append("teacherId", teacherId);
         form.append("roomId", roomId);
         form.append("userIds", JSON.stringify(userIds || []));
 
-        const response = await post("/rooms/groups/create", form);
+        const response = await postForm("/rooms/groups/create", form);
         dispatch(addBreakoutGroup(response.data as BreakoutGroup));
       } catch (ex) {
         console.log(ex);
       }
     });
-    await socket.invoke(RoomAction, roomId, RoomActionType.GroupNotification, getLoginData().id);
   };
 }
 
@@ -84,7 +113,6 @@ export function deleteGroups(roomId: string, groupIds: string[]): AppThunk {
         console.log(ex);
       }
     });
-    await socket.invoke(RoomAction, roomId, RoomActionType.GroupNotification, getLoginData().id);
   };
 }
 
@@ -108,7 +136,7 @@ export function updateGroups(roomId: string, groups: BreakoutGroup[]): AppThunk 
         form.append("groupId", groupId);
         form.append("userIds", JSON.stringify(userIds));
 
-        const response = await post("/rooms/groups/update", form);
+        const response = await postForm("/rooms/groups/update", form);
         if (response.data === null) return;
 
         dispatch(updateBreakoutGroup(response.data));
@@ -141,7 +169,7 @@ export function startNewSession(roomId: string, duration: number, groupIds: stri
       form.append("roomId", roomId);
       form.append("startTime", startTime);
       form.append("duration", duration.toString());
-      await post("/rooms/groups/start", form);
+      await postForm("/rooms/groups/start", form);
     } catch (ex) {
       console.log(ex);
     }
