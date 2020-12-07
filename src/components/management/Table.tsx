@@ -101,8 +101,6 @@ const Table = (props: TableProps) => {
             actionsColumnIndex: -1
           }}
           onRowClick={(e, rowData) => {
-            console.log(e);
-            console.log(rowData);
             onRowClick && onRowClick(rowData);
           }}
           editable={{

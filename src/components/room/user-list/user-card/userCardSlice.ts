@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { socket } from "~app/App";
 import { AppThunk } from "~app/store";
-import { RoomAction, RoomActionType } from "~utils/types";
+import { RoomAction, RoomActionType } from "~utils/index";
 
 interface ErrorResponse {
   message: string;
@@ -16,7 +16,6 @@ interface UserCardState {
   isLoading: boolean;
   isKickSuccess: boolean;
   isMuteSuccess: boolean;
-  isAllowWhiteboardSuccess: boolean;
   muteOtherUser: boolean;
   kickOtherUser: boolean;
   allowWhiteboard: boolean;
@@ -32,7 +31,6 @@ const initialState: UserCardState = {
   isLoading: false,
   isKickSuccess: false,
   isMuteSuccess: false,
-  isAllowWhiteboardSuccess: false,
   muteOtherUser: false,
   kickOtherUser: false,
   allowWhiteboard: false,
@@ -62,9 +60,6 @@ const userCardSlice = createSlice({
       state.userId = action.payload.userId;
       state.isRemoteControlWaitingModalOpen = action.payload.isModalOpen;
     },
-    allowWhiteboardStart(state) {
-      state.isLoading = true;
-    },
     kickUserStart(state) {
       state.isLoading = true;
     },
@@ -80,10 +75,6 @@ const userCardSlice = createSlice({
       state.isLoading = false;
       state.isKickSuccess = true;
       state.isKickModalOpen = false;
-    },
-    allowWhiteboardSuccess(state) {
-      state.isLoading = false;
-      state.isAllowWhiteboardSuccess = true;
     },
     setMuteOtherUser(state, action: PayloadAction<boolean>) {
       state.muteOtherUser = action.payload;
@@ -114,9 +105,7 @@ export const {
   muteUserStart,
   muteSuccess,
   kickSuccess,
-  allowWhiteboardStart,
   toggleWhiteboard,
-  allowWhiteboardSuccess,
   resetCardState,
   toggleUserWhiteboard
 } = userCardSlice.actions;

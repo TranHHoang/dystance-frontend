@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import SimplePeer from "simple-peer";
 import { Instance } from "simple-peer";
-import { getLoginData } from "~utils/tokenStorage";
+import { createNotification, getLoginData, NotificationType } from "~utils/index";
 import { socket } from "~app/App";
 // @ts-ignore
 import wrtc from "wrtc";
@@ -11,7 +11,6 @@ import robot from "robotjs";
 import styled from "styled-components";
 import { setRemoteControlWaitingModalOpen } from "../user-list/user-card/userCardSlice";
 import { useDispatch } from "react-redux";
-import { createNotification, NotificationType } from "~utils/notification";
 
 const StyledVideo = styled.video`
   width: 100%;
@@ -247,7 +246,6 @@ const RemoteControl = (props: any) => {
   useEffect(() => {
     socket.on(REMOTE_CONTROL_SIGNAL, async (data) => {
       const objData = JSON.parse(data) as RemoteControlSignal;
-      console.log(data);
 
       switch (objData.type) {
         case RemoteControlSignalType.Ping:
@@ -297,7 +295,6 @@ const RemoteControl = (props: any) => {
       });
 
       peer.current.on("data", (data) => {
-        console.log("Received", JSON.parse(data));
         syncWithRemote(JSON.parse(data) as MouseSignalData | KeyboardSignalData);
       });
 

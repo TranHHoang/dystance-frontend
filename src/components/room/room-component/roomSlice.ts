@@ -1,17 +1,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
-import { getLoginData } from "~utils/tokenStorage";
-import { AllUsersInfo, ErrorResponse, RoomAction, RoomActionType, User } from "~utils/types";
 import { fetchLatestMessage } from "../../chat/chatSlice";
-import { setUserInfoList } from "../user-list/userListSlice";
-import { UserInfo } from "~utils/types";
 import { toggleWhiteboard, setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
 import { socket } from "~app/App";
+import {
+  ErrorResponse,
+  RoomAction,
+  RoomActionType,
+  getLoginData,
+  getUser,
+  createNotification,
+  NotificationType,
+  Logger,
+  LogType
+} from "~utils/index";
 import { fetchAllGroups } from "../group/groupSlice";
-import { createNotification, NotificationType } from "~utils/notification";
-import _ from "lodash";
+import { setUserInfoList } from "../user-list/userListSlice";
 
 export interface BreakoutGroup {
   id: string;
@@ -83,9 +87,9 @@ export const {
 } = roomSlice.actions;
 
 export function initSocket(roomId: string): AppThunk {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     socket.invoke(RoomAction, roomId, RoomActionType.Join, getLoginData().id);
-    const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
+    const logger = Logger.getInstance();
 
     socket.on(RoomAction, async (data: string) => {
       const response = JSON.parse(data);
@@ -93,19 +97,14 @@ export function initSocket(roomId: string): AppThunk {
         case RoomActionType.Chat:
           dispatch(fetchLatestMessage(roomId, undefined));
           if (response.payload !== getLoginData().id) {
-            const user = _.find(allUsers, { id: response.payload });
+            const user = getUser(response.payload);
             dispatch(incrementChatBadge());
             createNotification(NotificationType.RoomNotification, `New message from ${user.userName}`);
           }
           break;
         case RoomActionType.Join:
         case RoomActionType.Leave:
-          const userInfoList: UserInfo[] = [];
-          for (const id of response.payload) {
-            const response = await Axios.get(`${hostName}/api/users/info?id=${id}`);
-            const data = response.data as UserInfo;
-            userInfoList.push(data);
-          }
+          const userInfoList = (response.payload as string[]).map(getUser);
           dispatch(setUserInfoList(userInfoList));
           break;
         case RoomActionType.Mute:
@@ -117,6 +116,12 @@ export function initSocket(roomId: string): AppThunk {
           createNotification(NotificationType.RoomNotification, "You have been kicked");
           break;
         case RoomActionType.ToggleWhiteboard:
+          const previousAllowWhiteboardState = getState().userCardState.allowWhiteboard;
+          if (previousAllowWhiteboardState) {
+            logger.log(LogType.WhiteboardDisable, roomId, `Lost whiteboard permissions`);
+          } else {
+            logger.log(LogType.WhiteboardAllow, roomId, `Gained whiteboard permissions`);
+          }
           dispatch(toggleWhiteboard());
           createNotification(NotificationType.RoomNotification, "Your whiteboard permission has been changed");
           break;

@@ -5,7 +5,6 @@ import {
   faComments,
   faUsers,
   faVideoSlash,
-  faCalendarTimes,
   faObjectUngroup
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,13 +12,12 @@ import PeopleProfilePage from "../../profile-page/people-profile/PeopleProfilePa
 import { setPeopleProfileModalOpen } from "../../profile-page/people-profile/peopleProfileSlice";
 import React from "react";
 import { useEffect, useState } from "react";
-import { Button, Drawer, Modal, Tab, Tabset, Notification, BadgeOverlay } from "react-rainbow-components";
+import { Button, Drawer, Modal, Tab, Tabset, BadgeOverlay } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import ChatArea from "../../chat/ChatArea";
 import { fetchAllMessages } from "../../chat/chatSlice";
-import { AllUsersInfo, getCurrentRole, getUserInfo, RoomAction, RoomActionType, User } from "~utils/types";
 import JitsiMeetComponent from "../jitsi-meet-component/JitsiMeetComponent";
 import UserListComponent from "../user-list/UserListComponent";
 import Whiteboard from "../whiteboard/Whiteboard";
@@ -33,18 +31,19 @@ import {
   setRemoteControlOfferModalOpen,
   setRemoteControlWaitingModalOpen
 } from "../user-list/user-card/userCardSlice";
-import { StyledText } from "../../homepage/single-room/styles";
-import { hostName } from "~utils/hostUtils";
 import RemoteControl, { RemoteControlSignalType, REMOTE_CONTROL_SIGNAL } from "../remote-control/RemoteControl";
-import { UserInfo } from "~utils/types";
-import { getLoginData } from "~utils/tokenStorage";
 import { setRemoteControlAccepted } from "../remote-control/remoteControlSlice";
 import ChatPreview from "../../private-chat/ChatPreview";
 import { ipcRenderer } from "electron";
-import { resetPrivateChatBadge, initPrivateChatSocket } from "../../private-chat/chatPreviewSlice";
+import { resetPrivateChatBadge } from "../../private-chat/chatPreviewSlice";
 import GroupComponent from "../group/GroupComponent";
 import { Logger, LogType } from "~utils/logger";
-import _ from "lodash";
+import { RoomAction, getLoginData, hostName, RoomActionType, User, getUser, getCurrentRole } from "~utils/index";
+
+const StyledText = styled.p`
+  font-size: 20px;
+  margin-left: 12px;
+`;
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -111,9 +110,6 @@ const RearButton = styled(NormalButton)`
 const StyledModal = styled(Modal)`
   width: fit-content;
 `;
-const StyledNotification = styled(Notification)`
-  width: 100%;
-`;
 const TopButton = styled(NormalButton)`
   border-top-right-radius: 10px;
 `;
@@ -158,6 +154,9 @@ const InvisibleDiv = styled.div`
 `;
 
 const RoomComponent = (props: any) => {
+  let { roomName } = props.match.params;
+  const { roomId, teacherId, groupId } = props.match.params;
+
   const roomState = useSelector((state: RootState) => state.roomState);
   const peopleProfileState = useSelector((state: RootState) => state.peopleProfileState);
   const jitsiMeetState = useSelector((state: RootState) => state.jitisiMeetState);
@@ -165,16 +164,15 @@ const RoomComponent = (props: any) => {
   const userListState = useSelector((state: RootState) => state.userListState);
   const chatPreviewState = useSelector((state: RootState) => state.chatPreviewState);
   const remoteControlState = useSelector((state: RootState) => state.remoteControlState);
-  const { roomId, teacherId, groupId } = props.match.params;
-  let { roomName } = props.match.params;
   const [whiteboardOpen, setWhiteboardOpen] = useState(false);
-  const [remoteInitiatorInfo, setRemoteInitiatorInfo] = useState<UserInfo>();
+  const [remoteInitiatorInfo, setRemoteInitiatorInfo] = useState<User>();
   const [privateChatOpen, setPrivateChatOpen] = useState(false);
+
   const dispatch = useDispatch();
   const logger = Logger.getInstance();
-  const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
-  const user = _.find(allUsers, { id: userCardState.userId });
-  const remoteControlUser = _.find(allUsers, { id: remoteControlState.userId });
+  const user = getUser(userCardState.userId);
+  const remoteControlUser = getUser(remoteControlState.userId);
+
   const isBreakoutGroup = groupId !== undefined;
   const role = getCurrentRole();
   if (isBreakoutGroup) roomName = atob(roomName);
@@ -213,7 +211,7 @@ const RoomComponent = (props: any) => {
     const objData = JSON.parse(data);
     switch (objData.type) {
       case RemoteControlSignalType.Offer:
-        setRemoteInitiatorInfo(await getUserInfo(objData.payload));
+        setRemoteInitiatorInfo(getUser(objData.payload));
         dispatch(setRemoteControlOfferModalOpen({ userId: userCardState.userId, isModalOpen: true }));
         break;
       case RemoteControlSignalType.Accept:

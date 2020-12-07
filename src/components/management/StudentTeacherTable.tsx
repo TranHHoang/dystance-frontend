@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { ErrorResponse, UserTableInfo } from "~utils/types";
+import { ErrorResponse, User } from "~utils/index";
 import _ from "lodash";
 import * as Yup from "yup";
 import moment from "moment";
@@ -9,6 +9,10 @@ import { addTeacher, updateTeachers, deleteTeachers, resetTeacherError } from ".
 import styled from "styled-components";
 import { Notification } from "react-rainbow-components";
 import Table from "./Table";
+
+export interface UserTableInfo extends User {
+  code: string;
+}
 
 const StyledNotifications = styled(Notification)`
   position: absolute;
@@ -23,6 +27,7 @@ const StyledNotifications = styled(Notification)`
   }
   width: 30%;
 `;
+
 const StudentTeacherTableComponent = (props: any) => {
   const { data, title, isStudent, isLoading, studentError, teacherError } = props;
   const dispatch = useDispatch();

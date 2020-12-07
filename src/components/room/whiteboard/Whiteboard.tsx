@@ -7,8 +7,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { Logger, LogType } from "~utils/logger";
-import { getLoginData } from "~utils/tokenStorage";
+import { getLoginData } from "~utils/index";
 import "./js/index";
 import main, { setAllowWhiteboard } from "./js/main";
 import ReadOnlyService from "./js/services/ReadOnlyService";
@@ -48,7 +47,7 @@ const Whiteboard = (props: any) => {
   const userCardState = useSelector((state: RootState) => state.userCardState);
   const { roomId, teacherId } = props;
   const [thickness, setThickness] = useState(3);
-  const logger = Logger.getInstance();
+
   useEffect(() => {
     main(roomId);
   }, [roomId]);
@@ -57,12 +56,11 @@ const Whiteboard = (props: any) => {
     setAllowWhiteboard(userCardState.allowWhiteboard);
     if (userCardState.allowWhiteboard) {
       ReadOnlyService.deactivateReadOnlyMode();
-      logger.log(LogType.WhiteboardAllow, roomId, `Gained whiteboard permissions`);
     } else {
       ReadOnlyService.activateReadOnlyMode();
-      logger.log(LogType.WhiteboardDisable, roomId, `Lost whiteboard permissions`);
     }
   }, [userCardState.allowWhiteboard]);
+
   return (
     <StyledWhiteboard id="whiteboard">
       <div id="whiteboardContainer"></div>

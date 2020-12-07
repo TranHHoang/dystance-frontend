@@ -13,17 +13,15 @@ import SemesterManagement from "../management/semester/SemesterManagement";
 import RoomList from "../../components/activity-logs/room-list/RoomList";
 import fs from "fs";
 import moment from "moment";
-import { getLoginData } from "~utils/tokenStorage";
-import { Logger } from "~utils/logger";
 import _ from "lodash";
 import StudentTeacherManagement from "../management/StudentTeacherManagement";
 import AccountList from "../management/account/AccountList";
-import { AllUsersInfo, getCurrentRole } from "~utils/types";
 import { Spinner } from "react-rainbow-components";
 import { socket } from "~app/App";
 import Timetable from "../../components/timetable/Timetable";
 import StudentAttendanceReport from "../attendance-reports/StudentAttendanceReport";
 import AttendanceManagement from "../attendance-reports/AttendanceManagement";
+import { AllUsersInfo, getLoginData, getCurrentRole, Logger } from "~utils/index";
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;
@@ -73,7 +71,7 @@ export const HomePage = () => {
         `./logs/${getLoginData().id}/${moment().format("YYYY-MM-DD")}.txt`,
         Logger.getInstance().getLogs().join("\n"),
         (err) => {
-          console.log("WRite to file");
+          console.log("Write log to file");
           if (err) {
             console.log(err);
           }

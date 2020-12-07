@@ -2,12 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { fetchLatestMessage } from "../../components/chat/chatSlice";
 import { socket } from "~app/App";
 import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
-import { getLoginData } from "~utils/tokenStorage";
-import { AllUsersInfo, PrivateMessage, User } from "~utils/types";
-import { createNotification, NotificationType } from "~utils/notification";
-import _ from "lodash";
+import { get, PrivateMessage, getUser, getLoginData, createNotification, NotificationType } from "~utils/index";
 
 interface ChatPreview {
   id: string;
@@ -49,8 +44,7 @@ export const { initPreview, incrementPrivateChatBadge, resetPrivateChatBadge } =
 export function fetchAllPreview(userId: string): AppThunk {
   return async (dispatch) => {
     try {
-      console.log("Fetch all previews");
-      const response = await Axios.get(`${hostName}/api/users/chat/preview?id=${userId}`);
+      const response = await get(`/users/chat/preview?id=${userId}`);
       dispatch(initPreview(response.data));
     } catch (ex) {
       console.log(ex);
@@ -60,10 +54,9 @@ export function fetchAllPreview(userId: string): AppThunk {
 
 export function initPrivateChatSocket(): AppThunk {
   return (dispatch) => {
-    const allUsers = JSON.parse(sessionStorage.getItem(AllUsersInfo)) as User[];
     socket.on(PrivateMessage, (data) => {
       const senderId = JSON.parse(data).senderId;
-      const user = _.find(allUsers, { id: senderId });
+      const user = getUser(senderId);
       dispatch(incrementPrivateChatBadge());
       dispatch(fetchLatestMessage(undefined, { id1: getLoginData().id, id2: senderId }));
       dispatch(fetchAllPreview(getLoginData().id));

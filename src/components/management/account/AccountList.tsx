@@ -19,7 +19,7 @@ import styled from "styled-components";
 import * as Yup from "yup";
 import { Button, FileSelector, Notification } from "react-rainbow-components";
 import moment from "moment";
-import { ErrorResponse } from "~utils/types";
+import { ErrorResponse } from "~utils/index";
 
 const Title = styled.h1`
   font-size: 2.5em;
@@ -174,7 +174,6 @@ const AccountList = () => {
               dob: moment(newData.dob).format("YYYY-MM-DD"),
               role: newData.role
             };
-            console.log(format);
             if (_.some(format, _.isEmpty) || !Yup.string().email().isValidSync(format.email)) {
               return Promise.reject();
             } else {

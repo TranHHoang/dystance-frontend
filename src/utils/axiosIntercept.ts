@@ -1,6 +1,6 @@
 import Axios from "axios";
-import { getLoginData, saveLoginData } from "./tokenStorage";
-import { hostName } from "~utils/hostUtils";
+import { getLoginData, saveLoginData } from "./index";
+import { post } from "./axiosUtils";
 
 Axios.interceptors.request.use(
   (config) => {
@@ -37,11 +37,7 @@ Axios.interceptors.response.use(
 
       console.log("Expired token, need refreshing...");
 
-      const data = (
-        await Axios.post(`${hostName}/api/users/refreshToken`, form, {
-          headers: { "Content-Type": "multipart/form-data" }
-        })
-      ).data;
+      const data = (await post(`/users/refreshToken`, form)).data;
 
       saveLoginData({
         id: data.id,

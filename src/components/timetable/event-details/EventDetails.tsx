@@ -5,10 +5,25 @@ import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import { setDrawerOpen } from "./eventDetailsSlice";
 import moment from "moment";
-import { TimetableEventType } from "~utils/types";
 import { faClock, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { StyledButton, StyledLink } from "../../homepage/single-room/styles";
+import { TimetableEventType } from "../Timetable";
+import { Button } from "react-rainbow-components";
+import { Link } from "react-router-dom";
+import { getUser } from "~utils/index";
+
+const StyledLink = styled(Link)`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const StyledButton = styled(Button)`
+  align-self: center;
+  width: 50%;
+  max-width: 250px;
+  margin: 10px 60px 10px 0;
+`;
 
 const StyledIcon = styled.span`
   width: 50px;
@@ -96,7 +111,7 @@ const EventDetailsDrawer = () => {
         </StyledIcon>
         <InfoContainer>
           <StyleTitle>Teacher</StyleTitle>
-          <StyleSubTitle>{eventDetailsState.teacher?.realName}</StyleSubTitle>
+          <StyleSubTitle>{getUser(eventDetailsState.event?.teacherId)?.realName}</StyleSubTitle>
         </InfoContainer>
       </div>
       {eventDetailsState.event?.eventType === TimetableEventType.Schedule ? (
@@ -107,7 +122,7 @@ const EventDetailsDrawer = () => {
               pathname: `/room/${eventDetailsState.event?.roomId}/${eventDetailsState.event?.teacherId}/${eventDetailsState.event?.title}`
             }}
           >
-            <StyledJoinRoomButton label="Join Room" variant="brand" />
+            <StyledJoinRoomButton label="Join Room" variant="brand" onClick={() => dispatch(setDrawerOpen(false))} />
           </StyledJoinRoomLink>
         </div>
       ) : null}

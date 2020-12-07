@@ -1,11 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppThunk } from "~app/store";
-import Axios from "~utils/fakeAPI";
-import { hostName } from "~utils/hostUtils";
-import { getLoginData } from "~utils/tokenStorage";
-import { PrivateMessage, RoomAction, RoomActionType } from "~utils/types";
 import { socket } from "~app/App";
 import { fetchAllPreview } from "../../components/private-chat/chatPreviewSlice";
+import { getLoginData, RoomAction, RoomActionType, PrivateMessage, get, post } from "~utils/index";
 
 export enum ChatType {
   Text,
@@ -68,12 +65,9 @@ export const { initChat, addChat } = chatSlice.actions;
 export function fetchAllMessages(roomId: string, privateChat: { id1: string; id2: string }): AppThunk {
   return async (dispatch) => {
     try {
-      console.log("Start fetching all...");
       const messages = (
-        await Axios.get(
-          `${hostName}/api/${
-            roomId ? `rooms/chat/get?id=${roomId}` : `users/chat/get?id1=${privateChat.id1}&id2=${privateChat.id2}`
-          }`
+        await get(
+          roomId ? `/rooms/chat/get?id=${roomId}` : `/users/chat/get?id1=${privateChat.id1}&id2=${privateChat.id2}`
         )
       ).data as RoomMessage[] | PrivateMessage[];
 
@@ -88,17 +82,15 @@ export function fetchLatestMessage(roomId: string, privateChat: { id1: string; i
   return async (dispatch) => {
     try {
       const message = (
-        await Axios.get(
-          `${hostName}/api/${
-            roomId
-              ? `rooms/chat/getLast?id=${roomId}`
-              : `users/chat/getLast?id1=${privateChat.id1}&id2=${privateChat.id2}`
-          }`
+        await get(
+          roomId
+            ? `/rooms/chat/getLast?id=${roomId}`
+            : `/users/chat/getLast?id1=${privateChat.id1}&id2=${privateChat.id2}`
         )
       ).data as RoomMessage | PrivateMessage;
       dispatch(addChat({ type: roomId ? "room" : "private", content: message }));
     } catch (ex) {
-      console.log("Exception: " + ex);
+      console.log(ex);
     }
   };
 }
@@ -127,12 +119,8 @@ export function broadcastMessage(
       form.append("content", message);
       form.append("chatType", type.toString());
 
-      console.log("broadcasting...");
-      await Axios.post(`${hostName}/api/${roomId ? "rooms" : "users"}/chat/add`, form, {
-        headers: { "Content-Type": "multipart/form-data" },
+      await post(`/${roomId ? "rooms" : "users"}/chat/add`, form, {
         onUploadProgress: (progressEvent) => {
-          console.log(progressEvent);
-          console.log(onProgressEvent);
           onProgressEvent?.call(this, Math.round((progressEvent.loaded * 100) / progressEvent.total));
         }
       });

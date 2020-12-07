@@ -9,7 +9,7 @@ import { Button, ButtonIcon, Notification } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { AllUsersInfo, User } from "~utils/types";
+import { AllUsersInfo, User } from "~utils/index";
 import { getActivityLogs, resetActivityLogState, resetLogError } from "./activityLogsSlice";
 import { setSelectedRoom } from "./room-list/roomListSlice";
 
@@ -178,7 +178,7 @@ const ActivityLogs = () => {
                 exportButton: true,
                 exportAllData: true
               }}
-              title="Rooms"
+              title={_.find(roomListState.rooms, { roomId: roomListState.selectedRoom })?.roomName}
             />
           </MuiThemeProvider>
         </StyledDiv>

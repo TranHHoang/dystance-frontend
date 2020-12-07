@@ -77,7 +77,6 @@ const StudentTeacherManagement = () => {
           setRejectFile(true);
           setRejectReason("File size is too large");
         } else {
-          console.log("Went into true case");
           setRejectFile(false);
           const reader = new FileReader();
           const currentFile = files[0];
@@ -93,7 +92,6 @@ const StudentTeacherManagement = () => {
           }
         }
       } else {
-        console.log("Went into false case");
         setRejectFile(true);
         setRejectReason("File type not supported");
       }

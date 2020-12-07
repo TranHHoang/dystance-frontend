@@ -2,8 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
-import { get, postJson } from "~utils/axiosUtils";
-import { ErrorResponse } from "~utils/types";
+import { get, post, ErrorResponse } from "~utils/index";
 
 export interface Class {
   id: string;
@@ -14,11 +13,12 @@ export interface Class {
 }
 interface ClassState {
   classes: Class[];
-  error?: ErrorResponse;
+  errors?: ErrorResponse[];
 }
 
 const initialState: ClassState = {
-  classes: []
+  classes: [],
+  errors: []
 };
 
 const classSlice = createSlice({
@@ -29,13 +29,13 @@ const classSlice = createSlice({
       state.classes = action.payload;
     },
     setClassesFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     addClass(state, action: PayloadAction<Class>) {
       state.classes.push(action.payload);
     },
     addClassFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     updateClasses(state, action: PayloadAction<Class[]>) {
       _.each(action.payload, (schedule) => {
@@ -44,16 +44,16 @@ const classSlice = createSlice({
       });
     },
     updateClassesFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     removeClasses(state, action: PayloadAction<string[]>) {
       state.classes = _.reject(state.classes, ({ id }) => action.payload.includes(id));
     },
     removeClassesFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     resetClassError(state) {
-      state.error = undefined;
+      state.errors = [];
     },
     resetClassState() {
       return initialState;
@@ -108,7 +108,7 @@ export function fetchAllClasses(semesterId: string): AppThunk {
 export function addNewClass(semesterId: string, classObj: Class): AppThunk {
   return async (dispatch) => {
     try {
-      const data = (await postJson(`/semesters/classes/add?semesterId=${semesterId}`, classObj)).data;
+      const data = (await post(`/semesters/classes/add?semesterId=${semesterId}`, classObj)).data;
       dispatch(addClass(data));
     } catch (e) {
       const ex = e as AxiosError;
@@ -137,7 +137,7 @@ export function addNewClass(semesterId: string, classObj: Class): AppThunk {
 export function updateExistingClasses(semesterId: string, classes: Class[]): AppThunk {
   return async (dispatch) => {
     try {
-      const data = (await postJson(`/semesters/classes/update?semesterId=${semesterId}`, classes)).data;
+      const data = (await post(`/semesters/classes/update?semesterId=${semesterId}`, classes)).data;
       if (data.success.length > 0) {
         dispatch(updateClasses(data.success));
       }
@@ -174,11 +174,22 @@ export function updateExistingClasses(semesterId: string, classes: Class[]): App
   };
 }
 
-export function deleteExistingClasses(ids: string[]): AppThunk {
+export function deleteExistingClasses(semesterId: string, ids: string[]): AppThunk {
   return async (dispatch) => {
     try {
-      await postJson(`/semesters/classes/delete`, ids);
-      dispatch(removeClasses(ids));
+      const data = (await post(`/semesters/classes/delete`, ids)).data;
+      if (data.success.length > 0) {
+        dispatch(removeClasses(data.success));
+      }
+      if (data.failed.length > 0) {
+        dispatch(
+          removeClassesFailed({
+            message: "Class cannot be deleted",
+            type: 1
+          })
+        );
+        dispatch(fetchAllClasses(semesterId));
+      }
     } catch (e) {
       const ex = e as AxiosError;
 

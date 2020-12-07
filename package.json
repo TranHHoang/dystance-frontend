@@ -1,8 +1,8 @@
 {
-  "name": "react-electron",
-  "productName": "react-electron",
+  "name": "dystance",
+  "productName": "Dystance",
   "version": "1.0.0",
-  "description": "",
+  "description": "Distance learning system",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
@@ -16,8 +16,7 @@
   },
   "keywords": [],
   "author": {
-    "name": "Test",
-    "email": "test@test.com"
+    "name": "Dystance Team"
   },
   "license": "MIT",
   "config": {
@@ -114,6 +113,7 @@
     "@reduxjs/toolkit": "^1.4.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.0.2",
+    "@types/axios": "^0.14.0",
     "@types/electron-devtools-installer": "^2.2.0",
     "@types/emoji-mart": "^3.0.2",
     "@types/enzyme-adapter-react-16": "^1.0.6",
@@ -133,7 +133,7 @@
     "@types/yup": "^0.29.7",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
     "@typescript-eslint/parser": "^2.18.0",
-    "axios": "^0.20.0",
+    "axios": "^0.21.0",
     "axios-mock-adapter": "^1.18.2",
     "babel-runtime": "^6.26.0",
     "cache-loader": "^4.1.0",
