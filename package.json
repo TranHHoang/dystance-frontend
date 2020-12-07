@@ -1,8 +1,8 @@
 {
-  "name": "react-electron",
-  "productName": "react-electron",
+  "name": "dystance",
+  "productName": "Dystance",
   "version": "1.0.0",
-  "description": "",
+  "description": "Distance learning system",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
@@ -16,8 +16,7 @@
   },
   "keywords": [],
   "author": {
-    "name": "Test",
-    "email": "test@test.com"
+    "name": "Dystance Team"
   },
   "license": "MIT",
   "config": {
