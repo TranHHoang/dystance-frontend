@@ -21,7 +21,7 @@ import { socket } from "~app/App";
 import Timetable from "../../components/timetable/Timetable";
 import StudentAttendanceReport from "../attendance-reports/StudentAttendanceReport";
 import AttendanceManagement from "../attendance-reports/AttendanceManagement";
-import { AllUsersInfo, getLoginData, getCurrentRole, Logger } from "~utils/index";
+import { getLoginData, getCurrentRole, Logger } from "~utils/index";
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;
@@ -52,7 +52,7 @@ export const HomePage = () => {
   const sidebarState = useSelector((state: RootState) => state.sidebarState);
   const logger = Logger.getInstance();
   const dispatch = useDispatch();
-  const [ready, setReady] = useState(AllUsersInfo in sessionStorage);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     fetchAllUsers().then(() => setReady(true));
