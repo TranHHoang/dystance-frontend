@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
+import _ from "lodash";
 import moment from "moment";
 import { AppThunk } from "~app/store";
 import Axios from "~utils/fakeAPI";
@@ -8,7 +9,6 @@ import { getLoginData } from "~utils/tokenStorage";
 import { ErrorResponse, Room } from "~utils/types";
 import { resetRoom, showRoom } from "../showRoomsSlice";
 import { UpdateRoomFormValues } from "./SingleRoomUpdateForm";
-
 interface SingleRoomState {
   roomId: string;
   isLoading: boolean;
@@ -117,23 +117,23 @@ export function deleteRoom(roomId: string): AppThunk {
   };
 }
 
-export function updateRoom(
-  {
-    roomId,
-    classroomName,
-    startDate,
-    startTime,
-    endTime,
-    endDate,
-    description,
-    repeatOccurrence,
-    repeatDays,
-    roomImage
-  }: UpdateRoomFormValues,
-  updateRepeatToggle: boolean
-): AppThunk {
+export function updateRoom({
+  roomId,
+  classroomName,
+  startDate,
+  endDate,
+  description,
+  repeatOccurrence,
+  roomImage,
+  roomTime
+}: UpdateRoomFormValues): AppThunk {
   return async (dispatch) => {
     dispatch(updateRoomStart());
+    const roomTimes = _.map(roomTime, (value, key) => ({
+      dayOfWeek: key,
+      ...value
+    }));
+
     try {
       const fd = new FormData();
       const config = {
@@ -146,18 +146,10 @@ export function updateRoom(
       fd.append("creatorId", getLoginData().id);
       fd.append("description", description);
       fd.append("startDate", moment(startDate).format("YYYY-MM-DD"));
-      fd.append("startHour", startTime);
-      fd.append("endHour", endTime);
       fd.append("repeatOccurrence", repeatOccurrence.name);
-      fd.append("repeatDays", JSON.stringify(repeatDays));
-      if (updateRepeatToggle) {
-        console.log("Repeat Toggle is True");
-        fd.append("endDate", moment(endDate).format("YYYY-MM-DD"));
-      } else {
-        console.log("Repeat Toggle is False");
-        fd.append("endDate", moment(new Date()).format("YYYY-MM-DD"));
-      }
+      fd.append("endDate", moment(endDate).format("YYYY-MM-DD"));
       fd.append("roomImage", roomImage);
+      fd.append("roomTimes", JSON.stringify(roomTimes));
 
       await Axios.post(`${hostName}/api/rooms/update`, fd, config);
       dispatch(updateRoomSuccess());

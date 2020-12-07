@@ -11,6 +11,7 @@ import SideNavigationBar from "../sidebar/Sidebar";
 import { setSidebarValue } from "../sidebar/sidebarSlice";
 import { AllRooms } from "./all-rooms/AllRooms";
 import { fetchAllUsers } from "./showRoomsSlice";
+import { resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
 
 const CreateRoomDiv = styled.div`
   display: flex;
@@ -53,7 +54,6 @@ const HomePageDisplay = () => {
 export const HomePage = () => {
   const sidebarState = useSelector((state: RootState) => state.sidebarState);
   const dispatch = useDispatch();
-
   useEffect(() => {
     dispatch(setSidebarValue("Homepage"));
     dispatch(showProfile());
@@ -69,6 +69,7 @@ export const HomePage = () => {
       case "Timetable":
         return <Timetable />;
       case "Chat":
+        dispatch(resetPrivateChatBadge());
         return <ChatPreview />;
     }
   }

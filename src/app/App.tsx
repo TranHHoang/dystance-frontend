@@ -12,16 +12,20 @@ import ProfilePage from "../components/profile-page/ProfilePage";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import { hostName } from "~utils/hostUtils";
 import { getLoginData } from "~utils/tokenStorage";
+import { useDispatch } from "react-redux";
+import { initPrivateChatSocket } from "../components/private-chat/chatPreviewSlice";
 
 export const socket = new HubConnectionBuilder().withUrl(`${hostName}/socket`).build();
 
 export default hot(module)(function App() {
+  const dispatch = useDispatch();
   useEffect(() => {
     if (socket && socket.state === "Disconnected") {
       console.log("Start socket...");
       socket.start().then(() => {
         console.log("Started");
         socket.invoke("ConnectionState", 0, getLoginData().id);
+        dispatch(initPrivateChatSocket());
       });
     }
   }, []);
@@ -36,7 +40,7 @@ export default hot(module)(function App() {
         <Route exact path="/chatRoom/:roomId" component={ChatArea} />
         <Route exact path="/resetPassword" component={ResetPasswordComponent} />
         <Route exact path="/profile" component={ProfilePage} />
-        <Route exact path="/room/:roomId/:creatorId/:roomName" component={RoomComponent} />
+        <Route exact path="/room/:roomId/:creatorId/:roomName/:groupId?" component={RoomComponent} />
       </Switch>
     </HashRouter>
   );

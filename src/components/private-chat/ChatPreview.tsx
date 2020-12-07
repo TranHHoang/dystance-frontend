@@ -9,13 +9,14 @@ import { RootState } from "~app/rootReducer";
 import { hostName } from "~utils/hostUtils";
 import { AllUsersInfo, getUserInfo, PrivateMessage, User, UserInfo } from "~utils/types";
 import { broadcastMessage, ChatType, fetchAllMessages } from "../../components/chat/chatSlice";
-import { fetchAllPreview, initSocket } from "./chatPreviewSlice";
+import { fetchAllPreview } from "./chatPreviewSlice";
 import { getLoginData } from "~utils/tokenStorage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { socket } from "~app/App";
 import * as Yup from "yup";
 import { Field, Form, Formik, FormikProps } from "formik";
 import { LookupValue } from "react-rainbow-components/components/types";
+import _ from "lodash";
 
 declare module "react-rainbow-components/components/types" {
   interface LookupValue {
@@ -85,7 +86,7 @@ const schema = Yup.object({
 const ChatPreview = (props: any) => {
   const { inRoom, inSidebar } = props;
   const [usersInfo, setUsersInfo] = useState<{ [key: string]: UserInfo }>({});
-  const previews = useSelector((root: RootState) => root.chatPreviewState);
+  const previews = useSelector((root: RootState) => root.chatPreviewState.chatPreview);
   const [selectedUserId, setSelectedUserId] = useState<string>();
   const [showNewMessageModal, setShowNewMessageModal] = useState(false);
   const [autoCompleteOptions, setAutoCompleteOptions] = useState([]);
@@ -93,11 +94,7 @@ const ChatPreview = (props: any) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(initSocket());
     dispatch(fetchAllPreview(getLoginData().id));
-    return () => {
-      socket.off(PrivateMessage);
-    };
   }, []);
 
   useEffect(() => {
@@ -166,7 +163,7 @@ const ChatPreview = (props: any) => {
               <Title>Private Messages</Title>
             </div>
           ) : null}
-          {previews.map((preview) => {
+          {_.orderBy(previews, ["date"], ["desc"]).map((preview) => {
             const id = preview.senderId !== getLoginData().id ? preview.senderId : preview.receiverId;
             return (
               <StyledPreview key={preview.id} onClick={() => setSelectedUserId(id)}>

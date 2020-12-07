@@ -5,24 +5,25 @@ import {
   faComments,
   faUsers,
   faVideoSlash,
-  faCalendarTimes
+  faCalendarTimes,
+  faObjectUngroup
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PeopleProfilePage from "../../profile-page/people-profile/PeopleProfilePage";
 import { setPeopleProfileModalOpen } from "../../profile-page/people-profile/peopleProfileSlice";
 import React from "react";
 import { useEffect, useState, useRef } from "react";
-import { Button, Drawer, Modal, Tab, Tabset, Notification } from "react-rainbow-components";
+import { Button, Drawer, Modal, Tab, Tabset, Notification, BadgeOverlay } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
 import ChatArea from "../../chat/ChatArea";
 import { fetchAllMessages } from "../../chat/chatSlice";
-import { getUserInfo } from "~utils/types";
+import { getUserInfo, RoomAction, RoomActionType } from "~utils/types";
 import JitsiMeetComponent from "../jitsi-meet-component/JitsiMeetComponent";
 import UserListComponent from "../user-list/UserListComponent";
 import Whiteboard from "../whiteboard/Whiteboard";
-import { initSocket, removeListeners, setDrawerOpen, setTabsetValue } from "./roomSlice";
+import { initSocket, removeListeners, resetChatBadge, setDrawerOpen, setTabsetValue } from "./roomSlice";
 import { socket } from "~app/App";
 import {
   kickUser,
@@ -41,6 +42,9 @@ import { setRemoteControlAccepted } from "../remote-control/remoteControlSlice";
 import DeadlineListComponent, { DeadlineFormComponent } from "../deadline/DeadlineListComponent";
 import { deleteDeadline, setDeleteModalOpen, setUpdateModalOpen } from "../deadline/deadline-card/deadlineCardSlice";
 import ChatPreview from "../../private-chat/ChatPreview";
+import { ipcRenderer } from "electron";
+import { resetPrivateChatBadge, initPrivateChatSocket } from "../../private-chat/chatPreviewSlice";
+import GroupComponent from "../group/GroupComponent";
 
 const StyledHeader = styled.h1`
   color: rgba(178, 178, 178, 1);
@@ -152,26 +156,38 @@ const InvisibleDiv = styled.div`
   justify-content: center;
   background-color: black;
 `;
+
 const RoomComponent = (props: any) => {
   const roomState = useSelector((state: RootState) => state.roomState);
   const peopleProfileState = useSelector((state: RootState) => state.peopleProfileState);
   const jitsiMeetState = useSelector((state: RootState) => state.jitisiMeetState);
   const userCardState = useSelector((state: RootState) => state.userCardState);
   const deadlineCardState = useSelector((state: RootState) => state.deadlineCardState);
+  const userListState = useSelector((state: RootState) => state.userListState);
+  const chatPreviewState = useSelector((state: RootState) => state.chatPreviewState);
   const formRef = useRef(null);
   const remoteControlState = useSelector((state: RootState) => state.remoteControlState);
-  const { roomId, roomName, creatorId } = props.match.params;
+  const { roomId, creatorId, groupId } = props.match.params;
+  let { roomName } = props.match.params;
   const [whiteboardOpen, setWhiteboardOpen] = useState(false);
   const [remoteInitiatorInfo, setRemoteInitiatorInfo] = useState<UserInfo>();
   const [privateChatOpen, setPrivateChatOpen] = useState(false);
   const dispatch = useDispatch();
 
+  const isBreakoutGroup = groupId !== undefined;
+  console.log(isBreakoutGroup);
+  if (isBreakoutGroup) roomName = atob(roomName);
+  console.log(roomName);
+
   useEffect(() => {
     dispatch(initSocket(roomId));
     dispatch(fetchAllMessages(roomId, undefined));
-    return () => {
+    dispatch(initPrivateChatSocket());
+    //Listen to the event sent from ipcMain and leave Room and remove socket
+    ipcRenderer.on("app-close", () => {
+      socket.invoke(RoomAction, roomId, RoomActionType.Leave, getLoginData().id);
       removeListeners();
-    };
+    });
   }, []);
 
   //Switches components when the drawer tab value is changed
@@ -183,12 +199,10 @@ const RoomComponent = (props: any) => {
         return <UserListComponent roomId={roomId} creatorId={creatorId} />;
       case "Deadline":
         return <DeadlineListComponent roomId={roomId} creatorId={creatorId} />;
+      case "Groups":
+        return <GroupComponent roomId={roomId} roomName={roomName} creatorId={creatorId} />;
     }
   }
-
-  useEffect(() => {
-    console.log("Room ID: " + roomId);
-  }, []);
 
   useEffect(() => {
     if (userCardState.isRemoteControlWaitingModalOpen) {
@@ -196,9 +210,21 @@ const RoomComponent = (props: any) => {
     }
   }, [userCardState.isRemoteControlWaitingModalOpen]);
 
+  useEffect(() => {
+    if (roomState.isDrawerOpen) {
+      const closeAction = setInterval(() => {
+        if ($("#drawer-close-button").length) {
+          clearInterval(closeAction);
+        }
+        $("#drawer-close-button").on("click", () => {
+          dispatch(setDrawerOpen(false));
+        }),
+          500;
+      });
+    }
+  }, [roomState.isDrawerOpen]);
   socket.on(REMOTE_CONTROL_SIGNAL, async (data) => {
     const objData = JSON.parse(data);
-    console.log(objData);
     switch (objData.type) {
       case RemoteControlSignalType.Offer:
         setRemoteInitiatorInfo(await getUserInfo(objData.payload));
@@ -212,7 +238,6 @@ const RoomComponent = (props: any) => {
         break;
     }
   });
-
   return (
     <div>
       {jitsiMeetState.showUpperToolbar ? (
@@ -223,15 +248,28 @@ const RoomComponent = (props: any) => {
               dispatch(setDrawerOpen(true));
             }}
           >
-            <FontAwesomeIcon icon={faBars} size="2x" />
+            {roomState.chatBadge > 0 ? (
+              <BadgeOverlay>
+                <FontAwesomeIcon icon={faBars} size="2x" />
+              </BadgeOverlay>
+            ) : (
+              <FontAwesomeIcon icon={faBars} size="2x" />
+            )}
           </TopButton>
           <NormalButton
             variant="neutral"
             onClick={() => {
               setPrivateChatOpen(true);
+              dispatch(resetPrivateChatBadge());
             }}
           >
-            <FontAwesomeIcon icon={faComments} size="2x" />
+            {chatPreviewState.privateChatBadge > 0 ? (
+              <BadgeOverlay>
+                <FontAwesomeIcon icon={faComments} size="2x" />
+              </BadgeOverlay>
+            ) : (
+              <FontAwesomeIcon icon={faComments} size="2x" />
+            )}
           </NormalButton>
           <RearButton variant="neutral" onClick={() => setWhiteboardOpen(!whiteboardOpen)}>
             <FontAwesomeIcon icon={faChalkboard} size="2x" />
@@ -246,29 +284,53 @@ const RoomComponent = (props: any) => {
       >
         <ChatPreview inRoom={true} />
       </PrivateChatDrawer>
-
       <StyledDrawer
         header={
           <span>
             <StyledHeader>Meeting Details</StyledHeader>
             <Tabset
               activeTabName={roomState.tabsetValue}
-              onSelect={(_, selected) => dispatch(setTabsetValue(selected))}
+              onSelect={(_, selected) => {
+                dispatch(setTabsetValue(selected));
+                if (selected === "Chat") {
+                  dispatch(resetChatBadge());
+                }
+              }}
             >
-              <StyledTab label={<FontAwesomeIcon icon={faCommentDots} size="2x" />} name="Chat" />
-              <StyledTab label={<FontAwesomeIcon icon={faUsers} size="2x" />} name="People" />
-              <StyledTab label={<FontAwesomeIcon icon={faCalendarTimes} size="2x" />} name="Deadline" />
+              <StyledTab
+                label={
+                  roomState.chatBadge > 0 ? (
+                    <BadgeOverlay className="rainbow-m-around_medium" value={roomState.chatBadge} variant="brand">
+                      <FontAwesomeIcon icon={faCommentDots} size="2x" />
+                    </BadgeOverlay>
+                  ) : (
+                    <FontAwesomeIcon icon={faCommentDots} size="2x" />
+                  )
+                }
+                name="Chat"
+              />
+              <StyledTab
+                label={
+                  <BadgeOverlay className="rainbow-m-around_medium" value={userListState.length} variant="brand">
+                    <FontAwesomeIcon icon={faUsers} size="2x" />
+                  </BadgeOverlay>
+                }
+                name="People"
+              />
+              {!isBreakoutGroup && (
+                <>
+                  <StyledTab label={<FontAwesomeIcon icon={faCalendarTimes} size="2x" />} name="Deadline" />
+                  <StyledTab label={<FontAwesomeIcon icon={faObjectUngroup} size="2x" />} name="Groups" />
+                </>
+              )}
             </Tabset>
           </span>
         }
         isOpen={roomState.isDrawerOpen}
-        onRequestClose={() => {
-          //TODO: Prevent drawer from closing when clicking on a context menu item
-          dispatch(setDrawerOpen(false));
-        }}
       >
         {getTabContent()}
       </StyledDrawer>
+
       <RemoteControl remoteId={userCardState.userId} isStarted={remoteControlState.remoteControlAccepted} />
       {remoteControlState.remoteControlAccepted ? (
         <InvisibleDiv className="hidden-class">
@@ -280,14 +342,11 @@ const RoomComponent = (props: any) => {
         </InvisibleDiv>
       ) : null}
       {whiteboardOpen ? <Whiteboard roomId={roomId} creatorId={creatorId} /> : null}
-      <JitsiMeetComponent roomId={roomId} roomName={roomName} creatorId={creatorId} />
+      <JitsiMeetComponent roomId={roomId} roomName={roomName} creatorId={creatorId} groupId={groupId} />
 
       <StyledModal
         isOpen={peopleProfileState.peopleProfileModalOpen}
-        onRequestClose={() => {
-          dispatch(setPeopleProfileModalOpen({ userId: null, peopleProfileModalOpen: false }));
-          console.log("Modal in room component: " + peopleProfileState.peopleProfileModalOpen);
-        }}
+        onRequestClose={() => dispatch(setPeopleProfileModalOpen({ userId: null, peopleProfileModalOpen: false }))}
       >
         <PeopleProfilePage userId={peopleProfileState.userId} />
       </StyledModal>

@@ -1,4 +1,4 @@
-import { createHashHistory } from "history";
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
 import { setupScreenSharingRender } from "jitsi-meet-electron-utils";
 import React, { useEffect, useRef, useState } from "react";
 import Jitsi from "react-jitsi";
@@ -12,10 +12,10 @@ import { setRemoteControlAccepted } from "../remote-control/remoteControlSlice";
 import { socket } from "~app/App";
 import { resetCardState, setKickOtherUser, setMuteOtherUser } from "../user-list/user-card/userCardSlice";
 import { setShowUpperToolbar } from "./jitsiMeetSlice";
-import { resetRoomState } from "../room-component/roomSlice";
+import { BreakoutGroup, resetRoomState, switchToGroup, removeListeners } from "../room-component/roomSlice";
 import { Spinner } from "react-rainbow-components";
-import { session } from "electron";
-import { setAllowWhiteboard } from "../whiteboard/js/main";
+import { withRouter } from "react-router-dom";
+import moment from "moment";
 
 const loader = styled.div`
   display: none;
@@ -25,13 +25,27 @@ const StyledSpinner = styled(Spinner)`
   top: 50vh;
   left: 50vw;
 `;
+const StyledClock = styled.div`
+  position: absolute;
+  background-color: #36393f;
+  color: rgba(78, 204, 163, 1);
+  font-size: 18px;
+  padding: 8px;
+  border-bottom-right-radius: 10px;
+  opacity: 50%;
+`;
+
 const JitsiMeetComponent = (props: any) => {
   const userCardState = useSelector((state: RootState) => state.userCardState);
+  const roomState = useSelector((state: RootState) => state.roomState);
   const profile = JSON.parse(localStorage.getItem("profile")) as User;
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
-  const { roomId, roomName } = props;
+  const [remainingTime, setRemainingTime] = useState("00:00");
+  const { roomId, roomName, groupId, creatorId, history } = props;
   const api = useRef(null);
+  const groupRef = useRef<BreakoutGroup>();
+  const intervalRef = useRef<number>();
 
   useEffect(() => {
     if (userCardState.muteOtherUser) {
@@ -46,12 +60,58 @@ const JitsiMeetComponent = (props: any) => {
       });
     }
   }, [userCardState.muteOtherUser]);
+
   useEffect(() => {
     if (userCardState.kickOtherUser) {
       api?.current?.executeCommand("hangup");
       dispatch(setKickOtherUser(false));
     }
   }, [userCardState.kickOtherUser]);
+
+  useEffect(() => {
+    if (roomState.group) {
+      api.current?.executeCommand("hangup");
+      groupRef.current = roomState.group;
+
+      clearInterval(intervalRef.current);
+      let duration = moment(groupRef.current.endTime).diff(moment());
+
+      intervalRef.current = setInterval(() => {
+        duration = duration - 1000;
+        setRemainingTime(moment(duration).format("mm:ss"));
+        if (duration <= 0) {
+          clearInterval(intervalRef.current);
+          api.current?.executeCommand("hangup");
+        }
+      }, 1000);
+    }
+  }, [roomState.group]);
+
+  useEffect(() => {
+    if (roomState.groupStopped && groupRef.current && groupId) {
+      clearInterval(intervalRef.current);
+      api.current?.executeCommand("hangup");
+    }
+  }, [roomState.groupStopped]);
+
+  function redirect() {
+    if (groupRef.current) {
+      if (groupId) {
+        // Redirect back to room
+        history.push("/temp");
+        history.replace(`${groupRef.current.roomPath}`);
+        groupRef.current = undefined;
+      } else {
+        // Redirect to group
+        history.push("/temp");
+        history.replace(`/room/${groupRef.current.id}/${creatorId}/${groupRef.current.name}/${groupId}`);
+        dispatch(switchToGroup(undefined));
+      }
+    } else {
+      history.replace("/homepage");
+      groupRef.current = undefined;
+    }
+  }
 
   const handleAPI = (jitsiMeetAPI: any) => {
     setIsLoading(false);
@@ -71,13 +131,15 @@ const JitsiMeetComponent = (props: any) => {
       dispatch(setRemoteControlAccepted(undefined));
       dispatch(resetRoomState());
       dispatch(resetCardState());
-      createHashHistory().push("/homepage");
+      removeListeners();
+      redirect();
       jitsiMeetAPI.dispose();
     });
   };
   return (
     <>
       {isLoading && <StyledSpinner />}
+      {groupRef.current && <StyledClock>{`${roomName} - ${remainingTime}`}</StyledClock>}
       <Jitsi
         domain="jitsidystance.southeastasia.cloudapp.azure.com"
         loadingComponent={loader}
@@ -110,6 +172,8 @@ const JitsiMeetComponent = (props: any) => {
           VIDEO_QUALITY_LABEL_DISABLED: true
         }}
         config={{
+          // @ts-ignore
+          prejoinPageEnabled: groupId === undefined,
           disableSimulcast: false,
           requireDisplayName: false,
           enableWelcomePage: false,
@@ -128,4 +192,4 @@ const JitsiMeetComponent = (props: any) => {
     </>
   );
 };
-export default JitsiMeetComponent;
+export default withRouter(JitsiMeetComponent);

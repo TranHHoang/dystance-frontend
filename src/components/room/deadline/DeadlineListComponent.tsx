@@ -24,6 +24,7 @@ import { updateDeadline } from "./deadline-card/deadlineCardSlice";
 const ButtonDiv = styled.div`
   display: flex;
   justify-content: center;
+  margin-top: 20px;
 `;
 const StyledAccordion = styled(Accordion)`
   background-color: ${(props) => props.theme.rainbow.palette.background.main};
@@ -56,7 +57,12 @@ export interface CreateDeadlineFormValues {
   description: string;
   roomId: string;
 }
-
+const StyledLabel = styled.label`
+  color: ${(props) => props.theme.rainbow.palette.text.label};
+  font-size: 20;
+  text-align: center;
+  padding: 10px;
+`;
 const validationSchema = Yup.object({
   title: Yup.string().required("Deadline Title is required").max(100, "Maximum of 100 characters"),
   description: Yup.string().max(150, "Maximum of 150 characters"),
@@ -157,20 +163,29 @@ const DeadlineListComponent = (props: any) => {
   }
   return (
     <div>
-      {deadlineListState.deadlines.map((deadline) => (
-        <div key={deadline.deadlineId}>
-          <StyledAccordion>
-            <DeadlineCard
-              deadlineId={deadline.deadlineId}
-              title={deadline.title}
-              endDate={deadline.endDate}
-              description={deadline.description}
-              roomId={deadline.roomId}
-              creatorId={creatorId}
-            />
-          </StyledAccordion>
+      {deadlineListState.deadlines.length > 0 ? (
+        <>
+          {deadlineListState.deadlines.map((deadline) => (
+            <div key={deadline.deadlineId}>
+              <StyledAccordion>
+                <DeadlineCard
+                  deadlineId={deadline.deadlineId}
+                  title={deadline.title}
+                  endDate={deadline.endDate}
+                  description={deadline.description}
+                  roomId={deadline.roomId}
+                  creatorId={creatorId}
+                />
+              </StyledAccordion>
+            </div>
+          ))}
+        </>
+      ) : (
+        <div style={{ textAlign: "center" }}>
+          <StyledLabel>There are no deadlines for now. Lucky you!</StyledLabel>
         </div>
-      ))}
+      )}
+
       {creatorId === getLoginData().id ? (
         <ButtonDiv>
           <Button variant="brand" label="Create a deadline" onClick={() => dispatch(setDeadlineModalOpen(true))} />

@@ -1,7 +1,6 @@
 import NodeCache from "node-cache";
 import Axios from "./fakeAPI";
 import { hostName } from "./hostUtils";
-import { LookupValue } from "react-rainbow-components/components/types";
 
 export const AllUsersInfo = "allUsersInfo"; // For autocomplete function
 
@@ -27,10 +26,8 @@ export interface Room {
   description: string;
   startDate: string;
   endDate: string;
-  startHour: string;
-  endHour: string;
   repeatOccurrence: string;
-  repeatDays: string;
+  roomTimes: string;
 }
 
 export interface ErrorResponse {
@@ -79,7 +76,9 @@ export enum RoomActionType {
   Chat,
   Kick,
   Mute,
-  ToggleWhiteboard
+  ToggleWhiteboard,
+  GroupNotification,
+  StopGroup
 }
 export interface DeadlineInfo {
   deadlineId: string;
@@ -102,4 +101,10 @@ export interface TimetableEvent {
   description: string;
   startDate: string;
   endDate: string;
+}
+
+export interface RoomTimes {
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
 }

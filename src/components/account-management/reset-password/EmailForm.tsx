@@ -5,7 +5,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
 import { RootState } from "~app/rootReducer";
-import { ButtonContainer, StyledButton, StyledForm, StyledInput } from "../styles";
+import { ButtonContainer, StyledButton, StyledForm, StyledInput, StyledLink, StyledReturnLink } from "../styles";
 import { startSendEmail } from "./resetPasswordSlice";
 
 interface EmailFormValues {
@@ -47,6 +47,9 @@ const EmailForm = () => {
               disabled={resetPasswordState.isLoading}
               label="Get access code"
             />
+            <StyledReturnLink to="/">
+              <StyledButton style={{ width: "100%" }} variant="neutral" type="submit" label="Return to Login Page" />
+            </StyledReturnLink>
           </ButtonContainer>
         </StyledForm>
       )}

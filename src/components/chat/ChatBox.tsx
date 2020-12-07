@@ -1,5 +1,6 @@
 import { faImage, faPaperclip, faSmileBeam } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { resetChatBadge } from "../room/room-component/roomSlice";
 import { Picker } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
 import React, { useRef, useState } from "react";
@@ -7,6 +8,7 @@ import { Modal } from "react-rainbow-components";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import { broadcastMessage } from "./chatSlice";
+import { resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
 
 const StyledChatBox = styled.div`
   display: flex;
@@ -16,7 +18,6 @@ const StyledChatBox = styled.div`
   background-color: rgb(90, 90, 90);
   padding: 2 5 2 5;
   border-radius: 5px;
-  /* margin: 5px; */
   width: 100%;
   input {
     flex: 1;
@@ -73,6 +74,8 @@ const ChatBox = ({
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    dispatch(resetChatBadge());
+    dispatch(resetPrivateChatBadge());
     if (e.key === "Enter") {
       if (messageInput.current.value.trim()) {
         dispatch(broadcastMessage(roomId, receiverId, messageInput.current.value));
@@ -95,7 +98,15 @@ const ChatBox = ({
         <FontAwesomeIcon icon={faPaperclip} onClick={() => fileInput.current.click()} />
         <input type="file" accept="image/*" hidden ref={imageInput} onChange={handleFile} />
         <input type="file" hidden ref={fileInput} onChange={handleFile} />
-        <input ref={messageInput} placeholder="Enter your message" onKeyDown={handleKeyDown} />
+        <input
+          ref={messageInput}
+          placeholder="Enter your message"
+          onKeyDown={handleKeyDown}
+          onFocus={() => {
+            dispatch(resetChatBadge());
+            dispatch(resetPrivateChatBadge());
+          }}
+        />
         <FontAwesomeIcon icon={faSmileBeam} onClick={() => setToggleEmoji(!toggleEmoji)} />
       </StyledChatBox>
     </>

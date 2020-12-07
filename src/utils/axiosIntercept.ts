@@ -1,13 +1,12 @@
 import Axios from "axios";
-import { getLoginData, saveLoginData, removeLoginData } from "./tokenStorage";
+import { getLoginData, saveLoginData } from "./tokenStorage";
 import { hostName } from "~utils/hostUtils";
-import { UserLoginData } from "~utils/types";
 
 Axios.interceptors.request.use(
   (config) => {
     const url = config.url;
 
-    const isPublicRoute = /api\/users\/(login|register|google|resendEmail)/.test(url);
+    const isPublicRoute = /api\/users\/(login|register|google|resendEmail|resetPassword)/.test(url);
 
     if (!isPublicRoute) {
       // only need token for api access
@@ -38,26 +37,26 @@ Axios.interceptors.response.use(
 
       console.log("Expired token, need refreshing...");
 
-      const response: UserLoginData = await Axios.post(`${hostName}/api/users/refreshToken`, form, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
+      const data = (
+        await Axios.post(`${hostName}/api/users/refreshToken`, form, {
+          headers: { "Content-Type": "multipart/form-data" }
+        })
+      ).data;
 
       saveLoginData({
-        id: response.id,
-        userName: response.userName,
-        accessToken: response.accessToken,
-        refreshToken: response.refreshToken
+        id: data.id,
+        userName: data.userName,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken
       });
 
       console.log("Refreshed fisnish. Resend request...");
 
       // Resend request
-      error.response.configs.headers["Authorization"] = `Bearer ${response.accessToken}`;
+      error.response.config.headers["Authorization"] = `Bearer ${data.accessToken}`;
       return Axios(error.response.config);
     } catch (e) {
-      if (e.response.status === 401) {
-        removeLoginData();
-      }
+      console.log(e);
       return Promise.reject(e);
     }
   }
