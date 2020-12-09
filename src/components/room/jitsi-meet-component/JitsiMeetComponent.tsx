@@ -188,7 +188,7 @@ const JitsiMeetComponent = (props: any) => {
       {isLoading && <StyledSpinner />}
       {groupRef.current && <StyledClock>{`${roomName} - ${remainingTime}`}</StyledClock>}
       <Jitsi
-        domain="jitsidystance.southeastasia.cloudapp.azure.com"
+        domain="jitsiasia.southeastasia.cloudapp.azure.com"
         loadingComponent={loader}
         roomName={roomId}
         displayName={`${profile.realName} (${profile.userName})`}
