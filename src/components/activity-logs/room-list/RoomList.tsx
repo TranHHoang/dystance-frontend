@@ -124,7 +124,7 @@ const RoomList = () => {
   return !roomListState.selectedRoom ? (
     <>
       <div style={{ padding: "20px 0 10px 20px" }}>
-        <Title>Timetable</Title>
+        <Title>All Rooms</Title>
       </div>
       <Container>
         <SemesterSelectionDiv>

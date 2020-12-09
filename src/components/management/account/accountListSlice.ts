@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
+import { fetchAllUsers } from "../../../components/homepage/showRoomsSlice";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
 import { get, post, ErrorResponse } from "~utils/index";
@@ -75,7 +76,6 @@ export function fetchAllAccounts(): AppThunk {
   return async (dispatch) => {
     try {
       const data = (await get(`/admin/accounts`)).data;
-      console.log(data);
       dispatch(setAccounts(data));
     } catch (e) {
       const ex = e as AxiosError;
@@ -110,6 +110,7 @@ export function importExcelFile(file: File): AppThunk {
 
       await post("/admin/accounts/import", form);
       dispatch(fetchAllAccounts());
+      await fetchAllUsers();
     } catch (e) {
       const ex = e as AxiosError;
 
@@ -140,6 +141,7 @@ export function addNewAccount(account: Account): AppThunk {
     try {
       const data = (await post("/admin/accounts/add", account)).data;
       dispatch(addAccount(data));
+      await fetchAllUsers();
     } catch (e) {
       const ex = e as AxiosError;
 
@@ -170,6 +172,7 @@ export function updateExistingAccounts(accounts: Account[]): AppThunk {
       const data = (await post("/admin/accounts/update", accounts)).data;
       if (data.success.length > 0) {
         dispatch(updateAccounts(data.success));
+        await fetchAllUsers();
       }
       if (data.failed.length > 0) {
         _.forEach(data.failed, (error: ErrorResponse) => {
@@ -207,6 +210,7 @@ export function deleteExistingAccounts(ids: string[]): AppThunk {
     try {
       await post("/admin/accounts/delete", ids);
       dispatch(removeAccounts(ids));
+      await fetchAllUsers();
     } catch (e) {
       const ex = e as AxiosError;
 

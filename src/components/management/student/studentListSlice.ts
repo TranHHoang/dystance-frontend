@@ -1,5 +1,6 @@
 import { createSlice, current, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
+import { fetchAllUsers } from "../../../components/homepage/showRoomsSlice";
 import _ from "lodash";
 import moment from "moment";
 import { AppThunk } from "~app/store";
@@ -117,6 +118,7 @@ export function addStudent(student: UserTableInfo): AppThunk {
       };
       const data = (await post(`/users/students/add`, studentFormat)).data;
       dispatch(addStudentToList(data));
+      await fetchAllUsers();
     } catch (e) {
       const ex = e as AxiosError;
 
@@ -146,6 +148,7 @@ export function deleteStudents(userIds: string[]): AppThunk {
       const data = (await post("/users/students/delete", userIds)).data;
       if (data.success.length > 0) {
         dispatch(removeStudentsFromList(data.success));
+        await fetchAllUsers();
       }
       if (data.failed.length > 0) {
         _.forEach(data.failed, (error: ErrorResponse) => {
@@ -186,10 +189,10 @@ export function updateStudents(students: UserTableInfo[]): AppThunk {
       const data = (await post(`/users/students/update`, studentFormat)).data;
       if (data.success.length > 0) {
         dispatch(updateStudentList(data.success));
+        await fetchAllUsers();
       }
       if (data.failed.length > 0) {
         _.forEach(data.failed, (error: ErrorResponse) => {
-          console.log(error);
           dispatch(updateStudentListFailed(error));
         });
         dispatch(showStudentList());

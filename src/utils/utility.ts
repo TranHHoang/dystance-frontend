@@ -2,8 +2,6 @@ import _ from "lodash";
 import { LoginLocalStorageKey, Role, User, UserLoginData } from "./interfaces";
 import { AllUsersInfo } from "./consts";
 
-let users: { [id: string]: User };
-
 export function saveLoginData(data: UserLoginData) {
   localStorage.setItem(LoginLocalStorageKey.UserInfo, JSON.stringify(data));
 }
@@ -20,12 +18,12 @@ export function getAllUsers(): User[] {
 }
 
 export function getUser(id: string): User {
+  let users: { [id: string]: User };
   if (!users) {
     users = _.transform(getAllUsers(), (acc, cur) => {
       acc[cur.id] = cur;
     });
   }
-
   return users[id];
 }
 

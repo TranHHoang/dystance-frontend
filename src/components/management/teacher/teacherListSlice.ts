@@ -1,5 +1,6 @@
 import { createSlice, current, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
+import { fetchAllUsers } from "../../../components/homepage/showRoomsSlice";
 import _ from "lodash";
 import moment from "moment";
 import { AppThunk } from "~app/store";
@@ -41,6 +42,7 @@ const teacherListSlice = createSlice({
         const index = _.findIndex(state.teachers, { id: change.id });
         state.teachers.splice(index, 1, change);
       });
+      console.log(state.teachers);
     },
     updateTeacherListFailed(state, action: PayloadAction<ErrorResponse>) {
       state.errors = state.errors.concat(action.payload);
@@ -116,6 +118,7 @@ export function addTeacher(teacher: UserTableInfo): AppThunk {
       };
       const data = (await post(`/users/teachers/add`, teacherFormat)).data;
       dispatch(addTeacherToList(data));
+      await fetchAllUsers();
     } catch (e) {
       const ex = e as AxiosError;
       if (ex.response?.data) {
@@ -145,9 +148,9 @@ export function updateTeachers(teachers: UserTableInfo[]): AppThunk {
       const teacherFormat = teachers.map((teacher) => ({ ...teacher, dob: moment(teacher.dob).format("YYYY-MM-DD") }));
 
       const data = (await post(`/users/teachers/update`, teacherFormat)).data;
-      dispatch(updateTeacherList(data));
       if (data.success.length > 0) {
         dispatch(updateTeacherList(data.success));
+        await fetchAllUsers();
       }
       if (data.failed.length > 0) {
         _.forEach(data.failed, (error: ErrorResponse) => {
@@ -185,6 +188,7 @@ export function deleteTeachers(userIds: string[]): AppThunk {
       const data = (await post("/users/teachers/delete", userIds)).data;
       if (data.success.length > 0) {
         dispatch(removeTeachersFromList(data.success));
+        await fetchAllUsers();
       }
       if (data.failed.length > 0) {
         _.forEach(data.failed, (error: ErrorResponse) => {
