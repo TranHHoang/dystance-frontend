@@ -7,7 +7,6 @@ import ProfilePage from "../profile-page/ProfilePage";
 import { showProfile } from "../profile-page/showProfileInfoSlice";
 import SideNavigationBar from "../sidebar/Sidebar";
 import { setSidebarValue } from "../sidebar/sidebarSlice";
-import { fetchAllUsers } from "./showRoomsSlice";
 import { initPrivateChatSocket, resetPrivateChatBadge } from "../private-chat/chatPreviewSlice";
 import SemesterManagement from "../management/semester/SemesterManagement";
 import RoomList from "../../components/activity-logs/room-list/RoomList";
@@ -21,7 +20,7 @@ import { socket } from "~app/App";
 import Timetable from "../../components/timetable/Timetable";
 import StudentAttendanceReport from "../attendance-reports/StudentAttendanceReport";
 import AttendanceManagement from "../attendance-reports/AttendanceManagement";
-import { getLoginData, getCurrentRole, Logger } from "~utils/index";
+import { getLoginData, getCurrentRole, Logger, fetchAllUsers } from "~utils/index";
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;

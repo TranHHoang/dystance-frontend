@@ -1,10 +1,9 @@
 import { createSlice, current, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
-import { fetchAllUsers } from "../../../components/homepage/showRoomsSlice";
 import _ from "lodash";
 import moment from "moment";
 import { AppThunk } from "~app/store";
-import { get, ErrorResponse, post } from "~utils/index";
+import { get, ErrorResponse, post, fetchAllUsers } from "~utils/index";
 import { UserTableInfo } from "../StudentTeacherTable";
 
 interface TeacherListState {

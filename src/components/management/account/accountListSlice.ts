@@ -1,9 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
-import { fetchAllUsers } from "../../../components/homepage/showRoomsSlice";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
-import { get, post, ErrorResponse } from "~utils/index";
+import { get, post, ErrorResponse, fetchAllUsers } from "~utils/index";
 
 export interface Account {
   id: string;

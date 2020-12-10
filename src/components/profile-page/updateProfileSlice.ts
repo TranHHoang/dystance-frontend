@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
-import { fetchAllUsers } from "../../components/homepage/showRoomsSlice";
 import moment from "moment";
 import { AppThunk } from "~app/store";
 import { UpdateProfileFormValues } from "./ProfilePage";

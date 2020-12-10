@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import { AppThunk } from "~app/store";
-import { getLoginData, AllUsersInfo, get, Room } from "~utils/index";
+import { getLoginData, get, Room } from "~utils/index";
 
 enum ShowRoomError {
   OtherError = 2
@@ -74,13 +74,4 @@ export function showRoom(): AppThunk {
       }
     }
   };
-}
-
-export async function fetchAllUsers() {
-  try {
-    const response = await get(`/users/getAll`);
-    sessionStorage.setItem(AllUsersInfo, JSON.stringify(response.data));
-  } catch (ex) {
-    console.log(ex);
-  }
 }

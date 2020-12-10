@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
-import { fetchAllUsers } from "../../components/homepage/showRoomsSlice";
 import { AppThunk } from "~app/store";
-import { ErrorResponse, post } from "~utils/index";
+import { ErrorResponse, post, fetchAllUsers } from "~utils/index";
 import { showStudentList } from "./student/StudentListSlice";
 import { FileUploadFormValues } from "./StudentTeacherManagement";
 import { showTeacherList } from "./teacher/teacherListSlice";
