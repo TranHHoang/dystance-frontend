@@ -102,17 +102,18 @@ export function fetchAllAccounts(): AppThunk {
 
 export function importExcelFile(file: File): AppThunk {
   return async (dispatch) => {
-    setLoadingState(true);
+    dispatch(setLoadingState(true));
     try {
       const form = new FormData();
       form.append("file", file);
 
       await post("/admin/accounts/import", form);
+      dispatch(setLoadingState(false));
       dispatch(fetchAllAccounts());
       await fetchAllUsers();
     } catch (e) {
       const ex = e as AxiosError;
-
+      dispatch(setLoadingState(false));
       if (ex.response?.data) {
         dispatch(setAccountsError(e.response.data as ErrorResponse));
       } else if (ex.request) {
