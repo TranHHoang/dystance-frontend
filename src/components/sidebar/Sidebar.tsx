@@ -71,7 +71,7 @@ const StyledAvatarMenu = styled(AvatarMenu)`
 
 const Logo = styled.img`
   margin-bottom: 10vh;
-  @media (max-height: 550px) {
+  @media (max-height: 720px) {
     display: none;
   }
 `;
@@ -102,7 +102,7 @@ const SideNavigationBar = () => {
           <StyledSidebarItem icon={<StyledIcon icon={faCalendarAlt} size="2x" />} name="Timetable" label="Timetable" />
         )}
 
-        {role === "quality assurance" && (
+        {["academic management", "quality assurance"].includes(role) && (
           <StyledSidebarItem icon={<StyledIcon icon={faChalkboardTeacher} size="2x" />} name="Rooms" label="Rooms" />
         )}
         {["teacher", "student", "quality assurance", "academic management"].includes(role) && (

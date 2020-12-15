@@ -171,7 +171,7 @@ const ClassList = (props: { semesterId: string }) => {
           title="Error"
           onRequestClose={() => dispatch(resetClassError())}
           description={_.map(classState.errors, (error: ErrorResponse) => (
-            <p>{error?.message}</p>
+            <p>{error}</p>
           ))}
           icon="error"
         />
@@ -283,6 +283,16 @@ const ClassList = (props: { semesterId: string }) => {
           return Promise.resolve();
         }}
       />
+      {classState.errors && classState.errors?.length > 0 ? (
+        <StyledNotifications
+          title="Error"
+          onRequestClose={() => dispatch(resetClassError())}
+          description={_.map(classState.errors, (error: ErrorResponse) => (
+            <p>{error}</p>
+          ))}
+          icon="error"
+        />
+      ) : null}
     </>
   );
 };

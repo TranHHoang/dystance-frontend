@@ -142,12 +142,9 @@ export function updateExistingClasses(semesterId: string, classes: Class[]): App
         dispatch(updateClasses(data.success));
       }
       if (data.failed.length > 0) {
-        dispatch(
-          updateClassesFailed({
-            message: "There was a problem with updating a few of the classes, please try again",
-            type: 1
-          })
-        );
+        _.forEach(data.failed, (error: ErrorResponse) => {
+          dispatch(updateClassesFailed(error));
+        });
         dispatch(fetchAllClasses(semesterId));
       }
     } catch (e) {

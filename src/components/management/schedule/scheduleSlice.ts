@@ -16,10 +16,11 @@ export interface Schedule {
 
 interface ScheduleState {
   schedules: Schedule[];
-  error?: ErrorResponse;
+  errors?: ErrorResponse[];
 }
 const initialState: ScheduleState = {
-  schedules: []
+  schedules: [],
+  errors: []
 };
 
 const scheduleSlice = createSlice({
@@ -30,13 +31,13 @@ const scheduleSlice = createSlice({
       state.schedules = action.payload;
     },
     setSchedulesFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     addSchedule(state, action: PayloadAction<Schedule>) {
       state.schedules.push(action.payload);
     },
     addScheduleFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     updateSchedules(state, action: PayloadAction<Schedule[]>) {
       _.each(action.payload, (schedule) => {
@@ -45,16 +46,16 @@ const scheduleSlice = createSlice({
       });
     },
     updateSchedulesFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     removeSchedules(state, action: PayloadAction<string[]>) {
       state.schedules = _.reject(state.schedules, ({ id }) => action.payload.includes(id));
     },
     removeSchedulesFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     resetErrorState(state) {
-      state.error = undefined;
+      state.errors = [];
     },
     resetScheduleState() {
       return initialState;
@@ -148,12 +149,9 @@ export function updateExistingSchedules(semesterId: string, schedules: Schedule[
         dispatch(updateSchedules(data.success));
       }
       if (data.failed.length > 0) {
-        dispatch(
-          updateSchedulesFailed({
-            message: "There was a problem with updating a few of the schedules, please try again",
-            type: 1
-          })
-        );
+        _.forEach(data.failed, (error: ErrorResponse) => {
+          dispatch(updateSchedulesFailed(error));
+        });
         dispatch(fetchAllSchedule(semesterId));
       }
     } catch (e) {
