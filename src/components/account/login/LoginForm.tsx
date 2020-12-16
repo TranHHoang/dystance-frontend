@@ -72,7 +72,7 @@ const LoginForm = () => {
   }
 
   function onGoogleResponse(response: GoogleLoginResponse) {
-    window.localStorage.setItem(LoginLocalStorageKey.GoogleEmail, response.profileObj.email);
+    window.localStorage.setItem(LoginLocalStorageKey.EmailOrUserName, response.profileObj.email);
     dispatch(startLogin(_, _, _, response.tokenId));
   }
 
