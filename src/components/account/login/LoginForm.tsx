@@ -1,3 +1,4 @@
+import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { faLock, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Field, Formik, FormikProps } from "formik";
@@ -13,17 +14,19 @@ import {
   ButtonContainer,
   Container,
   NotificationContainer,
-  Register,
   ResendButton,
   StyledButton,
   StyledCard,
   StyledForm,
+  StyledGoogleIcon,
   StyledInput,
   StyledLink,
   StyledNotification,
   Title
 } from "../styles";
+import config from "./googleConfigs.json";
 import { LoginError, resendEmail, resetLoginState, startLogin } from "./loginSlice";
+import GoogleLogin, { GoogleLoginResponse } from "react-google-login";
 
 interface LoginFormValues {
   emailOrUserName: string;
@@ -66,6 +69,11 @@ const LoginForm = () => {
     } else {
       dispatch(startLogin(_, values.emailOrUserName, values.password));
     }
+  }
+
+  function onGoogleResponse(response: GoogleLoginResponse) {
+    window.localStorage.setItem(LoginLocalStorageKey.GoogleEmail, response.profileObj.email);
+    dispatch(startLogin(_, _, _, response.tokenId));
   }
 
   function onResendEmail() {
@@ -153,6 +161,18 @@ const LoginForm = () => {
                 />
                 <ButtonContainer>
                   <StyledButton type="submit" label="Sign In" variant="brand" disabled={loginState.isLoading} />
+                  <GoogleLogin
+                    clientId={config.GoogleClientId}
+                    onSuccess={onGoogleResponse}
+                    onFailure={(e) => console.log(e)}
+                    render={(renderProps) => (
+                      <StyledButton onClick={renderProps.onClick} variant="destructive">
+                        <StyledGoogleIcon icon={faGoogle} />
+                        Login with Google
+                      </StyledButton>
+                    )}
+                    cookiePolicy="single_host_origin"
+                  />
                 </ButtonContainer>
 
                 <StyledLink to="/resetPassword" onClick={() => dispatch(resetPasswordSlice.resetState())}>

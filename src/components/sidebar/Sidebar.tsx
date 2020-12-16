@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
+import { useGoogleLogout } from "react-google-login";
+import config from "../account/login/googleConfigs.json";
 import {
   faCalendarAlt,
   faChalkboardTeacher,
@@ -82,6 +84,12 @@ const SideNavigationBar = () => {
   const role = getCurrentRole();
   const dispatch = useDispatch();
 
+  const googleLogout = useGoogleLogout({
+    clientId: config.GoogleClientId,
+    onLogoutSuccess: () => console.log("Google signed out"),
+    onFailure: () => console.log("Google signed out error")
+  });
+
   return (
     <StyledSidebar
       selectedItem={sidebarState.sidebarValue}
@@ -134,6 +142,7 @@ const SideNavigationBar = () => {
           label="Logout"
           icon={<FontAwesomeIcon icon={faPowerOff} />}
           onClick={() => {
+            googleLogout.signOut();
             dispatch(signOut());
           }}
           iconPosition="left"

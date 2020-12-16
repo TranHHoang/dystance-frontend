@@ -18,6 +18,7 @@ app.commandLine.appendSwitch("disable-webrtc-hw-decoding");
 
 // Needed until robot.js is fixed: https://github.com/octalmage/robotjs/issues/580
 app.allowRendererProcessReuse = false;
+
 function isDebug() {
   return process.env.npm_lifecycle_event === "start";
 }
@@ -49,6 +50,7 @@ const createWindow = () => {
   if (isDebug()) {
     mainWindow.webContents.openDevTools();
     mainWindow.loadURL(APP_WEBPACK_ENTRY);
+    // mainWindow.webContents.setUserAgent("Chrome");
   } else {
     const exApp = express();
     exApp.set("port", process.env.PORT || 3000);
@@ -104,3 +106,14 @@ app.setAppUserModelId(process.execPath);
 // app.userAgentFallback = app.userAgentFallback.replace(/Electron\/*/, '');
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+app.on("browser-window-created", (e, window) => {
+  window.on("show", () => {
+    if (window.title === "Dystance") {
+      window.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
+        details.requestHeaders["User-Agent"] = "Chrome";
+        callback({ cancel: false, requestHeaders: details.requestHeaders });
+      });
+    }
+  });
+});

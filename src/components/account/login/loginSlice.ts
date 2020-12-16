@@ -108,14 +108,7 @@ export function startLogin(email?: string, userName?: string, password?: string,
       createHashHistory().push("/homepage");
     } catch (ex) {
       console.log(ex);
-      const e = ex as AxiosError;
-      // Google login first time
-      if (googleTokenId && e.response?.status === 404) {
-        dispatch(loginSuccess());
-        createHashHistory().push("/googleUpdateInfo");
-      } else {
-        dispatch(getAxiosError(ex as AxiosError));
-      }
+      dispatch(getAxiosError(ex as AxiosError));
     }
   };
 }
