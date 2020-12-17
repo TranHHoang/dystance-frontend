@@ -10,6 +10,7 @@ import { RootState } from "~app/rootReducer";
 import { AllUsersInfo, getCurrentRole, User } from "~utils/index";
 import ActivityLogs from "../ActivityLogs";
 import {
+  exportAttendance,
   getRooms,
   getSemesters,
   resetRoomListError,
@@ -150,7 +151,8 @@ const RoomList = () => {
                   field: "tableData",
                   render: (rowData: any) => rowData.tableData.id + 1,
                   filtering: false,
-                  editable: "never"
+                  editable: "never",
+                  width: "fit-content"
                 },
                 {
                   title: "Room",
@@ -176,10 +178,15 @@ const RoomList = () => {
                         >
                           <StyledButton label="Join Now" variant="brand" />
                         </StyledLink>
-                        {getCurrentRole() === "quality assurance" ? (
+                        <StyledButton
+                          label="View Class Logs"
+                          onClick={() => dispatch(setSelectedRoom(rowData.roomId))}
+                          variant="neutral"
+                        />
+                        {getCurrentRole() === "academic management" ? (
                           <StyledButton
-                            label="View Class Logs"
-                            onClick={() => dispatch(setSelectedRoom(rowData.roomId))}
+                            label="Export Attendance"
+                            onClick={() => dispatch(exportAttendance(rowData.roomId, rowData.roomName))}
                             variant="neutral"
                           />
                         ) : null}

@@ -9,7 +9,7 @@ import { Button, ButtonIcon, Notification } from "react-rainbow-components";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { AllUsersInfo, User } from "~utils/index";
+import { AllUsersInfo, getCurrentRole, User } from "~utils/index";
 import { getActivityLogs, resetActivityLogState, resetLogError } from "./activityLogsSlice";
 import { setSelectedRoom } from "./room-list/roomListSlice";
 
@@ -175,7 +175,7 @@ const ActivityLogs = () => {
                 pageSize: 10,
                 filtering: true,
                 actionsColumnIndex: -1,
-                exportButton: true,
+                exportButton: getCurrentRole() === "quality assurance" ? { csv: true } : false,
                 exportAllData: true
               }}
               title={_.find(roomListState.rooms, { roomId: roomListState.selectedRoom })?.roomName}
