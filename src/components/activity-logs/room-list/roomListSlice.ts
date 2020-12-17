@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AxiosError } from "axios";
+import Axios, { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
-import { ErrorResponse, get, Room, Semester } from "~utils/index";
+import { ErrorResponse, get, hostName, Room, Semester } from "~utils/index";
 
 interface RoomListState {
   semesters: Semester[];
@@ -42,6 +42,9 @@ const roomListSlice = createSlice({
       state.isLoading = false;
       state.error = action.payload;
     },
+    fetchAttendanceExportFailed(state, action: PayloadAction<ErrorResponse>) {
+      state.error = action.payload;
+    },
     setSelectedRoom(state, action: PayloadAction<string>) {
       state.selectedRoom = action.payload;
     },
@@ -66,7 +69,8 @@ export const {
   resetRoomListState,
   setSelectedRoom,
   resetRoomListError,
-  setSelectedSemester
+  setSelectedSemester,
+  fetchAttendanceExportFailed
 } = roomListSlice.actions;
 
 export function getSemesters(): AppThunk {
@@ -121,6 +125,44 @@ export function getRooms(semesterId: string): AppThunk {
       } else {
         dispatch(
           fetchRoomsFailed({
+            message: ex.message,
+            type: 2
+          })
+        );
+      }
+    }
+  };
+}
+
+export function exportAttendance(roomId: string, roomName: string): AppThunk {
+  return async (dispatch) => {
+    try {
+      const response = await Axios({
+        url: `${hostName}/api/users/reports/attendance/export?roomId=${roomId}`,
+        method: "GET",
+        responseType: "blob"
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${roomName}.xlsx`;
+      link.click();
+      link.remove();
+    } catch (e) {
+      const ex = e as AxiosError;
+
+      if (ex.response?.data) {
+        dispatch(fetchAttendanceExportFailed(e.response.data as ErrorResponse));
+      } else if (ex.request) {
+        dispatch(
+          fetchAttendanceExportFailed({
+            message: "Something Went Wrong",
+            type: 1
+          })
+        );
+      } else {
+        dispatch(
+          fetchAttendanceExportFailed({
             message: ex.message,
             type: 2
           })
