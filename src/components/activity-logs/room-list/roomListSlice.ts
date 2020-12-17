@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AxiosError } from "axios";
+import Axios, { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
 import { ErrorResponse, get, hostName, Room, Semester } from "~utils/index";
@@ -133,23 +133,18 @@ export function getRooms(semesterId: string): AppThunk {
     }
   };
 }
-// export function exportAttendance(roomId: string, roomName: string) {
-//   get(`/users/reports/attendance/export?roomId=${roomId}`).then(response => {
-//     let a = document.createElement("a");
-//     a.href = response.data;
-//     a.download = `${roomName}.xlsx`;
-//     a.click();
-//     a.remove();
-//   })
-// }
+
 export function exportAttendance(roomId: string, roomName: string): AppThunk {
   return async (dispatch) => {
     try {
-      const response = await get(`/users/reports/attendance/export?roomId=${roomId}`);
-      // const response = `${hostName}/api/users/getAvatar?fileName=default.png&realName=&userName=am`;
+      const response = await Axios({
+        url: `${hostName}/api/users/reports/attendance/export?roomId=${roomId}`,
+        method: "GET",
+        responseType: "blob"
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
-      console.log(response);
-      link.href = response.data;
+      link.href = url;
       link.download = `${roomName}.xlsx`;
       link.click();
       link.remove();
