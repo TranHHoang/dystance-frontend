@@ -36,7 +36,7 @@ const UserCardComponent = (props: any) => {
                 label="View Profile"
                 onClick={() => dispatch(setPeopleProfileModalOpen({ userId, peopleProfileModalOpen: true }))}
               />
-              {getLoginData().id === teacherId ? (
+              {getLoginData().id === teacherId && user.role === "student" ? (
                 <div>
                   <MenuItem
                     label="Kick User Out"

@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { RootState } from "~app/rootReducer";
-import { AllUsersInfo, User } from "~utils/index";
+import { AllUsersInfo, getCurrentRole, User } from "~utils/index";
 import ActivityLogs from "../ActivityLogs";
 import {
   getRooms,
@@ -176,11 +176,13 @@ const RoomList = () => {
                         >
                           <StyledButton label="Join Now" variant="brand" />
                         </StyledLink>
-                        <StyledButton
-                          label="View Class Logs"
-                          onClick={() => dispatch(setSelectedRoom(rowData.roomId))}
-                          variant="neutral"
-                        />
+                        {getCurrentRole() === "quality assurance" ? (
+                          <StyledButton
+                            label="View Class Logs"
+                            onClick={() => dispatch(setSelectedRoom(rowData.roomId))}
+                            variant="neutral"
+                          />
+                        ) : null}
                       </ActionContainer>
                     )
                 }

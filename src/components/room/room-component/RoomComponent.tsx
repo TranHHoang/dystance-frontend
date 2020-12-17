@@ -240,7 +240,7 @@ const RoomComponent = (props: any) => {
               <FontAwesomeIcon icon={faBars} size="2x" />
             )}
           </TopButton>
-          {role !== "quality assurance" ? (
+          {!["quality assurance", "academic management"].includes(role) ? (
             <NormalButton
               variant="neutral"
               onClick={() => {
@@ -305,7 +305,7 @@ const RoomComponent = (props: any) => {
                 }
                 name="People"
               />
-              {!isBreakoutGroup && role !== "quality assurance" ? (
+              {!isBreakoutGroup && !["quality assurance", "academic management"].includes(role) ? (
                 <>
                   <StyledTab label={<FontAwesomeIcon icon={faObjectUngroup} size="2x" />} name="Groups" />
                 </>

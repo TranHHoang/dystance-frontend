@@ -19,6 +19,7 @@ import Table from "../Table";
 import moment from "moment";
 import * as Yup from "yup";
 import styled from "styled-components";
+import { ErrorResponse } from "~utils/index";
 
 const StyledNotifications = styled(Notification)`
   position: absolute;
@@ -26,6 +27,7 @@ const StyledNotifications = styled(Notification)`
   right: 20px;
   p {
     font-size: 16px;
+    color: ${(props) => props.theme.rainbow.palette.text.main};
   }
   h1 {
     font-size: 20px;
@@ -179,11 +181,13 @@ const ScheduleList = (props: { semesterId: string }) => {
           icon="error"
         />
       ) : null}
-      {scheduleState.error ? (
+      {scheduleState.errors && scheduleState.errors?.length > 0 ? (
         <StyledNotifications
           title="Error"
           onRequestClose={() => dispatch(resetErrorState())}
-          description={scheduleState.error?.message}
+          description={_.map(scheduleState.errors, (error: ErrorResponse) => (
+            <p>{error?.message}</p>
+          ))}
           icon="error"
         />
       ) : null}
