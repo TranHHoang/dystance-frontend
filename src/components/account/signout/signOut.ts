@@ -1,5 +1,6 @@
 import { createAction } from "@reduxjs/toolkit";
 import { createHashHistory } from "history";
+import { socket } from "~app/App";
 import { AppThunk } from "~app/store";
 import { Logger } from "~utils/logger";
 
@@ -13,5 +14,6 @@ export function signOut(): AppThunk {
     Logger.getInstance().resetLogs();
     dispatch(resetReduxStore());
     createHashHistory().replace("/");
+    socket.stop();
   };
 }
