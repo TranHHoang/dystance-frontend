@@ -5,7 +5,7 @@ import moment from "moment";
 import { AppThunk } from "~app/store";
 import { ErrorResponse, post, get, fetchAllUsers } from "~utils/index";
 import { UserTableInfo } from "../StudentTeacherTable";
-
+import fs from "fs";
 interface StudentListState {
   students: UserTableInfo[];
   isLoading: boolean;
@@ -151,6 +151,18 @@ export function deleteStudents(userIds: string[]): AppThunk {
       }
       if (data.failed.length > 0) {
         dispatch(removeStudentsFromListFailed(data.failed));
+        const errors: ErrorResponse[] = _.map(data.failed, "message");
+        if (errors.length > 5) {
+          const folderName = `./errors/students`;
+          if (!fs.existsSync(folderName)) {
+            fs.mkdirSync(folderName, { recursive: true });
+          }
+          fs.writeFile(`./errors/students/${moment().format("YYYY-MM-DD")}.txt`, errors.join("\n"), (err) => {
+            if (err) {
+              console.log(err);
+            }
+          });
+        }
         dispatch(showStudentList());
       }
     } catch (e) {
@@ -189,6 +201,18 @@ export function updateStudents(students: UserTableInfo[]): AppThunk {
       }
       if (data.failed.length > 0) {
         dispatch(updateStudentListFailed(data.failed));
+        const errors: ErrorResponse[] = _.map(data.failed, "message");
+        if (errors.length > 5) {
+          const folderName = `./errors/students`;
+          if (!fs.existsSync(folderName)) {
+            fs.mkdirSync(folderName, { recursive: true });
+          }
+          fs.writeFile(`./errors/students/${moment().format("YYYY-MM-DD")}.txt`, errors.join("\n"), (err) => {
+            if (err) {
+              console.log(err);
+            }
+          });
+        }
         dispatch(showStudentList());
       }
     } catch (e) {

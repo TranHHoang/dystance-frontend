@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import _ from "lodash";
+import fs from "fs";
+import moment from "moment";
 import { AppThunk } from "~app/store";
 import { get, post, ErrorResponse, fetchAllUsers } from "~utils/index";
 
@@ -111,6 +113,18 @@ export function importExcelFile(file: File): AppThunk {
       dispatch(setLoadingState(false));
       if (data.failed.length > 0) {
         dispatch(setAccountsError(data.failed));
+        const errors: ErrorResponse[] = _.map(data.failed, "message");
+        if (errors.length > 5) {
+          const folderName = `./errors/qa-am-accounts`;
+          if (!fs.existsSync(folderName)) {
+            fs.mkdirSync(folderName, { recursive: true });
+          }
+          fs.writeFile(`./errors/qa-am-accounts/${moment().format("YYYY-MM-DD")}.txt`, errors.join("\n"), (err) => {
+            if (err) {
+              console.log(err);
+            }
+          });
+        }
       }
       dispatch(fetchAllAccounts());
       await fetchAllUsers();
@@ -179,6 +193,18 @@ export function updateExistingAccounts(accounts: Account[]): AppThunk {
       }
       if (data.failed.length > 0) {
         dispatch(setAccountsError(data.failed));
+        const errors: ErrorResponse[] = _.map(data.failed, "message");
+        if (errors.length > 5) {
+          const folderName = `./errors/qa-am-accounts`;
+          if (!fs.existsSync(folderName)) {
+            fs.mkdirSync(folderName, { recursive: true });
+          }
+          fs.writeFile(`./errors/qa-am-accounts/${moment().format("YYYY-MM-DD")}.txt`, errors.join("\n"), (err) => {
+            if (err) {
+              console.log(err);
+            }
+          });
+        }
         dispatch(fetchAllAccounts());
       }
     } catch (e) {

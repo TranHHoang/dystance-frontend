@@ -3,6 +3,8 @@ import { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
 import { get, post, ErrorResponse } from "~utils/index";
+import fs from "fs";
+import moment from "moment";
 
 export interface Semester {
   id: string;
@@ -112,6 +114,18 @@ export function addNewSemester(name: string, file: File): AppThunk {
       const data = (await post("/semesters/add", form)).data;
       if (data.failed.length > 0) {
         dispatch(addSemesterFailed(data.failed));
+        const errors: ErrorResponse[] = _.map(data.failed, "message");
+        if (errors.length > 5) {
+          const folderName = `./errors/semesters/${name}`;
+          if (!fs.existsSync(folderName)) {
+            fs.mkdirSync(folderName, { recursive: true });
+          }
+          fs.writeFile(`./errors/semesters/${name}/${moment().format("YYYY-MM-DD")}.txt`, errors.join("\n"), (err) => {
+            if (err) {
+              console.log(err);
+            }
+          });
+        }
       }
       dispatch(addSemester(data.success));
     } catch (e) {
@@ -149,6 +163,18 @@ export function updateExistingSemester(semester: Semester): AppThunk {
       const data = (await post("/semesters/update", fd)).data;
       if (data.failed.length > 0) {
         dispatch(updateSemesterFailed(data.failed));
+        const errors: ErrorResponse[] = _.map(data.failed, "message");
+        if (errors.length > 5) {
+          const folderName = `./errors/semesters/${name}`;
+          if (!fs.existsSync(folderName)) {
+            fs.mkdirSync(folderName, { recursive: true });
+          }
+          fs.writeFile(`./errors/semesters/${name}/${moment().format("YYYY-MM-DD")}.txt`, errors.join("\n"), (err) => {
+            if (err) {
+              console.log(err);
+            }
+          });
+        }
       }
       dispatch(updateSemester(data.success));
     } catch (e) {

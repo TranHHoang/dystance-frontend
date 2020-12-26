@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import _ from "lodash";
+import fs from "fs";
+import moment from "moment";
 import { AppThunk } from "~app/store";
 import { get, post, ErrorResponse } from "~utils/index";
 
@@ -143,6 +145,18 @@ export function updateExistingClasses(semesterId: string, classes: Class[]): App
       }
       if (data.failed.length > 0) {
         dispatch(updateClassesFailed(data.failed));
+        const errors: ErrorResponse[] = _.map(data.failed, "message");
+        if (errors.length > 5) {
+          const folderName = `./errors/classes`;
+          if (!fs.existsSync(folderName)) {
+            fs.mkdirSync(folderName, { recursive: true });
+          }
+          fs.writeFile(`./errors/classes/${moment().format("YYYY-MM-DD")}.txt`, errors.join("\n"), (err) => {
+            if (err) {
+              console.log(err);
+            }
+          });
+        }
         dispatch(fetchAllClasses(semesterId));
       }
     } catch (e) {

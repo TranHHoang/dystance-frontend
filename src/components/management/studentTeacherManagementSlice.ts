@@ -1,11 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import _ from "lodash";
+import fs from "fs";
 import { AppThunk } from "~app/store";
 import { ErrorResponse, post, fetchAllUsers } from "~utils/index";
 import { showStudentList } from "./student/StudentListSlice";
 import { FileUploadFormValues } from "./StudentTeacherManagement";
 import { showTeacherList } from "./teacher/teacherListSlice";
+import moment from "moment";
 
 interface StudentTeacherManagementState {
   isLoading: boolean;
@@ -54,7 +56,6 @@ export function uploadFile({ file }: FileUploadFormValues): AppThunk {
     dispatch(startFileUpload());
     try {
       const form = new FormData();
-      form.append("name", name);
       form.append("file", file);
 
       const data = (await post("/users/accounts", form)).data;
@@ -64,6 +65,22 @@ export function uploadFile({ file }: FileUploadFormValues): AppThunk {
       }
       if (data.failed.length > 0) {
         dispatch(fileUploadFailed(data.failed));
+        const errors: ErrorResponse[] = _.map(data.failed, "message");
+        if (errors.length > 5) {
+          const folderName = `./errors/student-teacher-accounts`;
+          if (!fs.existsSync(folderName)) {
+            fs.mkdirSync(folderName, { recursive: true });
+          }
+          fs.writeFile(
+            `./errors/student-teacher-accounts/${moment().format("YYYY-MM-DD")}.txt`,
+            errors.join("\n"),
+            (err) => {
+              if (err) {
+                console.log(err);
+              }
+            }
+          );
+        }
       }
       dispatch(showStudentList());
       dispatch(showTeacherList());
