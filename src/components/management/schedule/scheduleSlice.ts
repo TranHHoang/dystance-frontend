@@ -149,9 +149,7 @@ export function updateExistingSchedules(semesterId: string, schedules: Schedule[
         dispatch(updateSchedules(data.success));
       }
       if (data.failed.length > 0) {
-        _.forEach(data.failed, (error: ErrorResponse) => {
-          dispatch(updateSchedulesFailed(error));
-        });
+        dispatch(updateSchedulesFailed(data.failed));
         dispatch(fetchAllSchedule(semesterId));
       }
     } catch (e) {

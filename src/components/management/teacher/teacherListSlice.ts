@@ -152,9 +152,7 @@ export function updateTeachers(teachers: UserTableInfo[]): AppThunk {
         await fetchAllUsers();
       }
       if (data.failed.length > 0) {
-        _.forEach(data.failed, (error: ErrorResponse) => {
-          dispatch(updateTeacherListFailed(error));
-        });
+        dispatch(updateTeacherListFailed(data.failed));
         dispatch(showTeacherList());
       }
     } catch (e) {
@@ -190,10 +188,7 @@ export function deleteTeachers(userIds: string[]): AppThunk {
         await fetchAllUsers();
       }
       if (data.failed.length > 0) {
-        _.forEach(data.failed, (error: ErrorResponse) => {
-          console.log(error);
-          dispatch(removeTeacherListFailed(error));
-        });
+        dispatch(removeTeacherListFailed(data.failed));
         dispatch(showTeacherList());
       }
     } catch (e) {

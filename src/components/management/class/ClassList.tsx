@@ -44,7 +44,11 @@ const StyledTextField = styled(TextField)`
 const StyledNotifications = styled(Notification)`
   position: absolute;
   top: 50px;
+  z-index: 100;
   right: 20px;
+  max-height: 200px;
+  overflow: auto;
+  width: 700px;
   p {
     font-size: 16px;
     color: ${(props) => props.theme.rainbow.palette.text.main};

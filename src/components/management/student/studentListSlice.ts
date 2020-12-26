@@ -150,10 +150,7 @@ export function deleteStudents(userIds: string[]): AppThunk {
         await fetchAllUsers();
       }
       if (data.failed.length > 0) {
-        _.forEach(data.failed, (error: ErrorResponse) => {
-          console.log(error);
-          dispatch(removeStudentsFromListFailed(error));
-        });
+        dispatch(removeStudentsFromListFailed(data.failed));
         dispatch(showStudentList());
       }
     } catch (e) {
@@ -191,9 +188,7 @@ export function updateStudents(students: UserTableInfo[]): AppThunk {
         await fetchAllUsers();
       }
       if (data.failed.length > 0) {
-        _.forEach(data.failed, (error: ErrorResponse) => {
-          dispatch(updateStudentListFailed(error));
-        });
+        dispatch(updateStudentListFailed(data.failed));
         dispatch(showStudentList());
       }
     } catch (e) {

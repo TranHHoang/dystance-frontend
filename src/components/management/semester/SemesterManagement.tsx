@@ -22,6 +22,7 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as Yup from "yup";
 import moment from "moment";
+import { ErrorResponse } from "~utils/index";
 
 const Title = styled.h1`
   font-size: 2.5em;
@@ -45,9 +46,14 @@ const StyledHeader = styled.header`
 const StyledNotifications = styled(Notification)`
   position: absolute;
   top: 20px;
+  z-index: 100;
   right: 20px;
+  max-height: 200px;
+  overflow: auto;
+  width: 700px;
   p {
     font-size: 16px;
+    color: ${(props) => props.theme.rainbow.palette.text.main};
   }
   h1 {
     font-size: 20px;
@@ -59,12 +65,11 @@ const SemesterManagement = () => {
   const dispatch = useDispatch();
   const semesters = semesterState.semesters.map((s) => ({
     ...s,
-    lastUpdate: moment(s.lastUpdated).format("YYYY-MM-DD HH:mm")
+    lastUpdate: moment.utc(s.lastUpdated).local().calendar()
   }));
   const [selectedSemesterId, setSelectedSemesterId] = useState("");
   const [rejectFile, setRejectFile] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
-
   useEffect(() => {
     dispatch(fetchAllSemesters());
     return () => {
@@ -184,11 +189,13 @@ const SemesterManagement = () => {
           icon="error"
         />
       ) : null}
-      {semesterState.error ? (
+      {semesterState.errors && semesterState.errors?.length > 0 ? (
         <StyledNotifications
           title="Error"
           onRequestClose={() => dispatch(resetSemesterError())}
-          description={semesterState.error.message}
+          description={_.map(semesterState.errors, (error: ErrorResponse) => (
+            <p>{error?.message}</p>
+          ))}
           icon="error"
         />
       ) : null}
