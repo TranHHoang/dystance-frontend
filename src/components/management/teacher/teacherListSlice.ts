@@ -2,6 +2,7 @@ import { createSlice, current, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import _ from "lodash";
 import moment from "moment";
+import fs from "fs";
 import { AppThunk } from "~app/store";
 import { get, ErrorResponse, post, fetchAllUsers } from "~utils/index";
 import { UserTableInfo } from "../StudentTeacherTable";
@@ -152,9 +153,19 @@ export function updateTeachers(teachers: UserTableInfo[]): AppThunk {
         await fetchAllUsers();
       }
       if (data.failed.length > 0) {
-        _.forEach(data.failed, (error: ErrorResponse) => {
-          dispatch(updateTeacherListFailed(error));
-        });
+        dispatch(updateTeacherListFailed(data.failed));
+        const errors: ErrorResponse[] = _.map(data.failed, "message");
+        if (errors.length > 5) {
+          const folderName = `./errors/teachers`;
+          if (!fs.existsSync(folderName)) {
+            fs.mkdirSync(folderName, { recursive: true });
+          }
+          fs.writeFile(`./errors/teachers/${moment().format("YYYY-MM-DD")}.txt`, errors.join("\n"), (err) => {
+            if (err) {
+              console.log(err);
+            }
+          });
+        }
         dispatch(showTeacherList());
       }
     } catch (e) {
@@ -190,10 +201,19 @@ export function deleteTeachers(userIds: string[]): AppThunk {
         await fetchAllUsers();
       }
       if (data.failed.length > 0) {
-        _.forEach(data.failed, (error: ErrorResponse) => {
-          console.log(error);
-          dispatch(removeTeacherListFailed(error));
-        });
+        dispatch(removeTeacherListFailed(data.failed));
+        const errors: ErrorResponse[] = _.map(data.failed, "message");
+        if (errors.length > 5) {
+          const folderName = `./errors/teachers`;
+          if (!fs.existsSync(folderName)) {
+            fs.mkdirSync(folderName, { recursive: true });
+          }
+          fs.writeFile(`./errors/teachers/${moment().format("YYYY-MM-DD")}.txt`, errors.join("\n"), (err) => {
+            if (err) {
+              console.log(err);
+            }
+          });
+        }
         dispatch(showTeacherList());
       }
     } catch (e) {

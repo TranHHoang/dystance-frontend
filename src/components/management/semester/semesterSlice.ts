@@ -3,6 +3,8 @@ import { AxiosError } from "axios";
 import _ from "lodash";
 import { AppThunk } from "~app/store";
 import { get, post, ErrorResponse } from "~utils/index";
+import fs from "fs";
+import moment from "moment";
 
 export interface Semester {
   id: string;
@@ -12,11 +14,12 @@ export interface Semester {
 }
 interface SemesterState {
   semesters: Semester[];
-  error?: ErrorResponse;
+  errors?: ErrorResponse[];
 }
 
 const initialState: SemesterState = {
-  semesters: []
+  semesters: [],
+  errors: []
 };
 
 const semesterSlice = createSlice({
@@ -37,19 +40,19 @@ const semesterSlice = createSlice({
       state.semesters = _.reject(state.semesters, ({ id }) => action.payload.includes(id));
     },
     setSemestersFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     addSemesterFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     updateSemesterFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     removeSemestersFailed(state, action: PayloadAction<ErrorResponse>) {
-      state.error = action.payload;
+      state.errors = state.errors.concat(action.payload);
     },
     resetSemesterError(state) {
-      state.error = undefined;
+      state.errors = [];
     },
     resetSemesterState() {
       return initialState;
@@ -109,7 +112,22 @@ export function addNewSemester(name: string, file: File): AppThunk {
       form.append("file", file);
 
       const data = (await post("/semesters/add", form)).data;
-      dispatch(addSemester(data));
+      if (data.failed.length > 0) {
+        dispatch(addSemesterFailed(data.failed));
+        const errors: ErrorResponse[] = _.map(data.failed, "message");
+        if (errors.length > 5) {
+          const folderName = `./errors/semesters/${name}`;
+          if (!fs.existsSync(folderName)) {
+            fs.mkdirSync(folderName, { recursive: true });
+          }
+          fs.writeFile(`./errors/semesters/${name}/${moment().format("YYYY-MM-DD")}.txt`, errors.join("\n"), (err) => {
+            if (err) {
+              console.log(err);
+            }
+          });
+        }
+      }
+      dispatch(addSemester(data.success));
     } catch (e) {
       const ex = e as AxiosError;
 
@@ -143,7 +161,22 @@ export function updateExistingSemester(semester: Semester): AppThunk {
       fd.append("name", semester.name);
       fd.append("file", semester.file);
       const data = (await post("/semesters/update", fd)).data;
-      dispatch(updateSemester(data));
+      if (data.failed.length > 0) {
+        dispatch(updateSemesterFailed(data.failed));
+        const errors: ErrorResponse[] = _.map(data.failed, "message");
+        if (errors.length > 5) {
+          const folderName = `./errors/semesters/${name}`;
+          if (!fs.existsSync(folderName)) {
+            fs.mkdirSync(folderName, { recursive: true });
+          }
+          fs.writeFile(`./errors/semesters/${name}/${moment().format("YYYY-MM-DD")}.txt`, errors.join("\n"), (err) => {
+            if (err) {
+              console.log(err);
+            }
+          });
+        }
+      }
+      dispatch(updateSemester(data.success));
     } catch (e) {
       const ex = e as AxiosError;
 

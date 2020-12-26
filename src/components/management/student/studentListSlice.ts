@@ -5,7 +5,7 @@ import moment from "moment";
 import { AppThunk } from "~app/store";
 import { ErrorResponse, post, get, fetchAllUsers } from "~utils/index";
 import { UserTableInfo } from "../StudentTeacherTable";
-
+import fs from "fs";
 interface StudentListState {
   students: UserTableInfo[];
   isLoading: boolean;
@@ -150,10 +150,19 @@ export function deleteStudents(userIds: string[]): AppThunk {
         await fetchAllUsers();
       }
       if (data.failed.length > 0) {
-        _.forEach(data.failed, (error: ErrorResponse) => {
-          console.log(error);
-          dispatch(removeStudentsFromListFailed(error));
-        });
+        dispatch(removeStudentsFromListFailed(data.failed));
+        const errors: ErrorResponse[] = _.map(data.failed, "message");
+        if (errors.length > 5) {
+          const folderName = `./errors/students`;
+          if (!fs.existsSync(folderName)) {
+            fs.mkdirSync(folderName, { recursive: true });
+          }
+          fs.writeFile(`./errors/students/${moment().format("YYYY-MM-DD")}.txt`, errors.join("\n"), (err) => {
+            if (err) {
+              console.log(err);
+            }
+          });
+        }
         dispatch(showStudentList());
       }
     } catch (e) {
@@ -191,9 +200,19 @@ export function updateStudents(students: UserTableInfo[]): AppThunk {
         await fetchAllUsers();
       }
       if (data.failed.length > 0) {
-        _.forEach(data.failed, (error: ErrorResponse) => {
-          dispatch(updateStudentListFailed(error));
-        });
+        dispatch(updateStudentListFailed(data.failed));
+        const errors: ErrorResponse[] = _.map(data.failed, "message");
+        if (errors.length > 5) {
+          const folderName = `./errors/students`;
+          if (!fs.existsSync(folderName)) {
+            fs.mkdirSync(folderName, { recursive: true });
+          }
+          fs.writeFile(`./errors/students/${moment().format("YYYY-MM-DD")}.txt`, errors.join("\n"), (err) => {
+            if (err) {
+              console.log(err);
+            }
+          });
+        }
         dispatch(showStudentList());
       }
     } catch (e) {

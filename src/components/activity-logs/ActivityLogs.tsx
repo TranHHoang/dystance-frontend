@@ -53,6 +53,10 @@ const StyledNotifications = styled(Notification)`
   position: absolute;
   top: 20px;
   right: 20px;
+  z-index: 100;
+  max-height: 200px;
+  overflow: auto;
+  width: 700px;
   p {
     font-size: 16px;
   }

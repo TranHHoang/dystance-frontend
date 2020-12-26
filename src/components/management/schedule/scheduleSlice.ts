@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import _ from "lodash";
 import moment from "moment";
+import fs from "fs";
 import { AppThunk } from "~app/store";
 import { get, post, ErrorResponse } from "~utils/index";
 
@@ -149,9 +150,19 @@ export function updateExistingSchedules(semesterId: string, schedules: Schedule[
         dispatch(updateSchedules(data.success));
       }
       if (data.failed.length > 0) {
-        _.forEach(data.failed, (error: ErrorResponse) => {
-          dispatch(updateSchedulesFailed(error));
-        });
+        dispatch(updateSchedulesFailed(data.failed));
+        const errors: ErrorResponse[] = _.map(data.failed, "message");
+        if (errors.length > 5) {
+          const folderName = `./errors/schedules`;
+          if (!fs.existsSync(folderName)) {
+            fs.mkdirSync(folderName, { recursive: true });
+          }
+          fs.writeFile(`./errors/schedules/${moment().format("YYYY-MM-DD")}.txt`, errors.join("\n"), (err) => {
+            if (err) {
+              console.log(err);
+            }
+          });
+        }
         dispatch(fetchAllSchedule(semesterId));
       }
     } catch (e) {

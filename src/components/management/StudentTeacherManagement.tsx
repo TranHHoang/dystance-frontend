@@ -1,12 +1,14 @@
 import StudentList from "./student/StudentList";
 import TeacherList from "./teacher/TeacherList";
 import React, { useRef, useState } from "react";
-import { Tabset, Tab, Button, FileSelector } from "react-rainbow-components";
+import { Tabset, Tab, Button, FileSelector, Notification } from "react-rainbow-components";
 import styled from "styled-components";
 import { Field, Form, Formik, FormikProps } from "formik";
 import { RootState } from "~app/rootReducer";
 import { useDispatch, useSelector } from "react-redux";
-import { uploadFile } from "./studentTeacherManagementSlice";
+import { resetFileUploadError, uploadFile } from "./studentTeacherManagementSlice";
+import _ from "lodash";
+import { ErrorResponse } from "~utils/index";
 
 const Title = styled.h1`
   font-size: 2.5em;
@@ -18,7 +20,23 @@ export const Container = styled.div`
   padding: 20px;
   width: 100%;
 `;
-
+const StyledNotifications = styled(Notification)`
+  position: absolute;
+  top: 50px;
+  right: 20px;
+  z-index: 100;
+  max-height: 200px;
+  overflow: auto;
+  width: 700px;
+  p {
+    font-size: 16px;
+    color: ${(props) => props.theme.rainbow.palette.text.main};
+  }
+  h1 {
+    font-size: 18px;
+  }
+  width: 30%;
+`;
 const StyledTab = styled(Tab)`
   button {
     font-size: 16px;
@@ -154,6 +172,16 @@ const StudentTeacherManagement = () => {
         </Tabset>
         {getTabContent()}
       </Container>
+      {studentTeacherManagementState.errors && studentTeacherManagementState.errors?.length > 0 ? (
+        <StyledNotifications
+          title="Error"
+          onRequestClose={() => dispatch(resetFileUploadError())}
+          description={_.map(studentTeacherManagementState.errors, (error: ErrorResponse) => (
+            <p>{error?.message}</p>
+          ))}
+          icon="error"
+        />
+      ) : null}
     </>
   );
 };
