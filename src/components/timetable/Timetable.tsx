@@ -21,7 +21,7 @@ const StyledWeeklyCalendar = styled(WeeklyCalendar)`
 const Title = styled.h1`
   font-size: 2.5em;
   font-weight: 500;
-  color: white;
+  /* color: white; */
   padding-right: 20px;
 `;
 

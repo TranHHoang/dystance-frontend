@@ -17,15 +17,15 @@ const StyledChatBox = styled.div`
   align-items: center;
   align-self: center;
   align-content: space-around;
-  background-color: rgb(90, 90, 90);
+  /* background-color: rgb(90, 90, 90); */
   padding: 2 5 2 5;
   border-radius: 5px;
   width: 100%;
   input {
     flex: 1;
     border: none;
-    background-color: rgb(90, 90, 90);
-    color: white;
+    background-color: transparent;
+    /* color: white; */
     padding: 5px;
     font-size: 16px;
     margin-left: 10px;
@@ -39,11 +39,11 @@ const StyledChatBox = styled.div`
 
   svg {
     font-size: 24px;
-    color: white;
+    /* color: white; */
     margin: 10px;
     :hover {
       cursor: pointer;
-      color: rgba(255, 255, 255, 0.7);
+      color: rgba(0, 0, 0, 0.7);
     }
   }
 `;

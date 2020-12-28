@@ -40,7 +40,7 @@ const StyledFileLink = styled.a`
 const StyledText = styled.p`
   font-size: 16px;
   word-break: break-all;
-  color: white;
+  /* color: white; */
   a {
     color: #00b0f4;
   }

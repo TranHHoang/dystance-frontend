@@ -27,7 +27,7 @@ import { ErrorResponse } from "~utils/index";
 const Title = styled.h1`
   font-size: 2.5em;
   font-weight: 500;
-  color: white;
+  /* color: white; */
   padding-right: 20px;
 `;
 
@@ -39,7 +39,7 @@ const StyledHeader = styled.header`
   span {
     align-self: center;
     font-size: 16px;
-    color: white;
+    /* color: white; */
   }
 `;
 

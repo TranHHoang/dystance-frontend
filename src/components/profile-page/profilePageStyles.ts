@@ -32,7 +32,7 @@ export const StyledCard = styled(Card)`
 export const Title = styled.h1`
   font-size: 2.25em;
   font-weight: 400;
-  color: white;
+  /* color: white; */
   padding-bottom: 20px;
 `;
 export const StyledFileSelector = styled(FileSelector)`

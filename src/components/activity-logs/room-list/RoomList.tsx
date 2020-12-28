@@ -22,7 +22,7 @@ import {
 const Title = styled.h1`
   font-size: 2.5em;
   font-weight: 500;
-  color: white;
+  /* color: white; */
   padding-right: 20px;
 `;
 
@@ -38,7 +38,7 @@ const SemesterSelectionDiv = styled.div`
 `;
 const SelectSemesterText = styled.p`
   font-size: 1.75em;
-  color: white;
+  /* color: white; */
   margin-right: 20px;
 `;
 const StyledDiv = styled.div`
@@ -83,10 +83,10 @@ const theme = createMuiTheme({
     type: "dark",
     primary: {
       main: "#4ecca3",
-      contrastText: "#36393f"
+      contrastText: "#fff"
     },
     background: {
-      paper: "#36393f"
+      paper: "#fff"
     },
     secondary: {
       main: "#4ecca3"

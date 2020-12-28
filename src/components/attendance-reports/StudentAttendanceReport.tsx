@@ -13,7 +13,7 @@ import Table from "./Table";
 const Title = styled.h1`
   font-size: 2.5em;
   font-weight: 500;
-  color: white;
+  /* color: white; */
   padding-right: 20px;
 `;
 const StyledNotifications = styled(Notification)`
@@ -34,9 +34,9 @@ const StyledNotifications = styled(Notification)`
 `;
 const theme = createMuiTheme({
   palette: {
-    type: "dark",
+    type: "light",
     background: {
-      paper: "#36393f"
+      paper: "#fff"
     },
     secondary: {
       main: "#4ecca3"

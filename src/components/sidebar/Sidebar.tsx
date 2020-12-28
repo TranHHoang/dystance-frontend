@@ -61,7 +61,7 @@ const SidebarItemContainer = styled.div`
   margin-bottom: 20px;
 `;
 const StyledIcon = styled(FontAwesomeIcon)`
-  color: white;
+  /* color: white; */
 `;
 const StyledAvatarMenu = styled(AvatarMenu)`
   display: flex;

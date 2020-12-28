@@ -16,7 +16,7 @@ import { setSelectedRoom } from "./room-list/roomListSlice";
 const Title = styled.h1`
   font-size: 2.5em;
   font-weight: 500;
-  color: white;
+  /* color: white; */
   padding-right: 20px;
 `;
 
@@ -45,7 +45,7 @@ const StyledHeader = styled.header`
   span {
     align-self: center;
     font-size: 16px;
-    color: white;
+    /* color: white; */
   }
 `;
 
@@ -71,10 +71,10 @@ const theme = createMuiTheme({
     type: "dark",
     primary: {
       main: "#4ecca3",
-      contrastText: "#36393f"
+      contrastText: "#fff"
     },
     background: {
-      paper: "#36393f"
+      paper: "#fff"
     },
     secondary: {
       main: "#4ecca3"

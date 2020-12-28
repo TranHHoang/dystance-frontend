@@ -97,7 +97,7 @@ const NormalButton = styled(Button)`
     height: 24px;
   }
   height: 50px;
-  color: white;
+  /* color: white; */
   transition: 0.2s;
   min-width: 64px;
   :hover {

@@ -12,13 +12,13 @@ const StyledDiv = styled.div`
 
 const theme = createMuiTheme({
   palette: {
-    type: "dark",
+    type: "light",
     primary: {
       main: "#4ecca3",
-      contrastText: "#36393f"
+      contrastText: "#fff"
     },
     background: {
-      paper: "#36393f"
+      paper: "#fff"
     },
     secondary: {
       main: "#4ecca3"
@@ -27,7 +27,7 @@ const theme = createMuiTheme({
   overrides: {
     MuiTableCell: {
       root: {
-        color: "#fff !important"
+        // color: "#fff !important"
       }
     }
   }
@@ -68,8 +68,8 @@ const Table = (props: TableProps) => {
           data={data}
           options={{
             rowStyle: {
-              color: "white",
-              fontSize: "16px"
+              // color: "white",
+              fontSize: "18px"
             },
             minBodyHeight: "70vh",
             maxBodyHeight: "70vh",

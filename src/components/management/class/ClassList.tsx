@@ -31,7 +31,7 @@ const StyledHeader = styled.header`
   span {
     align-self: center;
     font-size: 16px;
-    color: white;
+    /* color: white; */
   }
 `;
 

@@ -10,7 +10,7 @@ const theme = {
   rainbow: {
     palette: {
       brand: "#4ecca3",
-      mainBackground: "#36393f"
+      mainBackground: "#fff"
     }
   }
 };

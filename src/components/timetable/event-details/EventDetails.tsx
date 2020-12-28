@@ -35,7 +35,7 @@ const StyledIcon = styled.span`
   align-items: center;
   background-color: ${(props) => props.theme.rainbow.palette.background.secondary};
   svg {
-    color: white;
+    /* color: white; */
   }
 `;
 
