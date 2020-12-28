@@ -12,7 +12,6 @@ import { socket } from "~app/App";
 
 let whiteboardId;
 let allowWhiteboard = false;
-const myUsername = (getLoginData() || {}).userName;
 
 function main(roomId) {
   whiteboardId = roomId;
@@ -95,7 +94,7 @@ function initWhiteboard() {
     whiteboard.loadWhiteboard("#whiteboardContainer", {
       //Load the whiteboard
       whiteboardId: whiteboardId,
-      username: btoa(myUsername),
+      username: btoa(getLoginData().userName),
       sendFunction: function (content) {
         if (ReadOnlyService.readOnlyActive) return;
         socket.invoke("DrawToWhiteboard", whiteboardId, JSON.stringify(content));
