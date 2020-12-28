@@ -17,6 +17,10 @@ const StyledWeeklyCalendar = styled(WeeklyCalendar)`
   font-size: 16px;
   padding: 1rem;
   height: 88vh;
+  h3 {
+    color: black;
+    font-weight: 500;
+  }
 `;
 const Title = styled.h1`
   font-size: 2.5em;

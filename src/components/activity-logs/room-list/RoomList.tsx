@@ -57,6 +57,7 @@ export const StyledButton = styled(Button)`
   align-self: center;
   width: 100%;
   max-width: 250px;
+  color: black;
 `;
 const ActionContainer = styled.div`
   display: flex;
@@ -80,7 +81,7 @@ const StyledNotifications = styled(Notification)`
 
 const theme = createMuiTheme({
   palette: {
-    type: "dark",
+    type: "light",
     primary: {
       main: "#4ecca3",
       contrastText: "#fff"
@@ -100,7 +101,7 @@ const theme = createMuiTheme({
     },
     MuiTableCell: {
       root: {
-        color: "#fff !important"
+        // color: "#fff !important"
       }
     }
   }
@@ -202,8 +203,8 @@ const RoomList = () => {
               isLoading={roomListState.isLoading}
               options={{
                 rowStyle: {
-                  color: "white",
-                  fontSize: "16px"
+                  // color: "white",
+                  fontSize: "18px"
                 },
                 minBodyHeight: "70vh",
                 maxBodyHeight: "70vh",

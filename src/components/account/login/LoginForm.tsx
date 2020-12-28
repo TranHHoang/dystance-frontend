@@ -128,8 +128,6 @@ const LoginForm = () => {
   return (
     <BackgroundContainer>
       <Container>
-        <Title>Sign in</Title>
-
         <StyledCard>
           {loginState.error && loginState.error.type !== LoginError.EmailIsNotConfirmed && (
             <StyledNotification title={loginState.error.message} hideCloseButton={true} icon="error" />
@@ -138,7 +136,7 @@ const LoginForm = () => {
             <StyledNotification title="Login successful. Redirecting..." hideCloseButton={true} icon="success" />
           )}
           {resendEmailSection}
-
+          <Title>Sign in</Title>
           <Formik initialValues={initialValues} validationSchema={validateSchema} onSubmit={onSubmit}>
             {({ errors, touched }: FormikProps<LoginFormValues>) => (
               <StyledForm>

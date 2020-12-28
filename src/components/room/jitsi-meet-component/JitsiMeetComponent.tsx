@@ -27,7 +27,7 @@ const StyledSpinner = styled(Spinner)`
 `;
 const StyledClock = styled.div`
   position: absolute;
-  background-color: #fff;
+  background-color: #36393f;
   color: rgba(78, 204, 163, 1);
   font-size: 18px;
   padding: 8px;

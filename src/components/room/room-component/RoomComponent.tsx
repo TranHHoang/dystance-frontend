@@ -46,13 +46,13 @@ const StyledText = styled.p`
 `;
 
 const StyledHeader = styled.h1`
-  color: rgba(178, 178, 178, 1);
+  color: black;
   margin: 0 1.25rem;
   padding: 1.375rem 0 1.325rem;
   display: block;
   box-sizing: border-box;
   font-family: "Lato Light";
-  font-weight: 300;
+  font-weight: 600;
   font-size: 1.5rem;
   font-stretch: normal;
   font-style: normal;
@@ -92,6 +92,7 @@ const NormalButton = styled(Button)`
   padding-top: 10px;
   padding-bottom: 10px;
   border: 0;
+  background-color: #36393f;
   svg {
     width: 24px;
     height: 24px;
@@ -455,7 +456,7 @@ const RoomComponent = (props: any) => {
             <StyleTitle>
               {remoteInitiatorInfo?.realName} ({remoteInitiatorInfo?.userName})
             </StyleTitle>
-            <StyleSubTitle>wants to gain access to your computer for a bit. Do you accept?</StyleSubTitle>
+            <StyleSubTitle>wants to control your computer. Do you accept?</StyleSubTitle>
           </InfoContainer>
         </div>
       </StyledModal>

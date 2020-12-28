@@ -30,8 +30,10 @@ const StyledAvatar = styled.img`
 
 const StyledPreview = styled.div`
   padding: 20px 20px;
+  transition: 0.2s;
   :hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: lightgray;
+    /* filter: brightness(80%); */
     cursor: pointer;
   }
 `;
@@ -61,7 +63,7 @@ const Container = styled.div`
 `;
 const Title = styled.h1`
   font-size: 2.5em;
-  font-weight: 500;
+  font-weight: 600;
   /* color: white; */
   padding-right: 20px;
 `;

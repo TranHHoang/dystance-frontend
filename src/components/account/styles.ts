@@ -5,7 +5,8 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 export const BackgroundContainer = styled.div`
-  background-image: url("https://images.wallpaperscraft.com/image/minimalism_sky_clouds_sun_mountains_lake_landscape_95458_1920x1080.jpg");
+  /* background-image: url("https://images.wallpaperscraft.com/image/minimalism_sky_clouds_sun_mountains_lake_landscape_95458_1920x1080.jpg"); */
+  background-image: url("https://images.unsplash.com/photo-1512977851705-67ee4bf294f4?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=783&q=80");
   background-size: cover;
   height: 100%;
   overflow: auto;
